@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Data.Common;
 
 namespace TelegramBot;
 
@@ -27,7 +28,7 @@ class Program
         
         string selectSql = "SELECT * FROM users";
         var selectCmd = new SQLiteCommand(selectSql, connection);
-        var reader = await selectCmd.ExecuteReaderAsync();
+        DbDataReader reader = await selectCmd.ExecuteReaderAsync();
 
         while (await reader.ReadAsync())
         {
