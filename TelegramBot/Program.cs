@@ -17,7 +17,8 @@ class Program
         }
 
         string token = tokenVar;
-
-        Console.WriteLine("Hello, World!");
+        
+        Console.WriteLine($"Token length is {token.Length}");
+        
     }
 }
