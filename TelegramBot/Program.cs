@@ -32,8 +32,12 @@ class Program
             errorHandler: HandleErrorAsync,
             receiverOptions: receiverOptions,
             cancellationToken: cts.Token);
-        
-        
+
+        var me = await botClient.GetMe(cancellationToken: cts.Token);
+        Console.WriteLine($"Start listening @{me.Username}");
+        Console.ReadLine();
+
+        await cts.CancelAsync();
     }
 
     static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
