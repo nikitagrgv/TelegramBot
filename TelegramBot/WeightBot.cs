@@ -38,6 +38,7 @@ public class WeightBot
         {
             foreach (MessageEntity entity in entities)
             {
+                Console.WriteLine($"{entity.Offset} + {entity.Length}");
             }
         }
 
