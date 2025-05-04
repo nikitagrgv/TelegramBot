@@ -24,8 +24,9 @@ public class WeightBot
             receiverOptions: receiverOptions,
             cancellationToken: cts.Token);
 
-        var me = await botClient.GetMe(cancellationToken: cts.Token);
+        User me = await botClient.GetMe(cancellationToken: cts.Token);
         Console.WriteLine($"Start listening @{me.Username}");
+        
 
         cts.Token.WaitHandle.WaitOne();
     }
@@ -36,7 +37,7 @@ public class WeightBot
     {
         if (update.Message is not { Text: { } messageText }) return;
 
-        var chatId = update.Message.Chat.Id;
+        long chatId = update.Message.Chat.Id;
         await botClient.SendMessage(chatId, messageText, cancellationToken: cancellationToken);
     }
 
