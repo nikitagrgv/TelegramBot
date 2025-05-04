@@ -29,6 +29,7 @@ class Program
         string selectSql = "SELECT * FROM users";
         var selectCmd = new SQLiteCommand(selectSql, connection);
         DbDataReader reader = await selectCmd.ExecuteReaderAsync();
+        
 
         while (await reader.ReadAsync())
         {
