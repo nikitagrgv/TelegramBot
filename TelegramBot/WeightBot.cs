@@ -7,17 +7,9 @@ using Telegram.Bot.Types.Enums;
 
 public class WeightBot
 {
-    private string _token;
-
-    public WeightBot(string token)
+    public async Task Run(string token)
     {
-        _token = token;
-    }
-
-
-    public async Task Run()
-    {
-        var botClient = new TelegramBotClient(_token);
+        var botClient = new TelegramBotClient(token);
 
         using var cts = new CancellationTokenSource();
 
