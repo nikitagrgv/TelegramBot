@@ -1,4 +1,6 @@
-﻿namespace TelegramBot;
+﻿using System.Data;
+
+namespace TelegramBot;
 
 using System.Data.SQLite;
 
@@ -10,12 +12,27 @@ class Program
         string connectionString = $"Data Source={dbPath};Version=3;";
         var connection = new SQLiteConnection(connectionString);
         await connection.OpenAsync();
+
+        if (connection.State != ConnectionState.Open)
+        {
+            Console.WriteLine("Can't open the database");
+            return;
+        }
         
-        string insertSql = "INSERT INTO users (name, email) VALUES (@name, @email)";
-        var insertCmd = new SQLiteCommand(insertSql, connection);
-        insertCmd.Parameters.AddWithValue("@name", "Alice");
-        insertCmd.Parameters.AddWithValue("@email", "alice@example.com");
-        insertCmd.ExecuteNonQuery();
+        // string insertSql = "INSERT INTO users (name, email) VALUES (@name, @email)";
+        // var insertCmd = new SQLiteCommand(insertSql, connection);
+        // insertCmd.Parameters.AddWithValue("@name", "Alice");
+        // insertCmd.Parameters.AddWithValue("@email", "alice@example.com");
+        // insertCmd.ExecuteNonQuery();
+        
+        string selectSql = "SELECT * FROM users";
+        var selectCmd = new SQLiteCommand(selectSql, connection);
+        var reader = await selectCmd.ExecuteReaderAsync();
+
+        while (await reader.ReadAsync())
+        {
+            Console.WriteLine($"{reader["id"]}: {reader["name"]} - {reader["email"]}");
+        }
 
         return;
         
