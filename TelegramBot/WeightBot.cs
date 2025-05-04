@@ -34,6 +34,13 @@ public class WeightBot
     {
         if (update.Message is not { Text: { } messageText }) return;
 
+        if (update.Message.Entities is { } entities)
+        {
+            foreach (MessageEntity entity in entities)
+            {
+            }
+        }
+
         long chatId = update.Message.Chat.Id;
         await botClient.SendMessage(chatId, messageText, cancellationToken: cancellationToken);
     }
