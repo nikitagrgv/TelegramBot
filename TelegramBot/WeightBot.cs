@@ -18,17 +18,14 @@ public class WeightBot
             AllowedUpdates = [],
         };
 
-        botClient.StartReceiving(
+        User me = await botClient.GetMe(cancellationToken: cts.Token);
+        Console.WriteLine($"Start listening @{me.Username}");
+
+        await botClient.ReceiveAsync(
             updateHandler: HandleUpdateAsync,
             errorHandler: HandleErrorAsync,
             receiverOptions: receiverOptions,
             cancellationToken: cts.Token);
-
-        User me = await botClient.GetMe(cancellationToken: cts.Token);
-        Console.WriteLine($"Start listening @{me.Username}");
-        
-
-        cts.Token.WaitHandle.WaitOne();
     }
 
 
