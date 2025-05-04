@@ -35,9 +35,7 @@ class Program
 
         var me = await botClient.GetMe(cancellationToken: cts.Token);
         Console.WriteLine($"Start listening @{me.Username}");
-        Console.ReadLine();
-
-        await cts.CancelAsync();
+        
     }
 
     private static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
