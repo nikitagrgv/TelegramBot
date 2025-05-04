@@ -40,7 +40,7 @@ class Program
         await cts.CancelAsync();
     }
 
-    static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
+    private static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
         CancellationToken cancellationToken)
     {
         if (update.Message is not { Text: { } messageText }) return;
@@ -49,7 +49,7 @@ class Program
         await botClient.SendMessage(chatId, messageText, cancellationToken: cancellationToken);
     }
 
-    static Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
+    private static Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
         CancellationToken cancellationToken)
     {
         Console.WriteLine($"Error: {exception.Message}");
