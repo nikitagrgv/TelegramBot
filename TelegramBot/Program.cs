@@ -43,10 +43,16 @@ class Program
     static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
         CancellationToken cancellationToken)
     {
+        if (update.Message is not { Text: { } messageText }) return;
+
+        var chatId = update.Message.Chat.Id;
+        await botClient.SendMessage(chatId, messageText, cancellationToken: cancellationToken);
     }
 
-    static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
+    static Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
         CancellationToken cancellationToken)
     {
+        Console.WriteLine($"Error: {exception.Message}");
+        return Task.CompletedTask;
     }
 }
