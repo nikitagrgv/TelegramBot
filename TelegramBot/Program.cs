@@ -7,18 +7,42 @@ using Telegram.Bot.Types.Enums;
 
 class Program
 {
-    static void Main(string[] args)
+    static async Task Main()
     {
-        string? tokenVar = Environment.GetEnvironmentVariable("BOT_TOKEN");
-        if (string.IsNullOrEmpty(tokenVar))
+        string? token = Environment.GetEnvironmentVariable("BOT_TOKEN");
+        if (string.IsNullOrEmpty(token))
         {
             Console.WriteLine("Environment variable 'BOT_TOKEN' is not set");
             return;
         }
 
-        string token = tokenVar;
-        
         Console.WriteLine($"Token length is {token.Length}");
+
+        var botClient = new TelegramBotClient(token);
+
+        using var cts = new CancellationTokenSource();
+
+        var receiverOptions = new ReceiverOptions
+        {
+            AllowedUpdates = [],
+        };
+
+        botClient.StartReceiving(
+            updateHandler: HandleUpdateAsync,
+            errorHandler: HandleErrorAsync,
+            receiverOptions: receiverOptions,
+            cancellationToken: cts.Token);
         
+        
+    }
+
+    static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
+        CancellationToken cancellationToken)
+    {
+    }
+
+    static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
+        CancellationToken cancellationToken)
+    {
     }
 }
