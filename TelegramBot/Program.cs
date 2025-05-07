@@ -9,7 +9,7 @@ class Program
 {
     static async Task Main()
     {
-        string dbPath = @"C:\Users\nekita\Desktop\TelegramBot\identifier.sqlite";
+        string dbPath = @"database_v1.sqlite";
         string connectionString = $"Data Source={dbPath};Version=3;";
         var connection = new SQLiteConnection(connectionString);
         await connection.OpenAsync();
@@ -19,6 +19,8 @@ class Program
             Console.WriteLine("Can't open the database");
             return;
         }
+        
+        // TODO: check versions
         
         // string insertSql = "INSERT INTO users (name, email) VALUES (@name, @email)";
         // var insertCmd = new SQLiteCommand(insertSql, connection);
