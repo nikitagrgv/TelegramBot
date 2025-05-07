@@ -19,23 +19,28 @@ class Program
             Console.WriteLine("Can't open the database");
             return;
         }
-        
+
         // TODO: check versions
-        
-        
-        
-        
-        
+
+        string createUsersSql = @"
+CREATE TABLE IF NOT EXISTS users (
+    
+);
+";
+        var createUsersCmd = new SQLiteCommand(createUsersSql, connection);
+        createUsersCmd.ExecuteNonQuery();
+
+
         // string insertSql = "INSERT INTO users (name, email) VALUES (@name, @email)";
         // var insertCmd = new SQLiteCommand(insertSql, connection);
         // insertCmd.Parameters.AddWithValue("@name", "Alice");
         // insertCmd.Parameters.AddWithValue("@email", "alice@example.com");
         // insertCmd.ExecuteNonQuery();
-        
+
         string selectSql = "SELECT * FROM users";
         var selectCmd = new SQLiteCommand(selectSql, connection);
         DbDataReader reader = await selectCmd.ExecuteReaderAsync();
-        
+
 
         while (await reader.ReadAsync())
         {
@@ -43,7 +48,7 @@ class Program
         }
 
         return;
-        
+
         string? token = Environment.GetEnvironmentVariable("BOT_TOKEN");
         if (string.IsNullOrEmpty(token))
         {
@@ -52,7 +57,7 @@ class Program
         }
 
         Console.WriteLine($"Token length is {token.Length}");
-        
+
         var bot = new WeightBot();
         await bot.Run(token);
     }
