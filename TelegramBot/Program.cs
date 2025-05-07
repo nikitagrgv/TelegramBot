@@ -9,7 +9,7 @@ class Program
 {
     static async Task Main()
     {
-        string dbPath = @"database_v1.sqlite";
+        string dbPath = "database_v1.sqlite";
         string connectionString = $"Data Source={dbPath};Version=3;";
         var connection = new SQLiteConnection(connectionString);
         await connection.OpenAsync();
@@ -21,6 +21,10 @@ class Program
         }
         
         // TODO: check versions
+        
+        
+        
+        
         
         // string insertSql = "INSERT INTO users (name, email) VALUES (@name, @email)";
         // var insertCmd = new SQLiteCommand(insertSql, connection);
