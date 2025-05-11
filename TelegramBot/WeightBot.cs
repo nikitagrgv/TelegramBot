@@ -1,4 +1,6 @@
-﻿namespace TelegramBot;
+﻿using System.Data.SQLite;
+
+namespace TelegramBot;
 
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -7,6 +9,13 @@ using Telegram.Bot.Types.Enums;
 
 public class WeightBot
 {
+    private SQLiteConnection _connection;
+
+    public WeightBot(SQLiteConnection connection)
+    {
+        _connection = connection;
+    }
+
     public async Task Run(string token)
     {
         var botClient = new TelegramBotClient(token);

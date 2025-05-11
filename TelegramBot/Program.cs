@@ -77,7 +77,7 @@ class Program
 
         Console.WriteLine($"Token length is {token.Length}");
 
-        var bot = new WeightBot();
+        var bot = new WeightBot(connection);
         await bot.Run(token);
     }
 }
