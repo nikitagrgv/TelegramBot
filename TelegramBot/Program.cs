@@ -22,14 +22,14 @@ class Program
 
         // TODO: check versions
 
-        string createUsersSql = @"
-CREATE TABLE IF NOT EXISTS users
-(
-    id            INTEGER PRIMARY KEY,
-    register_date TEXT NOT NULL,
-    wanted_ccal   REAL
-);
-";
+        string createUsersSql = """
+                                CREATE TABLE IF NOT EXISTS users
+                                (
+                                    id            INTEGER PRIMARY KEY,
+                                    register_date TEXT NOT NULL,
+                                    wanted_ccal   REAL
+                                );
+                                """;
         var createUsersCmd = new SQLiteCommand(createUsersSql, connection);
         createUsersCmd.ExecuteNonQuery();
 
