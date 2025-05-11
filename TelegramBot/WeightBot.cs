@@ -58,6 +58,8 @@ public class WeightBot
 
             string message = "You are registered! Welcome!";
             await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
+
+            await botClient.SendMessage(chatId, GetInfoMessage(), cancellationToken: cancellationToken);
         }
 
         await botClient.SendMessage(chatId, userText, cancellationToken: cancellationToken);
