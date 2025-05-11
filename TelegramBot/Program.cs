@@ -7,6 +7,12 @@ using System.Data.SQLite;
 
 class Program
 {
+    static async Task<int> runSqliteNonQueryAsync(string sql, SQLiteConnection connection)
+    {
+        var cmd = new SQLiteCommand(sql, connection);
+        return await cmd.ExecuteNonQueryAsync();
+    }
+
     static async Task Main()
     {
         string dbPath = "database_v1.sqlite";
@@ -22,16 +28,14 @@ class Program
 
         // TODO: check versions
 
-        string createUsersSql = """
-                                CREATE TABLE IF NOT EXISTS users
-                                (
-                                    id            INTEGER PRIMARY KEY,
-                                    register_date TEXT NOT NULL,
-                                    wanted_ccal   REAL
-                                );
-                                """;
-        var createUsersCmd = new SQLiteCommand(createUsersSql, connection);
-        await createUsersCmd.ExecuteNonQueryAsync();
+        await runSqliteNonQueryAsync("""
+                                     CREATE TABLE IF NOT EXISTS users
+                                     (
+                                         id            INTEGER PRIMARY KEY,
+                                         register_date TEXT NOT NULL,
+                                         wanted_ccal   REAL
+                                     );  
+                                     """, connection);
 
 
         // string insertSql = "INSERT INTO users (name, email) VALUES (@name, @email)";
