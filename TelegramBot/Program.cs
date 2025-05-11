@@ -27,6 +27,7 @@ class Program
         }
 
         // TODO: check versions
+        await runSqliteNonQueryAsync("PRAGMA foreign_keys = ON;", connection);
 
         await runSqliteNonQueryAsync("""
                                      CREATE TABLE IF NOT EXISTS users
