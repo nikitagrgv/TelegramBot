@@ -99,10 +99,16 @@ public class WeightBot
     private string GetInfoMessage()
     {
         return """
-               Bot commands:
-               /add porridge, 12 ---- add porridge, 12 kcal 
-               /stat ---- print your consumed products
-               /help ---- print this help
+               ---- Bot commands ----
+
+               Add a consumed product:
+               /add porridge, 12
+
+               Print all consumed products;
+               /stat
+
+               Print this help
+               /help
                """;
     }
 
