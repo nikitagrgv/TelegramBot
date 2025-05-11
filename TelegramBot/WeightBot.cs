@@ -60,7 +60,6 @@ public class WeightBot
             await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
         }
 
-
         await botClient.SendMessage(chatId, userText, cancellationToken: cancellationToken);
     }
 
