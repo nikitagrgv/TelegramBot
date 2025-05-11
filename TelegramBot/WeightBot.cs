@@ -42,12 +42,26 @@ public class WeightBot
     private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
         CancellationToken cancellationToken)
     {
-        if (update.Message is not { Text: { } messageText }) return;
+        if (update.Message is not { Text: { } userText }) return;
 
         long chatId = update.Message.Chat.Id;
+        if (!await HasChatIdAsync(chatId))
+        {
+            bool registered = await RegisterChatIdAsync(chatId);
+            if (!registered)
+            {
+                Console.WriteLine($"Failed to register chat. Id = ${chatId}");
+                return;
+            }
+
+            Console.WriteLine($"Registered chat. Id = ${chatId}");
+
+            string message = "You are registered! Welcome!";
+            await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
+        }
 
 
-        await botClient.SendMessage(chatId, messageText, cancellationToken: cancellationToken);
+        await botClient.SendMessage(chatId, userText, cancellationToken: cancellationToken);
     }
 
     private Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
