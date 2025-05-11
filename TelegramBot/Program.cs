@@ -7,7 +7,7 @@ using System.Data.SQLite;
 
 class Program
 {
-    static async Task<int> runSqliteNonQueryAsync(string sql, SQLiteConnection connection)
+    private static async Task<int> RunSqliteNonQueryAsync(string sql, SQLiteConnection connection)
     {
         var cmd = new SQLiteCommand(sql, connection);
         return await cmd.ExecuteNonQueryAsync();
@@ -27,9 +27,9 @@ class Program
         }
 
         // TODO: check versions
-        await runSqliteNonQueryAsync("PRAGMA foreign_keys = ON;", connection);
+        await RunSqliteNonQueryAsync("PRAGMA foreign_keys = ON;", connection);
 
-        await runSqliteNonQueryAsync("""
+        await RunSqliteNonQueryAsync("""
                                      CREATE TABLE IF NOT EXISTS users
                                      (
                                          id            INTEGER PRIMARY KEY,
@@ -39,7 +39,7 @@ class Program
                                      );
                                      """, connection);
 
-        await runSqliteNonQueryAsync("""
+        await RunSqliteNonQueryAsync("""
                                      CREATE TABLE IF NOT EXISTS consumed
                                      (
                                          id      INTEGER PRIMARY KEY AUTOINCREMENT,

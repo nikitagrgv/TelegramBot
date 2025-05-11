@@ -43,15 +43,9 @@ public class WeightBot
     {
         if (update.Message is not { Text: { } messageText }) return;
 
-        if (update.Message.Entities is { } entities)
-        {
-            foreach (MessageEntity entity in entities)
-            {
-                Console.WriteLine($"{entity.Offset} + {entity.Length}");
-            }
-        }
-
         long chatId = update.Message.Chat.Id;
+
+
         await botClient.SendMessage(chatId, messageText, cancellationToken: cancellationToken);
     }
 
@@ -60,5 +54,12 @@ public class WeightBot
     {
         Console.WriteLine($"Error: {exception.Message}");
         return Task.CompletedTask;
+    }
+
+
+    private async Task<int> RunSqliteNonQueryAsync(string sql)
+    {
+        var cmd = new SQLiteCommand(sql, _connection);
+        return await cmd.ExecuteNonQueryAsync();
     }
 }
