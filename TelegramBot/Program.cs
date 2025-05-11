@@ -51,24 +51,22 @@ class Program
                                      );
                                      """, connection);
 
-
         // string insertSql = "INSERT INTO users (name, email) VALUES (@name, @email)";
         // var insertCmd = new SQLiteCommand(insertSql, connection);
         // insertCmd.Parameters.AddWithValue("@name", "Alice");
         // insertCmd.Parameters.AddWithValue("@email", "alice@example.com");
         // insertCmd.ExecuteNonQuery();
 
-        string selectSql = "SELECT * FROM users";
-        var selectCmd = new SQLiteCommand(selectSql, connection);
-        DbDataReader reader = await selectCmd.ExecuteReaderAsync();
-
-
-        while (await reader.ReadAsync())
-        {
-            Console.WriteLine($"{reader["id"]}: {reader["name"]} - {reader["email"]}");
-        }
-
-        return;
+        // string selectSql = "SELECT * FROM users";
+        // var selectCmd = new SQLiteCommand(selectSql, connection);
+        // DbDataReader reader = await selectCmd.ExecuteReaderAsync();
+        //
+        //
+        // while (await reader.ReadAsync())
+        // {
+        //     Console.WriteLine($"{reader["id"]}: {reader["name"]} - {reader["email"]}");
+        // }
+        //
 
         string? token = Environment.GetEnvironmentVariable("BOT_TOKEN");
         if (string.IsNullOrEmpty(token))
