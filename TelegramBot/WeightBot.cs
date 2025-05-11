@@ -56,6 +56,14 @@ public class WeightBot
         return Task.CompletedTask;
     }
 
+    private async Task<bool> HasChatIdAsync(long chatId)
+    {
+        string sql = "SELECT EXISTS(SELECT 1 FROM users WHERE id = @id)";
+        var cmd = new SQLiteCommand(sql, _connection);
+        cmd.Parameters.AddWithValue("id", chatId);
+        object? result = await cmd.ExecuteScalarAsync();
+        return Convert.ToInt32(result) == 1;
+    }
 
     private async Task<int> RunSqliteNonQueryAsync(string sql)
     {
