@@ -31,7 +31,7 @@ class Program
                                 );
                                 """;
         var createUsersCmd = new SQLiteCommand(createUsersSql, connection);
-        createUsersCmd.ExecuteNonQuery();
+        await createUsersCmd.ExecuteNonQueryAsync();
 
 
         // string insertSql = "INSERT INTO users (name, email) VALUES (@name, @email)";
