@@ -94,6 +94,16 @@ public class WeightBot
         return result != 0;
     }
 
+    private string GetInfoMessage()
+    {
+        return """
+               Bot commands:
+               /add porridge, 12 ---- add porridge, 12 kcal 
+               /stat ---- print your consumed products
+               /help ---- print this help
+               """;
+    }
+
     private static string ToDatabaseTimeFormat(DateTime dateTime)
     {
         return dateTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
