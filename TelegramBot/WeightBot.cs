@@ -104,10 +104,10 @@ public class WeightBot
                Add a consumed product:
                /add porridge, 12
 
-               Print all consumed products;
+               Print all consumed products:
                /stat
 
-               Print this help
+               Print this help:
                /help
                """;
     }
