@@ -1,4 +1,5 @@
 ﻿using System.Data.SQLite;
+using System.Globalization;
 
 namespace TelegramBot;
 
@@ -65,9 +66,23 @@ public class WeightBot
         return Convert.ToInt32(result) == 1;
     }
 
-    private async Task<int> RunSqliteNonQueryAsync(string sql)
+    private async Task<bool> RegisterChatIdAsync(long chatId)
     {
+        string date = ToDatabaseTimeFormat(DateTime.UtcNow);
+
+        string sql = """
+                     INSERT INTO users (id, register_date)
+                     VALUES (@id, @date);
+                     """;
         var cmd = new SQLiteCommand(sql, _connection);
-        return await cmd.ExecuteNonQueryAsync();
+        cmd.Parameters.AddWithValue("id", chatId);
+        cmd.Parameters.AddWithValue("date", date);
+        int result = await cmd.ExecuteNonQueryAsync();
+        return result != 0;
+    }
+
+    private static string ToDatabaseTimeFormat(DateTime dateTime)
+    {
+        return dateTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
     }
 }
