@@ -34,8 +34,21 @@ class Program
                                      (
                                          id            INTEGER PRIMARY KEY,
                                          register_date TEXT NOT NULL,
-                                         wanted_ccal   REAL
-                                     );  
+                                         min_kcal      REAL,
+                                         max_kcal      REAL
+                                     );
+                                     """, connection);
+
+        await runSqliteNonQueryAsync("""
+                                     CREATE TABLE IF NOT EXISTS consumed
+                                     (
+                                         id      INTEGER PRIMARY KEY AUTOINCREMENT,
+                                         user_id INTEGER NOT NULL,
+                                         date    TEXT    NOT NULL,
+                                         text    TEXT    NOT NULL,
+                                         kcal    REAL,
+                                         FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+                                     );
                                      """, connection);
 
 
