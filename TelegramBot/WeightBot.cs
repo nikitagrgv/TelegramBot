@@ -200,10 +200,11 @@ public partial class WeightBot
         string message = "";
         message += "<pre>";
 
-        message += $"{"Name",-20} {"Kcal",5} {"Date",20} {"ID",5}\n";
+        message += $"{"Name",-20} {"Kcal",5} {"Date",13} {"ID",5}\n";
         foreach (ConsumedRowInfo row in rows)
         {
-            message += $"{row.Text,-20} {row.Kcal,5} {row.Date,20} {row.Id,5}\n";
+            string date = FromDatabaseToUserTimeFormat(row.Date);
+            message += $"{row.Text,-20} {row.Kcal,5} {date,13} {row.Id,5}\n";
         }
 
         message += "</pre>";
@@ -408,6 +409,17 @@ public partial class WeightBot
     private static string ToDatabaseTimeFormat(DateTime dateTime)
     {
         return dateTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+    }
+
+    private static DateTime FromDatabaseTimeFormat(string dateTime)
+    {
+        return DateTime.ParseExact(dateTime, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+    }
+
+    private static string FromDatabaseToUserTimeFormat(string dateTime)
+    {
+        DateTime date = FromDatabaseTimeFormat(dateTime);
+        return date.ToString("dd MMM HH:mm", CultureInfo.InvariantCulture);
     }
 
     [GeneratedRegex(@"^\s*/(?<cmd>\w+)(?:\s+(?<args>\S(?:.*\S)?))?\s*$")]
