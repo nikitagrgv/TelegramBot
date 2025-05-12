@@ -107,6 +107,9 @@ public partial class WeightBot
             case "stat":
                 await PrintStatAsync(chatId, botClient, cancellationToken);
                 break;
+            case "timezone":
+                await SetUserTimezoneOffsetAsync(args, chatId, botClient, cancellationToken);
+                break;
             case "kill":
                 await ShutdownBot(chatId, botClient, cancellationToken);
                 break;
@@ -259,6 +262,30 @@ public partial class WeightBot
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken, parseMode: ParseMode.Html);
     }
 
+    private async Task SetUserTimezoneOffsetAsync(string args, long chatId, ITelegramBotClient botClient,
+        CancellationToken cancellationToken)
+    {
+        if (!int.TryParse(args.Trim(), out int timezone) || timezone < 0)
+        {
+            string invalidCommandMessage =
+                $"Sorry, I didn't understand your 'timezone' command. Invalid offset: '{args}'. Type /help to see a list of available commands.";
+            await botClient.SendMessage(chatId, invalidCommandMessage, cancellationToken: cancellationToken);
+            return;
+        }
+
+        bool success = await SetUserTimezoneOffsetToDatabaseAsync(chatId, timezone);
+        if (!success)
+        {
+            string errorMessage =
+                $"Database error. Can't set the timezone. Chat ID: '{chatId}', timezone: '{timezone}'";
+            await botClient.SendMessage(chatId, errorMessage, cancellationToken: cancellationToken);
+            return;
+        }
+
+        string message = $"Timezone updated: {timezone:+#;-#;0}";
+        await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
+    }
+
     private async Task<bool> RegisterChatIfNotRegisteredAsync(long chatId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
@@ -394,7 +421,7 @@ public partial class WeightBot
         return Convert.ToInt32(result) == 1;
     }
 
-    private async Task<bool> SetUserTimezoneOffsetAsync(long chatId, int timezoneOffset)
+    private async Task<bool> SetUserTimezoneOffsetToDatabaseAsync(long chatId, int timezoneOffset)
     {
         string sql = "UPDATE users SET timezone = @timezone WHERE id = @id";
         await using var cmd = new SQLiteCommand(sql, _connection);
