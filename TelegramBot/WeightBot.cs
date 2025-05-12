@@ -107,13 +107,6 @@ public partial class WeightBot
             case "stat":
                 await PrintStatAsync(chatId, botClient, cancellationToken);
                 break;
-            case "kill":
-                string shutdownMessage = $"Goodbye {chatId}";
-                await botClient.SendMessage(chatId, shutdownMessage, cancellationToken: cancellationToken);
-
-                await _cancelTokenSource.CancelAsync();
-                _connection.Close();
-                break;
             default:
                 string message = $"Unknown command: {cmd}. Type /help to see a list of available commands.";
                 await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
@@ -290,7 +283,7 @@ public partial class WeightBot
                      VALUES (@user_id, @date, @text, @kcal)
                      RETURNING *;
                      """;
-        var cmd = new SQLiteCommand(sql, _connection);
+        await using var cmd = new SQLiteCommand(sql, _connection);
         cmd.Parameters.AddWithValue("user_id", chatId);
         cmd.Parameters.AddWithValue("date", date);
         cmd.Parameters.AddWithValue("text", name);
@@ -307,7 +300,7 @@ public partial class WeightBot
                      WHERE id = @id
                      RETURNING *;
                      """;
-        var cmd = new SQLiteCommand(sql, _connection);
+        await using var cmd = new SQLiteCommand(sql, _connection);
         cmd.Parameters.AddWithValue("id", id);
 
         return await ExecuteConsumedAndGetOneAsync(cmd);
@@ -321,7 +314,7 @@ public partial class WeightBot
                      WHERE user_id = @id
                      ORDER BY date;
                      """;
-        var cmd = new SQLiteCommand(sql, _connection);
+        await using var cmd = new SQLiteCommand(sql, _connection);
         cmd.Parameters.AddWithValue("id", id);
 
         return await ExecuteConsumedAndGetAllAsync(cmd);
@@ -380,7 +373,7 @@ public partial class WeightBot
     private async Task<bool> HasChatIdAsync(long chatId)
     {
         string sql = "SELECT EXISTS(SELECT 1 FROM users WHERE id = @id)";
-        var cmd = new SQLiteCommand(sql, _connection);
+        await using var cmd = new SQLiteCommand(sql, _connection);
         cmd.Parameters.AddWithValue("id", chatId);
         object? result = await cmd.ExecuteScalarAsync();
         return Convert.ToInt32(result) == 1;
@@ -394,7 +387,7 @@ public partial class WeightBot
                      INSERT INTO users (id, register_date)
                      VALUES (@id, @date);
                      """;
-        var cmd = new SQLiteCommand(sql, _connection);
+        await using var cmd = new SQLiteCommand(sql, _connection);
         cmd.Parameters.AddWithValue("id", chatId);
         cmd.Parameters.AddWithValue("date", date);
         int result = await cmd.ExecuteNonQueryAsync();

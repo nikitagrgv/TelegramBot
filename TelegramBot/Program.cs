@@ -17,7 +17,7 @@ class Program
     {
         string dbPath = "database_v1.sqlite";
         string connectionString = $"Data Source={dbPath};Version=3;";
-        var connection = new SQLiteConnection(connectionString);
+        await using var connection = new SQLiteConnection(connectionString);
         await connection.OpenAsync();
 
         if (connection.State != ConnectionState.Open)
