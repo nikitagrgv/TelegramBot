@@ -200,7 +200,7 @@ public partial class WeightBot
         string message = "";
         message += "<pre>";
 
-        int nameSize = 20;
+        int nameSize = 0;
         int kcalSize = 0;
         int dateSize = 12;
         int idSize = 0;
