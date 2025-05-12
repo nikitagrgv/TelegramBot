@@ -214,8 +214,12 @@ public partial class WeightBot
     {
         List<ConsumedRowInfo> rows = await GetStatFromDatabaseAsync(chatId);
 
+        int timeZone = await GetUserTimezoneOffsetAsync(chatId);
+
         string message = "";
         message += "<pre>";
+
+        message += $"User Time Zone: ${timeZone:+#;-#;0}\n";
 
         const int budget = 36;
 
@@ -234,8 +238,6 @@ public partial class WeightBot
         string format = $"{{0, -{nameSize}}}| {{1, {kcalSize}}}| {{2, {dateSize}}}| {{3, {idSize}}}\n";
 
         message += string.Format(format, "Name", "Kcal", "Date", "ID");
-
-        int timeZone = 0;
 
         foreach (ConsumedRowInfo row in rows)
         {
