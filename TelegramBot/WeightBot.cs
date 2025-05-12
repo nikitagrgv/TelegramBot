@@ -19,6 +19,8 @@ public partial class WeightBot
 
     private readonly SQLiteConnection _connection;
 
+    private CancellationTokenSource _cancelTokenSource;
+
     public WeightBot(SQLiteConnection connection)
     {
         _connection = connection;
@@ -28,21 +30,21 @@ public partial class WeightBot
     {
         var botClient = new TelegramBotClient(token);
 
-        using var cts = new CancellationTokenSource();
+        _cancelTokenSource = new CancellationTokenSource();
 
         var receiverOptions = new ReceiverOptions
         {
             AllowedUpdates = [],
         };
 
-        User me = await botClient.GetMe(cancellationToken: cts.Token);
+        User me = await botClient.GetMe(cancellationToken: _cancelTokenSource.Token);
         Console.WriteLine($"Start listening @{me.Username}");
 
         await botClient.ReceiveAsync(
             updateHandler: HandleUpdateAsync,
             errorHandler: HandleErrorAsync,
             receiverOptions: receiverOptions,
-            cancellationToken: cts.Token);
+            cancellationToken: _cancelTokenSource.Token);
     }
 
 
