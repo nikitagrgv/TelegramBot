@@ -49,8 +49,10 @@ public class WeightBot
             return;
         }
 
-        if (update.Message is not { Text: { } userText }) return;
-
+        if (update.Message is not { Text: { } userText })
+        {
+            return;
+        }
 
         await botClient.SendMessage(chatId, userText, cancellationToken: cancellationToken);
     }
