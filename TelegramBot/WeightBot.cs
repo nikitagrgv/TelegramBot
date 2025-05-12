@@ -147,7 +147,7 @@ public partial class WeightBot
         if (consumedId == null)
         {
             string errorMessage =
-                $"Database error. Can't add a row. Chat ID: '{chatId}', name: '{name}', kcal: '{kcal}'";
+                $"Database error. Can't add the row. Chat ID: '{chatId}', name: '{name}', kcal: '{kcal}'";
             await botClient.SendMessage(chatId, errorMessage, cancellationToken: cancellationToken);
             return;
         }
@@ -171,8 +171,24 @@ public partial class WeightBot
             await botClient.SendMessage(chatId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
         }
-        
-        
+
+        ConsumedRowInfo? row = await RemoveConsumedFromDatabaseAsync(consumedId);
+        if (row == null)
+        {
+            string errorMessage =
+                $"Database error. Can't remove the row. Chat ID: '{chatId}', consumed ID: '{consumedId}'";
+            await botClient.SendMessage(chatId, errorMessage, cancellationToken: cancellationToken);
+            return;
+        }
+
+        string message = $"""
+                          Product removed:
+                          ID: {row.Id}
+                          Date: {row.Date}
+                          Name: {row.Text}
+                          kcal: {row.Kcal}
+                          """;
+        await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
     }
 
     private async Task PrintStatAsync(long chatId, ITelegramBotClient botClient,
@@ -236,7 +252,7 @@ public partial class WeightBot
         }
     }
 
-    private async Task<ConsumedRowInfo?> RemoveConsumedFromDatabaseAsync(long chatId)
+    private async Task<ConsumedRowInfo?> RemoveConsumedFromDatabaseAsync(long id)
     {
         string sql = """
                      DELETE
@@ -245,7 +261,7 @@ public partial class WeightBot
                      RETURNING *;
                      """;
         var cmd = new SQLiteCommand(sql, _connection);
-        cmd.Parameters.AddWithValue("id", chatId);
+        cmd.Parameters.AddWithValue("id", id);
 
         try
         {
@@ -255,13 +271,13 @@ public partial class WeightBot
                 return null;
             }
 
-            string id = reader["id"].ToString() ?? string.Empty;
+            string consumedId = reader["id"].ToString() ?? string.Empty;
             string userId = reader["user_id"].ToString() ?? string.Empty;
             string date = reader["date"].ToString() ?? string.Empty;
             string text = reader["text"].ToString() ?? string.Empty;
             string kcal = reader["kcal"].ToString() ?? string.Empty;
 
-            return new ConsumedRowInfo(id, userId, date, text, kcal);
+            return new ConsumedRowInfo(consumedId, userId, date, text, kcal);
         }
         catch (Exception)
         {
