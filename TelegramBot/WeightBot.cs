@@ -228,7 +228,7 @@ public partial class WeightBot
                 curName = curName.Substring(nameSize);
             }
 
-            message += string.Format(format, row.Text, row.Kcal, date, row.Id);
+            message += string.Format(format, curName, row.Kcal, date, row.Id);
         }
 
         message += "</pre>";
