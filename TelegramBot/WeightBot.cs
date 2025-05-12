@@ -153,6 +153,15 @@ public partial class WeightBot
     private async Task RemoveConsumedAsync(string args, long chatId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
+        if (!long.TryParse(args.Trim(), out long consumedId) || consumedId < 0)
+        {
+            string invalidCommandMessage =
+                $"Sorry, I didn't understand your 'remove' command. Invalid id: '{args}'. Type /help to see a list of available commands.";
+            await botClient.SendMessage(chatId, invalidCommandMessage, cancellationToken: cancellationToken);
+            return;
+        }
+
+        
     }
 
     private async Task PrintStatAsync(long chatId, ITelegramBotClient botClient,
