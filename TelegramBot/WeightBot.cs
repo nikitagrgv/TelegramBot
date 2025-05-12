@@ -97,6 +97,7 @@ public partial class WeightBot
                 break;
             case "remove":
                 await RemoveConsumed(args, chatId, botClient, cancellationToken);
+                break;
             case "stat":
                 await PrintStat(chatId, botClient, cancellationToken);
                 break;
