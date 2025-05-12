@@ -120,9 +120,9 @@ public partial class WeightBot
     private async Task ShutdownBot(long chatId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        _cancelTokenSource.CancelAfter(1000);
         string message = "Shutdown...";
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
+        _cancelTokenSource.CancelAfter(1000);
     }
 
     private async Task PrintHelpAsync(long chatId, ITelegramBotClient botClient,
