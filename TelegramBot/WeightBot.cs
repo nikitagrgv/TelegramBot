@@ -190,6 +190,9 @@ public partial class WeightBot
 
                Add a consumed product:
                /add porridge, 12
+               
+               Remove a consumed product by id:
+               /remove 6
 
                Print all consumed products:
                /stat
