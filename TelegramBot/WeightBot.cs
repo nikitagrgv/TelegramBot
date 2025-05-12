@@ -193,6 +193,21 @@ public partial class WeightBot
 
     private async Task<long> AddConsumedAsync(long chatId, string name, double kcal)
     {
+        string date = GetCurrentDatetime();
+
+        string sql = """
+                     INSERT INTO consumed (user_id, date, text, kcal)
+                     VALUES (@user_id, @date, @text, @kcal)
+                     RETURNING id;
+                     """;
+        var cmd = new SQLiteCommand(sql, _connection);
+        cmd.Parameters.AddWithValue("user_id", chatId);
+        cmd.Parameters.AddWithValue("date", date);
+        cmd.Parameters.AddWithValue("text", name);
+        cmd.Parameters.AddWithValue("kcal", kcal);
+
+        object? result = await cmd.ExecuteScalarAsync();
+        return Convert.ToInt64(result);
     }
 
     private async Task<bool> HasChatIdAsync(long chatId)
