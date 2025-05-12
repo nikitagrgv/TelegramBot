@@ -92,6 +92,11 @@ public partial class WeightBot
             case "help":
                 await PrintHelp(chatId, botClient, cancellationToken);
                 break;
+            case "add":
+                await AddConsumed(args, chatId, botClient, cancellationToken);
+                break;
+            case "remove":
+                await RemoveConsumed(args, chatId, botClient, cancellationToken);
             case "stat":
                 await PrintStat(chatId, botClient, cancellationToken);
                 break;
@@ -106,6 +111,16 @@ public partial class WeightBot
         CancellationToken cancellationToken)
     {
         await botClient.SendMessage(chatId, GetHelpMessage(), cancellationToken: cancellationToken);
+    }
+
+    private async Task AddConsumed(string args, long chatId, ITelegramBotClient botClient,
+        CancellationToken cancellationToken)
+    {
+    }
+
+    private async Task RemoveConsumed(string args, long chatId, ITelegramBotClient botClient,
+        CancellationToken cancellationToken)
+    {
     }
 
     private async Task PrintStat(long chatId, ITelegramBotClient botClient,
