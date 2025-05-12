@@ -169,7 +169,7 @@ public partial class WeightBot
                           Product added:
                           Name: {row.Text}
                           Kcal: {row.Kcal}
-                          Date: {row.Date}
+                          Date: {FromDatabaseToUserTimeFormat(row.Date)}
                           ID: {row.Id}
                           """;
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
@@ -199,7 +199,7 @@ public partial class WeightBot
                           Product removed:
                           Name: {row.Text}
                           Kcal: {row.Kcal}
-                          Date: {row.Date}
+                          Date: {FromDatabaseToUserTimeFormat(row.Date)}
                           ID: {row.Id}
                           """;
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
