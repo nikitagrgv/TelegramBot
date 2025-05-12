@@ -419,6 +419,12 @@ public partial class WeightBot
                """;
     }
 
+    private string FromDatabaseToUserTimeFormat(string dateTime, long chatId)
+    {
+        DateTime date = FromDatabaseTimeFormat(dateTime);
+        return date.ToString("dd MMM HH:mm", CultureInfo.InvariantCulture);
+    }
+
     // TODO: shit?
     private static bool TryParseDouble(string s, out double result)
     {
@@ -452,12 +458,6 @@ public partial class WeightBot
     private static DateTime FromDatabaseTimeFormat(string dateTime)
     {
         return DateTime.ParseExact(dateTime, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-    }
-
-    private static string FromDatabaseToUserTimeFormat(string dateTime)
-    {
-        DateTime date = FromDatabaseTimeFormat(dateTime);
-        return date.ToString("dd MMM HH:mm", CultureInfo.InvariantCulture);
     }
 
     [GeneratedRegex(@"^\s*/(?<cmd>\w+)(?:\s+(?<args>\S(?:.*\S)?))?\s*$")]
