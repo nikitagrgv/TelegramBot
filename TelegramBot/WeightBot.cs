@@ -316,7 +316,7 @@ public partial class WeightBot
         return Task.CompletedTask;
     }
 
-    private async Task<double> GetConsumedCalFromDatabaseAsync(long chatId)
+    private async Task<double> GetConsumedDayCalFromDatabaseAsync(long chatId)
     {
         DateTime curDateUtc = DateTime.UtcNow;
 
@@ -326,8 +326,17 @@ public partial class WeightBot
             new DateTime(curDateUtc.Year, curDateUtc.Month, curDateUtc.Day, 0, 0, 0).AddHours(timezone);
 
         string dayBeginUserString = ToDatabaseTimeFormat(dayBeginUser);
-        
-        
+
+        string sql = """
+                     SELECT SUM(kcal) FROM consumed
+                     WHERE user_id = @user_id AND date >= @start;
+                     """;
+        await using var cmd = new SQLiteCommand(sql, _connection);
+        cmd.Parameters.AddWithValue("user_id", chatId);
+        cmd.Parameters.AddWithValue("start", dayBeginUserString);
+
+        object? result = await cmd.ExecuteScalarAsync();
+        return Convert.ToDouble(result);
     }
 
     private async Task<ConsumedRowInfo?> AddConsumedToDatabaseAsync(long chatId, string name, double kcal)
