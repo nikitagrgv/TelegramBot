@@ -62,10 +62,10 @@ public partial class WeightBot
             return;
         }
 
-        await DispatchUserMessage(chatId, userText.Trim(), botClient, cancellationToken);
+        await ParseAndDispatchUserMessage(chatId, userText.Trim(), botClient, cancellationToken);
     }
 
-    private async Task DispatchUserMessage(long chatId, string userText, ITelegramBotClient botClient,
+    private async Task ParseAndDispatchUserMessage(long chatId, string userText, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
         Match m = ParseCommandRegex.Match(userText);
@@ -80,9 +80,16 @@ public partial class WeightBot
         string cmd = m.Groups["cmd"].Value;
         string args = m.Groups["args"].Value;
 
+        await DispatchUserMessage(cmd, args, chatId, botClient, cancellationToken);
+    }
+
+    private async Task DispatchUserMessage(string cmd, string args, long chatId, ITelegramBotClient botClient,
+        CancellationToken cancellationToken)
+    {
         string message = $"Command: {cmd}. Args: {args}";
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
     }
+
 
     private async Task<bool> RegisterChatIfNotRegisteredAsync(long chatId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
