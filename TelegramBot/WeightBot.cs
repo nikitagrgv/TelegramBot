@@ -142,7 +142,12 @@ public partial class WeightBot
 
         long consumedId = 0;
 
-        string message = $"Added product '{name}' ({kcal} kcal)! ID = {consumedId}";
+        string message = $"""
+                          Added product:
+                          '{name}'
+                          {kcal} kcal
+                          ID = {consumedId}
+                          """;
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
     }
 
