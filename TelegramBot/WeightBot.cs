@@ -71,7 +71,7 @@ public class WeightBot
 
         if (!m.Success)
         {
-            const string message = "Sorry, can't understand you";
+            const string message = "Sorry, I can't understand you";
             await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
             return;
         }
