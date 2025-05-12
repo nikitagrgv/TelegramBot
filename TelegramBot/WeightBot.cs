@@ -200,7 +200,7 @@ public partial class WeightBot
         string message = "";
         message += "<pre>";
 
-        message += $"{"Name",-12} {"Kcal",6} {"Date",20} {"ID",8}\n";
+        message += $"{"Name",-20} {"Kcal",5} {"Date",20} {"ID",5}\n";
         foreach (ConsumedRowInfo row in rows)
         {
             message += $"{row.Text,-12} {row.Kcal,6} {row.Date,20} {row.Id,8}\n";
