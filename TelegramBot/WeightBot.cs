@@ -73,7 +73,7 @@ public partial class WeightBot
         if (!m.Success)
         {
             const string invalidCommandMessage =
-                "Sorry, I can't understand you. Print /help for the list of available commands.";
+                "Sorry, I didn't understand that. Type /help to see a list of available commands.";
             await botClient.SendMessage(chatId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
         }
@@ -96,7 +96,7 @@ public partial class WeightBot
                 await PrintStat(chatId, botClient, cancellationToken);
                 break;
             default:
-                string message = $"Unknown command: {cmd}. Print /help for the list of available commands.";
+                string message = $"Unknown command: {cmd}. Type /help to see a list of available commands.";
                 await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
                 break;
         }
