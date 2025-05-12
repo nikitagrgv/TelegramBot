@@ -210,7 +210,7 @@ public partial class WeightBot
         foreach (ConsumedRowInfo row in rows)
         {
             string date = FromDatabaseToUserTimeFormat(row.Date);
-            message += string.Format(format, "Name", "Kcal", "Date", "ID");
+            message += string.Format(format, row.Text, row.Kcal, date, row.Id);
         }
 
         message += "</pre>";
