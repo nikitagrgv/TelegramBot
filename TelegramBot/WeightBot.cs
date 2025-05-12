@@ -132,7 +132,7 @@ public partial class WeightBot
         string kcalString = m.Groups["kcal"].Value;
 
         double kcal;
-        if (!TryParseNumber(kcalString, out kcal))
+        if (!TryParseDouble(kcalString, out kcal))
         {
             string invalidCommandMessage =
                 $"Sorry, I didn't understand your 'add' command. Invalid kcal number: '{kcalString}'. Type /help to see a list of available commands.";
@@ -235,7 +235,7 @@ public partial class WeightBot
     }
 
     // TODO: shit?
-    private static bool TryParseNumber(string s, out double result)
+    private static bool TryParseDouble(string s, out double result)
     {
         result = 0;
         if (string.IsNullOrWhiteSpace(s))
