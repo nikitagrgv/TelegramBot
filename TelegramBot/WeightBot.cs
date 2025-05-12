@@ -59,8 +59,15 @@ public class WeightBot
             return;
         }
 
+        await DispatchUserMessage(chatId, userText, botClient, cancellationToken);
+    }
 
+    private async Task DispatchUserMessage(long chatId, string userText, ITelegramBotClient botClient,
+        CancellationToken cancellationToken)
+    {
         await botClient.SendMessage(chatId, userText, cancellationToken: cancellationToken);
+
+        return;
     }
 
     private async Task<bool> RegisterChatIfNotRegisteredAsync(long chatId, ITelegramBotClient botClient,
