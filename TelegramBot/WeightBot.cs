@@ -191,7 +191,7 @@ public partial class WeightBot
         return Task.CompletedTask;
     }
 
-    private async Task<long> AddConsumedAsync(long chatId, string name, double kcal)
+    private async Task<long> AddConsumedToDatabaseAsync(long chatId, string name, double kcal)
     {
         string date = GetCurrentDatetime();
 
