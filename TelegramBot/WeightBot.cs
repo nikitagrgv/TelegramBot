@@ -224,7 +224,8 @@ public partial class WeightBot
             string curName = row.Text;
             while (curName.Length > nameSize)
             {
-                message += string.Format(format, curName, string.Empty, string.Empty, string.Empty);
+                message += string.Format(format, curName.Substring(0, nameSize), string.Empty, string.Empty,
+                    string.Empty);
                 curName = curName.Substring(nameSize);
             }
 
