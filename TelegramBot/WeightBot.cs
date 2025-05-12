@@ -139,8 +139,11 @@ public partial class WeightBot
             await botClient.SendMessage(chatId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
         }
-        
-        
+
+        long consumedId = 0;
+
+        string message = $"Added product '{name}' ({kcal} kcal)! ID = {consumedId}";
+        await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
     }
 
     private async Task RemoveConsumed(string args, long chatId, ITelegramBotClient botClient,
