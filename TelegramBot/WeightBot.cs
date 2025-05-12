@@ -224,7 +224,7 @@ public partial class WeightBot
         message += $"User Time Zone: {timeZone:+#;-#;0}\n";
 
         double consumedToday = await GetConsumedDayCalFromDatabaseAsync(chatId);
-        message += $"Consumed Today: {consumedToday}\n";
+        message += $"Consumed Today: {consumedToday} kcal\n";
 
 
         const int budget = 36;
