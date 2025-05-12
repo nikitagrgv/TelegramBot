@@ -131,8 +131,7 @@ public partial class WeightBot
         string name = m.Groups["name"].Value;
         string kcalString = m.Groups["kcal"].Value;
 
-        double kcal;
-        if (!TryParseDouble(kcalString, out kcal))
+        if (!TryParseDouble(kcalString, out double kcal))
         {
             string invalidCommandMessage =
                 $"Sorry, I didn't understand your 'add' command. Invalid kcal number: '{kcalString}'. Type /help to see a list of available commands.";
@@ -140,7 +139,7 @@ public partial class WeightBot
             return;
         }
 
-        long consumedId = 0;
+        long consumedId = await AddConsumedToDatabaseAsync(chatId, name, kcal);
 
         string message = $"""
                           Added product:
