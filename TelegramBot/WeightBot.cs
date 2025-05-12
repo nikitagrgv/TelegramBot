@@ -142,9 +142,9 @@ public partial class WeightBot
             return;
         }
 
-        long? consumedId = await AddConsumedToDatabaseAsync(chatId, name, kcal);
+        ConsumedRowInfo? row = await AddConsumedToDatabaseAsync(chatId, name, kcal);
 
-        if (consumedId == null)
+        if (row == null)
         {
             string errorMessage =
                 $"Database error. Can't add the row. Chat ID: '{chatId}', name: '{name}', kcal: '{kcal}'";
@@ -153,10 +153,11 @@ public partial class WeightBot
         }
 
         string message = $"""
-                          Added product:
-                          {name}
-                          {kcal} kcal
-                          ID = {consumedId}
+                          Product added:
+                          Name: {row.Text}
+                          Kcal: {row.Kcal}
+                          Date: {row.Date}
+                          ID: {row.Id}
                           """;
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
     }
@@ -183,10 +184,10 @@ public partial class WeightBot
 
         string message = $"""
                           Product removed:
-                          ID: {row.Id}
-                          Date: {row.Date}
                           Name: {row.Text}
-                          kcal: {row.Kcal}
+                          Kcal: {row.Kcal}
+                          Date: {row.Date}
+                          ID: {row.Id}
                           """;
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
     }
@@ -226,14 +227,14 @@ public partial class WeightBot
         return Task.CompletedTask;
     }
 
-    private async Task<long?> AddConsumedToDatabaseAsync(long chatId, string name, double kcal)
+    private async Task<ConsumedRowInfo?> AddConsumedToDatabaseAsync(long chatId, string name, double kcal)
     {
         string date = GetCurrentDatetime();
 
         string sql = """
                      INSERT INTO consumed (user_id, date, text, kcal)
                      VALUES (@user_id, @date, @text, @kcal)
-                     RETURNING id;
+                     RETURNING *;
                      """;
         var cmd = new SQLiteCommand(sql, _connection);
         cmd.Parameters.AddWithValue("user_id", chatId);
@@ -241,15 +242,7 @@ public partial class WeightBot
         cmd.Parameters.AddWithValue("text", name);
         cmd.Parameters.AddWithValue("kcal", kcal);
 
-        try
-        {
-            object? result = await cmd.ExecuteScalarAsync();
-            return result != null ? Convert.ToInt64(result) : null;
-        }
-        catch (Exception)
-        {
-            return null;
-        }
+        return await ExecuteConsumedAsync(cmd);
     }
 
     private async Task<ConsumedRowInfo?> RemoveConsumedFromDatabaseAsync(long id)
@@ -263,6 +256,11 @@ public partial class WeightBot
         var cmd = new SQLiteCommand(sql, _connection);
         cmd.Parameters.AddWithValue("id", id);
 
+        return await ExecuteConsumedAsync(cmd);
+    }
+
+    private async Task<ConsumedRowInfo?> ExecuteConsumedAsync(SQLiteCommand cmd)
+    {
         try
         {
             DbDataReader reader = await cmd.ExecuteReaderAsync();
