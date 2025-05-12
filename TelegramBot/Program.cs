@@ -34,6 +34,7 @@ class Program
                                      (
                                          id            INTEGER PRIMARY KEY,
                                          register_date TEXT NOT NULL,
+                                         timezone      INTEGER NOT NULL,
                                          min_kcal      REAL,
                                          max_kcal      REAL
                                      );
@@ -79,7 +80,7 @@ class Program
 
         var bot = new WeightBot(connection);
         await bot.Run(token);
-        
+
         Console.WriteLine("Done");
     }
 }
