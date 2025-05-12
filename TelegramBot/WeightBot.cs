@@ -76,6 +76,8 @@ public partial class WeightBot
             await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
             return;
         }
+        
+        
 
 
         await botClient.SendMessage(chatId, userText, cancellationToken: cancellationToken);
@@ -156,6 +158,6 @@ public partial class WeightBot
         return dateTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
     }
 
-    [GeneratedRegex(@"/(\w+) (.+)$")]
+    [GeneratedRegex(@"^\s*/(\w+) (.+)$")]
     private static partial Regex GetParseCommandRegex();
 }
