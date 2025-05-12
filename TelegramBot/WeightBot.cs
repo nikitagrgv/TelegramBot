@@ -219,7 +219,7 @@ public partial class WeightBot
         string message = "";
         message += "<pre>";
 
-        message += $"User Time Zone: ${timeZone:+#;-#;0}\n";
+        message += $"User Time Zone: {timeZone:+#;-#;0}\n";
 
         const int budget = 36;
 
