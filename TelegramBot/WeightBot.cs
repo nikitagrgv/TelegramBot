@@ -12,6 +12,7 @@ using Telegram.Bot.Types.Enums;
 public partial class WeightBot
 {
     private static readonly Regex ParseCommandRegex = GetParseCommandRegex();
+    private static readonly Regex AddConsumedRegex = GetAddConsumedRegex();
 
     private readonly SQLiteConnection _connection;
 
@@ -190,7 +191,7 @@ public partial class WeightBot
 
                Add a consumed product:
                /add porridge, 12
-               
+
                Remove a consumed product by id:
                /remove 6
 
@@ -209,4 +210,7 @@ public partial class WeightBot
 
     [GeneratedRegex(@"^\s*/(?<cmd>\w+)(?:\s+(?<args>\S(?:.*\S)?))?\s*$")]
     private static partial Regex GetParseCommandRegex();
+
+    [GeneratedRegex(@"^\s*(?<name>.+?)\s*,?\s*(?<kcal>\d+[,.]?\d*)\s*$")]
+    private static partial Regex GetAddConsumedRegex();
 }
