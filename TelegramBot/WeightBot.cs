@@ -269,7 +269,7 @@ public partial class WeightBot
                 return null;
             }
 
-            return GetConsumedInfo(reader);
+            return ReadConsumedRowInfo(reader);
         }
         catch (Exception)
         {
@@ -286,7 +286,7 @@ public partial class WeightBot
             DbDataReader reader = await cmd.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
-                ConsumedRowInfo info = GetConsumedInfo(reader);
+                ConsumedRowInfo info = ReadConsumedRowInfo(reader);
                 rows.Add(info);
             }
 
@@ -298,7 +298,7 @@ public partial class WeightBot
         }
     }
 
-    private static ConsumedRowInfo GetConsumedInfo(DbDataReader reader)
+    private static ConsumedRowInfo ReadConsumedRowInfo(DbDataReader reader)
     {
         string consumedId = reader["id"].ToString() ?? string.Empty;
         string userId = reader["user_id"].ToString() ?? string.Empty;
