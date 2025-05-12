@@ -158,6 +158,6 @@ public partial class WeightBot
         return dateTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
     }
 
-    [GeneratedRegex(@"^\s*/(\w+) (.+)$")]
+    [GeneratedRegex(@"^\s*/(\w+)\s+(.+)$")]
     private static partial Regex GetParseCommandRegex();
 }
