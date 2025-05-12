@@ -1,4 +1,5 @@
-﻿using System.Data.SQLite;
+﻿using System.Data.Common;
+using System.Data.SQLite;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
@@ -11,6 +12,8 @@ using Telegram.Bot.Types.Enums;
 
 public partial class WeightBot
 {
+    private record ConsumedRowInfo(long Id, long UserId, string Date, string Text, double Kcal);
+
     private static readonly Regex ParseCommandRegex = GetParseCommandRegex();
     private static readonly Regex AddConsumedRegex = GetAddConsumedRegex();
 
@@ -139,7 +142,15 @@ public partial class WeightBot
             return;
         }
 
-        long consumedId = await AddConsumedToDatabaseAsync(chatId, name, kcal);
+        long? consumedId = await AddConsumedToDatabaseAsync(chatId, name, kcal);
+
+        if (consumedId == null)
+        {
+            string errorMessage =
+                $"Database error. Can't add a row. Chat ID: '{chatId}', name: '{name}', kcal: '{kcal}'";
+            await botClient.SendMessage(chatId, errorMessage, cancellationToken: cancellationToken);
+            return;
+        }
 
         string message = $"""
                           Added product:
@@ -160,8 +171,6 @@ public partial class WeightBot
             await botClient.SendMessage(chatId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
         }
-
-        
     }
 
     private async Task PrintStatAsync(long chatId, ITelegramBotClient botClient,
@@ -199,7 +208,7 @@ public partial class WeightBot
         return Task.CompletedTask;
     }
 
-    private async Task<long> AddConsumedToDatabaseAsync(long chatId, string name, double kcal)
+    private async Task<long?> AddConsumedToDatabaseAsync(long chatId, string name, double kcal)
     {
         string date = GetCurrentDatetime();
 
@@ -214,8 +223,33 @@ public partial class WeightBot
         cmd.Parameters.AddWithValue("text", name);
         cmd.Parameters.AddWithValue("kcal", kcal);
 
-        object? result = await cmd.ExecuteScalarAsync();
-        return Convert.ToInt64(result);
+        try
+        {
+            object? result = await cmd.ExecuteScalarAsync();
+            return result != null ? Convert.ToInt64(result) : null;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    private async Task<ConsumedRowInfo?> RemoveConsumedFromDatabaseAsync(long chatId)
+    {
+        string sql = """
+                     DELETE
+                     FROM consumed
+                     WHERE id = @id
+                     RETURNING *;
+                     """;
+        var cmd = new SQLiteCommand(sql, _connection);
+        cmd.Parameters.AddWithValue("id", chatId);
+
+        DbDataReader reader = await cmd.ExecuteReaderAsync();
+        if (!await reader.ReadAsync())
+        {
+            return null;
+        }
     }
 
     private async Task<bool> HasChatIdAsync(long chatId)
