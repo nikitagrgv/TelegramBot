@@ -42,27 +42,40 @@ public class WeightBot
     private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
         CancellationToken cancellationToken)
     {
-        if (update.Message is not { Text: { } userText }) return;
-
         long chatId = update.Message.Chat.Id;
-        if (!await HasChatIdAsync(chatId))
+
+        if (!await RegisterChatIfNotRegisteredAsync(chatId, botClient, cancellationToken))
         {
-            bool registered = await RegisterChatIdAsync(chatId);
-            if (!registered)
-            {
-                Console.WriteLine($"Failed to register chat. Id = ${chatId}");
-                return;
-            }
-
-            Console.WriteLine($"Registered chat. Id = ${chatId}");
-
-            string message = "You are registered! Welcome!";
-            await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
-
-            await botClient.SendMessage(chatId, GetInfoMessage(), cancellationToken: cancellationToken);
+            return;
         }
 
+        if (update.Message is not { Text: { } userText }) return;
+
+
         await botClient.SendMessage(chatId, userText, cancellationToken: cancellationToken);
+    }
+
+    private async Task<bool> RegisterChatIfNotRegisteredAsync(long chatId, ITelegramBotClient botClient,
+        CancellationToken cancellationToken)
+    {
+        if (await HasChatIdAsync(chatId))
+        {
+            return true;
+        }
+
+        bool registered = await RegisterChatIdAsync(chatId);
+        if (!registered)
+        {
+            Console.WriteLine($"Failed to register chat. Id = ${chatId}");
+            return false;
+        }
+
+        Console.WriteLine($"Registered chat. Id = ${chatId}");
+
+        string message = "You are registered! Welcome!";
+        await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
+        await botClient.SendMessage(chatId, GetInfoMessage(), cancellationToken: cancellationToken);
+        return true;
     }
 
     private Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
