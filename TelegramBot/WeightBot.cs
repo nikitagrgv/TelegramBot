@@ -316,6 +316,20 @@ public partial class WeightBot
         return Task.CompletedTask;
     }
 
+    private async Task<double> GetConsumedCalFromDatabaseAsync(long chatId)
+    {
+        DateTime curDateUtc = DateTime.UtcNow;
+
+        int timezone = await GetUserTimezoneOffsetAsync(chatId);
+
+        DateTime dayBeginUser =
+            new DateTime(curDateUtc.Year, curDateUtc.Month, curDateUtc.Day, 0, 0, 0).AddHours(timezone);
+
+        string dayBeginUserString = ToDatabaseTimeFormat(dayBeginUser);
+        
+        
+    }
+
     private async Task<ConsumedRowInfo?> AddConsumedToDatabaseAsync(long chatId, string name, double kcal)
     {
         string date = GetCurrentDatetime();
