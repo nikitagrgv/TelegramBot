@@ -173,8 +173,6 @@ public partial class WeightBot
                           ID: {row.Id}
                           """;
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
-
-        _cancelTokenSource.CancelAfter(1000);
     }
 
     private async Task RemoveConsumedAsync(string args, long chatId, ITelegramBotClient botClient,
