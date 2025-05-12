@@ -321,12 +321,10 @@ public partial class WeightBot
 
     private async Task<double> GetConsumedDayCalFromDatabaseAsync(long chatId)
     {
-        DateTime curDateUtc = DateTime.UtcNow;
-
         int timezone = await GetUserTimezoneOffsetAsync(chatId);
 
-        DateTime dayBeginUser =
-            new DateTime(curDateUtc.Year, curDateUtc.Month, curDateUtc.Day, 0, 0, 0).AddHours(-timezone);
+        DateTime curDateUser = DateTime.UtcNow.AddHours(-timezone);
+        DateTime dayBeginUser = new DateTime(curDateUser.Year, curDateUser.Month, curDateUser.Day, 0, 0, 0);
 
         string dayBeginUserString = ToDatabaseTimeFormat(dayBeginUser);
 
