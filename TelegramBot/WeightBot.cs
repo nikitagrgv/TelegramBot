@@ -91,7 +91,8 @@ public partial class WeightBot
             case "help":
                 await PrintHelp(chatId, botClient, cancellationToken);
                 break;
-            case "start":
+            case "stat":
+                await PrintStat(chatId, botClient, cancellationToken);
                 break;
             default:
                 string message = $"Unknown command: {cmd}";
@@ -101,6 +102,11 @@ public partial class WeightBot
     }
 
     private async Task PrintHelp(long chatId, ITelegramBotClient botClient,
+        CancellationToken cancellationToken)
+    {
+    }
+
+    private async Task PrintStat(long chatId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
     }
