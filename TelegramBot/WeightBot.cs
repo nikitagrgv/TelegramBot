@@ -129,7 +129,18 @@ public partial class WeightBot
         }
 
         string name = m.Groups["name"].Value;
-        string kcal = m.Groups["kcal"].Value;
+        string kcalString = m.Groups["kcal"].Value;
+
+        double kcal;
+        if (!TryParseNumber(kcalString, out kcal))
+        {
+            string invalidCommandMessage =
+                $"Sorry, I didn't understand your 'add' command. Invalid kcal number: '{kcalString}'. Type /help to see a list of available commands.";
+            await botClient.SendMessage(chatId, invalidCommandMessage, cancellationToken: cancellationToken);
+            return;
+        }
+        
+        
     }
 
     private async Task RemoveConsumed(string args, long chatId, ITelegramBotClient botClient,
