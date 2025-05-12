@@ -195,6 +195,20 @@ public partial class WeightBot
     private async Task PrintStatAsync(long chatId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
+        List<ConsumedRowInfo> rows = await GetStatFromDatabaseAsync(chatId);
+
+        string message = "";
+        message += "<pre>";
+
+        message += $"{"Name",-12} {"Kcal",6} {"Date",20} {"ID",8}\n";
+        foreach (ConsumedRowInfo row in rows)
+        {
+            message += $"{row.Text,-12} {row.Kcal,6} {row.Date,20} {row.Id,8}\n";
+        }
+
+        message += "</pre>";
+
+        await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken, parseMode: ParseMode.Html);
     }
 
     private async Task<bool> RegisterChatIfNotRegisteredAsync(long chatId, ITelegramBotClient botClient,
