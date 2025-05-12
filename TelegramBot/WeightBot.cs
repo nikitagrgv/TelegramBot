@@ -200,16 +200,19 @@ public partial class WeightBot
         string message = "";
         message += "<pre>";
 
-        int nameSize = 0;
+        const int budget = 36;
+
         int kcalSize = 0;
         int dateSize = 12;
         int idSize = 0;
+
         foreach (ConsumedRowInfo row in rows)
         {
-            nameSize = int.Max(nameSize, row.Text.Length);
             kcalSize = int.Max(kcalSize, row.Kcal.Length);
             idSize = int.Max(idSize, row.Id.Length);
         }
+
+        int nameSize = int.Max(8, budget - kcalSize - dateSize - idSize);
 
         string format = $"{{0, -{nameSize}}}| {{1, {kcalSize}}}| {{2, {dateSize}}}| {{3, {idSize}}}\n";
 
