@@ -392,6 +392,16 @@ public partial class WeightBot
         return Convert.ToInt32(result) == 1;
     }
 
+    private async Task<bool> SetUserTimezoneOffsetAsync(long chatId, int timezoneOffset)
+    {
+        string sql = "UPDATE users SET timezone = @timezone WHERE id = @id";
+        await using var cmd = new SQLiteCommand(sql, _connection);
+        cmd.Parameters.AddWithValue("id", chatId);
+        cmd.Parameters.AddWithValue("timezone", timezoneOffset);
+        int result = await cmd.ExecuteNonQueryAsync();
+        return result != 0;
+    }
+
     private async Task<int> GetUserTimezoneOffsetAsync(long chatId)
     {
         string sql = "SELECT timezone FROM users WHERE id = @id";
