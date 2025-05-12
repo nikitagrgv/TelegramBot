@@ -119,6 +119,7 @@ public partial class WeightBot
 
     private void ShutdownBot()
     {
+        _connection.Close();
         _cancelTokenSource.Cancel();
     }
 
