@@ -171,6 +171,8 @@ public partial class WeightBot
             await botClient.SendMessage(chatId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
         }
+        
+        
     }
 
     private async Task PrintStatAsync(long chatId, ITelegramBotClient botClient,
@@ -245,19 +247,26 @@ public partial class WeightBot
         var cmd = new SQLiteCommand(sql, _connection);
         cmd.Parameters.AddWithValue("id", chatId);
 
-        DbDataReader reader = await cmd.ExecuteReaderAsync();
-        if (!await reader.ReadAsync())
+        try
+        {
+            DbDataReader reader = await cmd.ExecuteReaderAsync();
+            if (!await reader.ReadAsync())
+            {
+                return null;
+            }
+
+            string id = reader["id"].ToString() ?? string.Empty;
+            string userId = reader["user_id"].ToString() ?? string.Empty;
+            string date = reader["date"].ToString() ?? string.Empty;
+            string text = reader["text"].ToString() ?? string.Empty;
+            string kcal = reader["kcal"].ToString() ?? string.Empty;
+
+            return new ConsumedRowInfo(id, userId, date, text, kcal);
+        }
+        catch (Exception)
         {
             return null;
         }
-
-        string id = reader["id"].ToString() ?? string.Empty;
-        string userId = reader["user_id"].ToString() ?? string.Empty;
-        string date = reader["date"].ToString() ?? string.Empty;
-        string text = reader["text"].ToString() ?? string.Empty;
-        string kcal = reader["kcal"].ToString() ?? string.Empty;
-
-        return new ConsumedRowInfo(id, userId, date, text, kcal);
     }
 
     private async Task<bool> HasChatIdAsync(long chatId)
