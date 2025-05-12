@@ -462,7 +462,14 @@ public partial class WeightBot
         await using var cmd = new SQLiteCommand(sql, _connection);
         cmd.Parameters.AddWithValue("id", chatId);
         object? result = await cmd.ExecuteScalarAsync();
-        return Convert.ToInt32(result);
+        try
+        {
+            return Convert.ToInt32(result);
+        }
+        catch (Exception)
+        {
+            return 0;
+        }
     }
 
     private async Task<bool> RegisterChatIdAsync(long chatId)
