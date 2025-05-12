@@ -206,7 +206,7 @@ public partial class WeightBot
 
     private async Task<bool> RegisterChatIdAsync(long chatId)
     {
-        string date = GetCurrentTime();
+        string date = GetCurrentDatetime();
 
         string sql = """
                      INSERT INTO users (id, register_date)
@@ -258,7 +258,7 @@ public partial class WeightBot
             out result);
     }
 
-    private static string GetCurrentTime()
+    private static string GetCurrentDatetime()
     {
         return ToDatabaseTimeFormat(DateTime.UtcNow);
     }
