@@ -1,5 +1,6 @@
 ﻿using System.Data.SQLite;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace TelegramBot;
 
@@ -11,6 +12,7 @@ using Telegram.Bot.Types.Enums;
 public class WeightBot
 {
     private SQLiteConnection _connection;
+    private Regex _parseCommandRegex = new Regex(@"/(\w) (.+)$");
 
     public WeightBot(SQLiteConnection connection)
     {
@@ -59,15 +61,23 @@ public class WeightBot
             return;
         }
 
-        await DispatchUserMessage(chatId, userText, botClient, cancellationToken);
+        await DispatchUserMessage(chatId, userText.Trim(), botClient, cancellationToken);
     }
 
     private async Task DispatchUserMessage(long chatId, string userText, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        await botClient.SendMessage(chatId, userText, cancellationToken: cancellationToken);
+        Match m = _parseCommandRegex.Match(userText);
 
-        return;
+        if (!m.Success)
+        {
+            const string message = "Sorry, can't understand you";
+            await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
+            return;
+        }
+
+
+        await botClient.SendMessage(chatId, userText, cancellationToken: cancellationToken);
     }
 
     private async Task<bool> RegisterChatIfNotRegisteredAsync(long chatId, ITelegramBotClient botClient,
@@ -87,7 +97,7 @@ public class WeightBot
 
         Console.WriteLine($"Registered chat. Id = ${chatId}");
 
-        string message = "You are registered! Welcome!";
+        const string message = "You are registered! Welcome!";
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
         await botClient.SendMessage(chatId, GetInfoMessage(), cancellationToken: cancellationToken);
         return true;
