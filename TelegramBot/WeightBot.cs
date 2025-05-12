@@ -165,11 +165,13 @@ public partial class WeightBot
             return;
         }
 
+        int timeZone = 0;
+
         string message = $"""
                           Product added:
                           Name: {row.Text}
                           Kcal: {row.Kcal}
-                          Date: {FromDatabaseToUserTimeFormat(row.Date, chatId)}
+                          Date: {FromDatabaseToUserTimeFormat(row.Date, timeZone)}
                           ID: {row.Id}
                           """;
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
@@ -195,11 +197,13 @@ public partial class WeightBot
             return;
         }
 
+        int timeZone = 0;
+
         string message = $"""
                           Product removed:
                           Name: {row.Text}
                           Kcal: {row.Kcal}
-                          Date: {FromDatabaseToUserTimeFormat(row.Date, chatId)}
+                          Date: {FromDatabaseToUserTimeFormat(row.Date, timeZone)}
                           ID: {row.Id}
                           """;
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
@@ -230,9 +234,12 @@ public partial class WeightBot
         string format = $"{{0, -{nameSize}}}| {{1, {kcalSize}}}| {{2, {dateSize}}}| {{3, {idSize}}}\n";
 
         message += string.Format(format, "Name", "Kcal", "Date", "ID");
+        
+        int timeZone = 0;
+
         foreach (ConsumedRowInfo row in rows)
         {
-            string date = FromDatabaseToUserTimeFormat(row.Date, chatId);
+            string date = FromDatabaseToUserTimeFormat(row.Date, timeZone);
 
             string curName = row.Text;
             while (curName.Length > nameSize)
@@ -419,7 +426,7 @@ public partial class WeightBot
                """;
     }
 
-    private string FromDatabaseToUserTimeFormat(string dateTime, long chatId)
+    private string FromDatabaseToUserTimeFormat(string dateTime, int timeZon)
     {
         DateTime date = FromDatabaseTimeFormat(dateTime);
         return date.ToString("dd MMM HH:mm", CultureInfo.InvariantCulture);
