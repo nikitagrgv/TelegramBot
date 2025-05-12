@@ -9,10 +9,11 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
 
-public class WeightBot
+public partial class WeightBot
 {
-    private SQLiteConnection _connection;
-    private Regex _parseCommandRegex = new Regex(@"/(\w) (.+)$");
+    private static readonly Regex ParseCommandRegex = GetParseCommandRegex();
+
+    private readonly SQLiteConnection _connection;
 
     public WeightBot(SQLiteConnection connection)
     {
@@ -67,7 +68,7 @@ public class WeightBot
     private async Task DispatchUserMessage(long chatId, string userText, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        Match m = _parseCommandRegex.Match(userText);
+        Match m = ParseCommandRegex.Match(userText);
 
         if (!m.Success)
         {
@@ -154,4 +155,7 @@ public class WeightBot
     {
         return dateTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
     }
+
+    [GeneratedRegex(@"/(\w+) (.+)$")]
+    private static partial Regex GetParseCommandRegex();
 }
