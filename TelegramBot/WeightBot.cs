@@ -191,6 +191,10 @@ public partial class WeightBot
         return Task.CompletedTask;
     }
 
+    private async Task<long> AddConsumedAsync(long chatId, string name, double kcal)
+    {
+    }
+
     private async Task<bool> HasChatIdAsync(long chatId)
     {
         string sql = "SELECT EXISTS(SELECT 1 FROM users WHERE id = @id)";
@@ -202,7 +206,7 @@ public partial class WeightBot
 
     private async Task<bool> RegisterChatIdAsync(long chatId)
     {
-        string date = ToDatabaseTimeFormat(DateTime.UtcNow);
+        string date = GetCurrentTime();
 
         string sql = """
                      INSERT INTO users (id, register_date)
@@ -252,6 +256,11 @@ public partial class WeightBot
             NumberStyles.Number,
             CultureInfo.CurrentCulture,
             out result);
+    }
+
+    private static string GetCurrentTime()
+    {
+        return ToDatabaseTimeFormat(DateTime.UtcNow);
     }
 
     private static string ToDatabaseTimeFormat(DateTime dateTime)
