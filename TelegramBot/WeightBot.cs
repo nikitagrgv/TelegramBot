@@ -325,8 +325,9 @@ public partial class WeightBot
 
         DateTime curDateUser = DateTime.UtcNow.AddHours(-timezone);
         DateTime dayBeginUser = new DateTime(curDateUser.Year, curDateUser.Month, curDateUser.Day, 0, 0, 0);
+        DateTime dayBeginUtc = dayBeginUser.AddHours(timezone);
 
-        string dayBeginUserString = ToDatabaseTimeFormat(dayBeginUser);
+        string dayBeginUserString = ToDatabaseTimeFormat(dayBeginUtc);
 
         string sql = """
                      SELECT SUM(kcal) FROM consumed
