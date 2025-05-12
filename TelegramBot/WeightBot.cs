@@ -165,7 +165,7 @@ public partial class WeightBot
             return;
         }
 
-        int timeZone = 0;
+        int timeZone = await GetUserTimezoneOffsetAsync(chatId);
 
         string message = $"""
                           Product added:
@@ -197,7 +197,7 @@ public partial class WeightBot
             return;
         }
 
-        int timeZone = 0;
+        int timeZone = await GetUserTimezoneOffsetAsync(chatId);
 
         string message = $"""
                           Product removed:
