@@ -215,6 +215,26 @@ public partial class WeightBot
                """;
     }
 
+    // TODO: shit?
+    private static bool TryParseNumber(string s, out double result)
+    {
+        result = 0;
+        if (string.IsNullOrWhiteSpace(s))
+            return false;
+
+        char sep = Convert.ToChar(
+            CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator);
+
+        var normalized = s
+            .Replace(",", sep.ToString())
+            .Replace(".", sep.ToString());
+
+        return double.TryParse(normalized,
+            NumberStyles.Number,
+            CultureInfo.CurrentCulture,
+            out result);
+    }
+
     private static string ToDatabaseTimeFormat(DateTime dateTime)
     {
         return dateTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
