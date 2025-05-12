@@ -469,6 +469,9 @@ public partial class WeightBot
                Print all consumed products:
                /stat
 
+               Set the time zone offset:
+               /timezone +7
+
                Print this help:
                /help
                """;
