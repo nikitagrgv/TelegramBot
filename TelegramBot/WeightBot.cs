@@ -104,6 +104,7 @@ public partial class WeightBot
     private async Task PrintHelp(long chatId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
+        await botClient.SendMessage(chatId, GetHelpMessage(), cancellationToken: cancellationToken);
     }
 
     private async Task PrintStat(long chatId, ITelegramBotClient botClient,
@@ -130,7 +131,7 @@ public partial class WeightBot
 
         const string message = "You are registered! Welcome!";
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
-        await botClient.SendMessage(chatId, GetInfoMessage(), cancellationToken: cancellationToken);
+        await botClient.SendMessage(chatId, GetHelpMessage(), cancellationToken: cancellationToken);
         return true;
     }
 
@@ -165,7 +166,7 @@ public partial class WeightBot
         return result != 0;
     }
 
-    private string GetInfoMessage()
+    private string GetHelpMessage()
     {
         return """
                ---- Bot commands ----
