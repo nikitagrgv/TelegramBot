@@ -169,7 +169,7 @@ public partial class WeightBot
                           Product added:
                           Name: {row.Text}
                           Kcal: {row.Kcal}
-                          Date: {FromDatabaseToUserTimeFormat(row.Date)}
+                          Date: {FromDatabaseToUserTimeFormat(row.Date, chatId)}
                           ID: {row.Id}
                           """;
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
@@ -199,7 +199,7 @@ public partial class WeightBot
                           Product removed:
                           Name: {row.Text}
                           Kcal: {row.Kcal}
-                          Date: {FromDatabaseToUserTimeFormat(row.Date)}
+                          Date: {FromDatabaseToUserTimeFormat(row.Date, chatId)}
                           ID: {row.Id}
                           """;
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
@@ -232,7 +232,7 @@ public partial class WeightBot
         message += string.Format(format, "Name", "Kcal", "Date", "ID");
         foreach (ConsumedRowInfo row in rows)
         {
-            string date = FromDatabaseToUserTimeFormat(row.Date);
+            string date = FromDatabaseToUserTimeFormat(row.Date, chatId);
 
             string curName = row.Text;
             while (curName.Length > nameSize)
