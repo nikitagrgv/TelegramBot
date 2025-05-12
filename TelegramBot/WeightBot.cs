@@ -118,6 +118,18 @@ public partial class WeightBot
     private async Task AddConsumed(string args, long chatId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
+        Match m = AddConsumedRegex.Match(args);
+
+        if (!m.Success)
+        {
+            string invalidCommandMessage =
+                $"Sorry, I didn't understand you add command. Invalid arguments: '{args}'. Type /help to see a list of available commands.";
+            await botClient.SendMessage(chatId, invalidCommandMessage, cancellationToken: cancellationToken);
+            return;
+        }
+
+        string name = m.Groups["name"].Value;
+        string kcal = m.Groups["kcal"].Value;
     }
 
     private async Task RemoveConsumed(string args, long chatId, ITelegramBotClient botClient,
