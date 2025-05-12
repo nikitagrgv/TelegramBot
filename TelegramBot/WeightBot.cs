@@ -107,11 +107,19 @@ public partial class WeightBot
             case "stat":
                 await PrintStatAsync(chatId, botClient, cancellationToken);
                 break;
+            case "kill":
+                ShutdownBot();
+                break;
             default:
                 string message = $"Unknown command: {cmd}. Type /help to see a list of available commands.";
                 await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
                 break;
         }
+    }
+
+    private void ShutdownBot()
+    {
+        _cancelTokenSource.Cancel();
     }
 
     private async Task PrintHelpAsync(long chatId, ITelegramBotClient botClient,
