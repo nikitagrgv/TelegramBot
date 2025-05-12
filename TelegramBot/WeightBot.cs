@@ -217,12 +217,15 @@ public partial class WeightBot
     {
         List<ConsumedRowInfo> rows = await GetStatFromDatabaseAsync(chatId);
 
-        int timeZone = await GetUserTimezoneOffsetAsync(chatId);
-
         string message = "";
         message += "<pre>";
 
+        int timeZone = await GetUserTimezoneOffsetAsync(chatId);
         message += $"User Time Zone: {timeZone:+#;-#;0}\n";
+
+        double consumedToday = await GetConsumedDayCalFromDatabaseAsync(chatId);
+        message += $"Consumed Today: {consumedToday}\n";
+
 
         const int budget = 36;
 
