@@ -242,7 +242,7 @@ public partial class WeightBot
         cmd.Parameters.AddWithValue("text", name);
         cmd.Parameters.AddWithValue("kcal", kcal);
 
-        return await ExecuteConsumedAsync(cmd);
+        return await ExecuteConsumedAndGetOneAsync(cmd);
     }
 
     private async Task<ConsumedRowInfo?> RemoveConsumedFromDatabaseAsync(long id)
@@ -256,10 +256,10 @@ public partial class WeightBot
         var cmd = new SQLiteCommand(sql, _connection);
         cmd.Parameters.AddWithValue("id", id);
 
-        return await ExecuteConsumedAsync(cmd);
+        return await ExecuteConsumedAndGetOneAsync(cmd);
     }
 
-    private async Task<ConsumedRowInfo?> ExecuteConsumedAsync(SQLiteCommand cmd)
+    private async Task<ConsumedRowInfo?> ExecuteConsumedAndGetOneAsync(SQLiteCommand cmd)
     {
         try
         {
@@ -269,18 +269,44 @@ public partial class WeightBot
                 return null;
             }
 
-            string consumedId = reader["id"].ToString() ?? string.Empty;
-            string userId = reader["user_id"].ToString() ?? string.Empty;
-            string date = reader["date"].ToString() ?? string.Empty;
-            string text = reader["text"].ToString() ?? string.Empty;
-            string kcal = reader["kcal"].ToString() ?? string.Empty;
-
-            return new ConsumedRowInfo(consumedId, userId, date, text, kcal);
+            return GetConsumedInfo(reader);
         }
         catch (Exception)
         {
             return null;
         }
+    }
+
+    private async Task<List<ConsumedRowInfo>> ExecuteConsumedAndGetAllAsync(SQLiteCommand cmd)
+    {
+        try
+        {
+            List<ConsumedRowInfo> rows = [];
+
+            DbDataReader reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                ConsumedRowInfo info = GetConsumedInfo(reader);
+                rows.Add(info);
+            }
+
+            return rows;
+        }
+        catch (Exception)
+        {
+            return [];
+        }
+    }
+
+    private static ConsumedRowInfo GetConsumedInfo(DbDataReader reader)
+    {
+        string consumedId = reader["id"].ToString() ?? string.Empty;
+        string userId = reader["user_id"].ToString() ?? string.Empty;
+        string date = reader["date"].ToString() ?? string.Empty;
+        string text = reader["text"].ToString() ?? string.Empty;
+        string kcal = reader["kcal"].ToString() ?? string.Empty;
+
+        return new ConsumedRowInfo(consumedId, userId, date, text, kcal);
     }
 
     private async Task<bool> HasChatIdAsync(long chatId)
