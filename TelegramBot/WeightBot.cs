@@ -144,7 +144,7 @@ public partial class WeightBot
 
         string message = $"""
                           Added product:
-                          '{name}'
+                          {name}
                           {kcal} kcal
                           ID = {consumedId}
                           """;
