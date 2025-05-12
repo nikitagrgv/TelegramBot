@@ -63,10 +63,10 @@ public partial class WeightBot
             return;
         }
 
-        await ParseAndDispatchUserMessage(chatId, userText.Trim(), botClient, cancellationToken);
+        await ParseAndDispatchUserMessageAsync(chatId, userText.Trim(), botClient, cancellationToken);
     }
 
-    private async Task ParseAndDispatchUserMessage(long chatId, string userText, ITelegramBotClient botClient,
+    private async Task ParseAndDispatchUserMessageAsync(long chatId, string userText, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
         Match m = ParseCommandRegex.Match(userText);
@@ -82,25 +82,25 @@ public partial class WeightBot
         string cmd = m.Groups["cmd"].Value;
         string args = m.Groups["args"].Value;
 
-        await DispatchUserMessage(cmd, args, chatId, botClient, cancellationToken);
+        await DispatchUserMessageAsync(cmd, args, chatId, botClient, cancellationToken);
     }
 
-    private async Task DispatchUserMessage(string cmd, string args, long chatId, ITelegramBotClient botClient,
+    private async Task DispatchUserMessageAsync(string cmd, string args, long chatId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
         switch (cmd)
         {
             case "help":
-                await PrintHelp(chatId, botClient, cancellationToken);
+                await PrintHelpAsync(chatId, botClient, cancellationToken);
                 break;
             case "add":
-                await AddConsumed(args, chatId, botClient, cancellationToken);
+                await AddConsumedAsync(args, chatId, botClient, cancellationToken);
                 break;
             case "remove":
-                await RemoveConsumed(args, chatId, botClient, cancellationToken);
+                await RemoveConsumedAsync(args, chatId, botClient, cancellationToken);
                 break;
             case "stat":
-                await PrintStat(chatId, botClient, cancellationToken);
+                await PrintStatAsync(chatId, botClient, cancellationToken);
                 break;
             default:
                 string message = $"Unknown command: {cmd}. Type /help to see a list of available commands.";
@@ -109,13 +109,13 @@ public partial class WeightBot
         }
     }
 
-    private async Task PrintHelp(long chatId, ITelegramBotClient botClient,
+    private async Task PrintHelpAsync(long chatId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
         await botClient.SendMessage(chatId, GetHelpMessage(), cancellationToken: cancellationToken);
     }
 
-    private async Task AddConsumed(string args, long chatId, ITelegramBotClient botClient,
+    private async Task AddConsumedAsync(string args, long chatId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
         Match m = AddConsumedRegex.Match(args);
@@ -151,12 +151,12 @@ public partial class WeightBot
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
     }
 
-    private async Task RemoveConsumed(string args, long chatId, ITelegramBotClient botClient,
+    private async Task RemoveConsumedAsync(string args, long chatId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
     }
 
-    private async Task PrintStat(long chatId, ITelegramBotClient botClient,
+    private async Task PrintStatAsync(long chatId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
     }
