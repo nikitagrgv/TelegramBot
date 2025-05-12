@@ -72,15 +72,16 @@ public partial class WeightBot
 
         if (!m.Success)
         {
-            const string message = "Sorry, I can't understand you";
-            await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
+            const string invalidCommandMessage = "Sorry, I can't understand you";
+            await botClient.SendMessage(chatId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
         }
-        
-        
 
+        string cmd = m.Groups["cmd"].Value;
+        string args = m.Groups["args"].Value;
 
-        await botClient.SendMessage(chatId, userText, cancellationToken: cancellationToken);
+        string message = $"Command: {cmd}. Args: {args}";
+        await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
     }
 
     private async Task<bool> RegisterChatIfNotRegisteredAsync(long chatId, ITelegramBotClient botClient,
@@ -94,11 +95,11 @@ public partial class WeightBot
         bool registered = await RegisterChatIdAsync(chatId);
         if (!registered)
         {
-            Console.WriteLine($"Failed to register chat. Id = ${chatId}");
+            Console.WriteLine($"Failed to register chat. Id = {chatId}");
             return false;
         }
 
-        Console.WriteLine($"Registered chat. Id = ${chatId}");
+        Console.WriteLine($"Registered chat. Id = {chatId}");
 
         const string message = "You are registered! Welcome!";
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
