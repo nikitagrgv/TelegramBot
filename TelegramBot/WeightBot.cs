@@ -123,7 +123,7 @@ public partial class WeightBot
         if (!m.Success)
         {
             string invalidCommandMessage =
-                $"Sorry, I didn't understand you add command. Invalid arguments: '{args}'. Type /help to see a list of available commands.";
+                $"Sorry, I didn't understand your 'add' command. Invalid arguments: '{args}'. Type /help to see a list of available commands.";
             await botClient.SendMessage(chatId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
         }
