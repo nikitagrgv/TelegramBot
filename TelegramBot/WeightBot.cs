@@ -12,7 +12,7 @@ using Telegram.Bot.Types.Enums;
 
 public partial class WeightBot
 {
-    private record ConsumedRowInfo(long Id, long UserId, string Date, string Text, double Kcal);
+    private record ConsumedRowInfo(string Id, string UserId, string Date, string Text, string Kcal);
 
     private static readonly Regex ParseCommandRegex = GetParseCommandRegex();
     private static readonly Regex AddConsumedRegex = GetAddConsumedRegex();
@@ -250,6 +250,14 @@ public partial class WeightBot
         {
             return null;
         }
+
+        string id = reader["id"].ToString() ?? string.Empty;
+        string userId = reader["user_id"].ToString() ?? string.Empty;
+        string date = reader["date"].ToString() ?? string.Empty;
+        string text = reader["text"].ToString() ?? string.Empty;
+        string kcal = reader["kcal"].ToString() ?? string.Empty;
+
+        return new ConsumedRowInfo(id, userId, date, text, kcal);
     }
 
     private async Task<bool> HasChatIdAsync(long chatId)
