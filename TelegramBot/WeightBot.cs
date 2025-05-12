@@ -200,11 +200,17 @@ public partial class WeightBot
         string message = "";
         message += "<pre>";
 
-        message += $"{"Name",-20} {"Kcal",5} {"Date",13} {"ID",4}\n";
+        int nameSize = 20;
+        int KcalSize = 5;
+        int DateSize = 13;
+        int IDSize = 4;
+        string format = $"{{0, -{nameSize}}} {{1, {KcalSize}}} {{2, {DateSize}}} {{3, {IDSize}}}\n";
+
+        message += string.Format(format, "Name", "Kcal", "Date", "ID");
         foreach (ConsumedRowInfo row in rows)
         {
             string date = FromDatabaseToUserTimeFormat(row.Date);
-            message += $"{row.Text,-20} {row.Kcal,5} {date,13} {row.Id,4}\n";
+            message += string.Format(format, "Name", "Kcal", "Date", "ID");
         }
 
         message += "</pre>";
