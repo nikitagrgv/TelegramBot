@@ -201,9 +201,17 @@ public partial class WeightBot
         message += "<pre>";
 
         int nameSize = 20;
-        int KcalSize = 5;
-        int DateSize = 13;
-        int IDSize = 4;
+        int KcalSize = 0;
+        int DateSize = 0;
+        int IDSize = 0;
+        foreach (ConsumedRowInfo row in rows)
+        {
+            nameSize = int.Max(nameSize, row.Text.Length);
+            KcalSize = int.Max(KcalSize, row.Kcal.Length);
+            DateSize = int.Max(DateSize, row.Date.Length);
+            IDSize = int.Max(IDSize, row.Id.Length);
+        }
+
         string format = $"{{0, -{nameSize}}} {{1, {KcalSize}}} {{2, {DateSize}}} {{3, {IDSize}}}\n";
 
         message += string.Format(format, "Name", "Kcal", "Date", "ID");
