@@ -108,7 +108,11 @@ public partial class WeightBot
                 await PrintStatAsync(chatId, botClient, cancellationToken);
                 break;
             case "kill":
-                ShutdownBot();
+                string shutdownMessage = $"Goodbye {chatId}";
+                await botClient.SendMessage(chatId, shutdownMessage, cancellationToken: cancellationToken);
+
+                await _cancelTokenSource.CancelAsync();
+                _connection.Close();
                 break;
             default:
                 string message = $"Unknown command: {cmd}. Type /help to see a list of available commands.";
@@ -119,7 +123,6 @@ public partial class WeightBot
 
     private void ShutdownBot()
     {
-        _connection.Close();
         _cancelTokenSource.Cancel();
     }
 
