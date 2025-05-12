@@ -86,10 +86,24 @@ public partial class WeightBot
     private async Task DispatchUserMessage(string cmd, string args, long chatId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        string message = $"Command: {cmd}. Args: {args}";
-        await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
+        switch (cmd)
+        {
+            case "help":
+                await PrintHelp(chatId, botClient, cancellationToken);
+                break;
+            case "start":
+                break;
+            default:
+                string message = $"Unknown command: {cmd}";
+                await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
+                break;
+        }
     }
 
+    private async Task PrintHelp(long chatId, ITelegramBotClient botClient,
+        CancellationToken cancellationToken)
+    {
+    }
 
     private async Task<bool> RegisterChatIfNotRegisteredAsync(long chatId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
