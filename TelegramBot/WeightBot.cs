@@ -326,7 +326,7 @@ public partial class WeightBot
         int timezone = await GetUserTimezoneOffsetAsync(chatId);
 
         DateTime dayBeginUser =
-            new DateTime(curDateUtc.Year, curDateUtc.Month, curDateUtc.Day, 0, 0, 0).AddHours(timezone);
+            new DateTime(curDateUtc.Year, curDateUtc.Month, curDateUtc.Day, 0, 0, 0).AddHours(-timezone);
 
         string dayBeginUserString = ToDatabaseTimeFormat(dayBeginUser);
 
