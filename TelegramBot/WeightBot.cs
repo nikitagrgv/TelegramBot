@@ -200,11 +200,11 @@ public partial class WeightBot
         string message = "";
         message += "<pre>";
 
-        message += $"{"Name",-20} {"Kcal",5} {"Date",13} {"ID",5}\n";
+        message += $"{"Name",-20} {"Kcal",5} {"Date",13} {"ID",4}\n";
         foreach (ConsumedRowInfo row in rows)
         {
             string date = FromDatabaseToUserTimeFormat(row.Date);
-            message += $"{row.Text,-20} {row.Kcal,5} {date,13} {row.Id,5}\n";
+            message += $"{row.Text,-20} {row.Kcal,5} {date,13} {row.Id,4}\n";
         }
 
         message += "</pre>";
