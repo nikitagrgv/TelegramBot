@@ -234,7 +234,7 @@ public partial class WeightBot
         string format = $"{{0, -{nameSize}}}| {{1, {kcalSize}}}| {{2, {dateSize}}}| {{3, {idSize}}}\n";
 
         message += string.Format(format, "Name", "Kcal", "Date", "ID");
-        
+
         int timeZone = 0;
 
         foreach (ConsumedRowInfo row in rows)
@@ -426,9 +426,10 @@ public partial class WeightBot
                """;
     }
 
-    private string FromDatabaseToUserTimeFormat(string dateTime, int timeZon)
+    private string FromDatabaseToUserTimeFormat(string dateTime, int timeZone)
     {
         DateTime date = FromDatabaseTimeFormat(dateTime);
+        date = date.AddHours(timeZone);
         return date.ToString("dd MMM HH:mm", CultureInfo.InvariantCulture);
     }
 
