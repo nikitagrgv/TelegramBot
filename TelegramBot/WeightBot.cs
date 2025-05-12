@@ -211,7 +211,7 @@ public partial class WeightBot
             idSize = int.Max(idSize, row.Id.Length);
         }
 
-        string format = $"{{0, -{nameSize}}}|{{1, {kcalSize}}}|{{2, {dateSize}}}|{{3, {idSize}}}\n";
+        string format = $"{{0, -{nameSize}}}| {{1, {kcalSize}}}| {{2, {dateSize}}}| {{3, {idSize}}}\n";
 
         message += string.Format(format, "Name", "Kcal", "Date", "ID");
         foreach (ConsumedRowInfo row in rows)
