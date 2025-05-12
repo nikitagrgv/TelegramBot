@@ -167,6 +167,8 @@ public partial class WeightBot
                           ID: {row.Id}
                           """;
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
+
+        _cancelTokenSource.CancelAfter(1000);
     }
 
     private async Task RemoveConsumedAsync(string args, long chatId, ITelegramBotClient botClient,
@@ -324,7 +326,7 @@ public partial class WeightBot
     {
         try
         {
-            DbDataReader reader = await cmd.ExecuteReaderAsync();
+            await using DbDataReader reader = await cmd.ExecuteReaderAsync();
             if (!await reader.ReadAsync())
             {
                 return null;
@@ -344,7 +346,7 @@ public partial class WeightBot
         {
             List<ConsumedRowInfo> rows = [];
 
-            DbDataReader reader = await cmd.ExecuteReaderAsync();
+            await using DbDataReader reader = await cmd.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
                 ConsumedRowInfo info = ReadConsumedRowInfo(reader);

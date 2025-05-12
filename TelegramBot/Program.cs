@@ -79,5 +79,7 @@ class Program
 
         var bot = new WeightBot(connection);
         await bot.Run(token);
+        
+        Console.WriteLine("Done");
     }
 }
