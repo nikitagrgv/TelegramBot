@@ -278,7 +278,7 @@ public partial class WeightBot
         string sql = """
                      SELECT *
                      FROM consumed
-                     WHERE id = @id
+                     WHERE user_id = @id
                      ORDER BY date;
                      """;
         var cmd = new SQLiteCommand(sql, _connection);
