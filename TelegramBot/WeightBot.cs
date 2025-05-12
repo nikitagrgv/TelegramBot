@@ -220,6 +220,14 @@ public partial class WeightBot
         foreach (ConsumedRowInfo row in rows)
         {
             string date = FromDatabaseToUserTimeFormat(row.Date);
+
+            string curName = row.Text;
+            while (curName.Length > nameSize)
+            {
+                message += string.Format(format, curName, string.Empty, string.Empty, string.Empty);
+                curName = curName.Substring(nameSize);
+            }
+
             message += string.Format(format, row.Text, row.Kcal, date, row.Id);
         }
 
