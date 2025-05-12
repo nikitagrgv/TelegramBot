@@ -259,6 +259,20 @@ public partial class WeightBot
         return await ExecuteConsumedAndGetOneAsync(cmd);
     }
 
+    private async Task<List<ConsumedRowInfo>> GetStatFromDatabaseAsync(long id)
+    {
+        string sql = """
+                     SELECT *
+                     FROM consumed
+                     WHERE id = @id
+                     ORDER BY date;
+                     """;
+        var cmd = new SQLiteCommand(sql, _connection);
+        cmd.Parameters.AddWithValue("id", id);
+
+        return await ExecuteConsumedAndGetAllAsync(cmd);
+    }
+
     private async Task<ConsumedRowInfo?> ExecuteConsumedAndGetOneAsync(SQLiteCommand cmd)
     {
         try
