@@ -166,19 +166,25 @@ public class BotDatabase : IDisposable
     {
         try
         {
-            if (reader["date"].ToString() is not { } dateString ||
+            if (
+                reader["id"] is not { } idObject || idObject is DBNull ||
+                reader["user_id"] is not { } userIdObject || userIdObject is DBNull ||
+                reader["date"] is not { } dateObject || dateObject is DBNull ||
+                reader["text"] is not { } textObject || textObject is DBNull ||
+                reader["kcal"] is not { } kcalObject || kcalObject is DBNull ||
+                reader["date"].ToString() is not { } dateString ||
                 reader["text"].ToString() is not { } text ||
                 string.IsNullOrEmpty(dateString))
             {
                 return null;
             }
 
-            long consumedId = Convert.ToInt64(reader["id"]);
-            long userId = Convert.ToInt64(reader["user_id"]);
+            long id = Convert.ToInt64(idObject);
+            long userId = Convert.ToInt64(userIdObject);
             DateTime date = FromDatabaseTimeFormat(dateString);
-            double kcal = Convert.ToDouble(reader["kcal"]);
+            double kcal = Convert.ToDouble(kcalObject);
 
-            return new ConsumedRowInfo(consumedId, userId, date, text, kcal);
+            return new ConsumedRowInfo(id, userId, date, text, kcal);
         }
         catch (Exception)
         {
