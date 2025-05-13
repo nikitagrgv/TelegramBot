@@ -162,7 +162,7 @@ public partial class WeightBot : IDisposable
             return;
         }
 
-        ConsumedRowInfo? row = await _database.AddConsumedToDatabaseAsync(chatId, name, kcal);
+        ConsumedRowInfo? row = await _database.AddConsumedAsync(chatId, name, kcal);
 
         if (row == null)
         {
@@ -195,7 +195,7 @@ public partial class WeightBot : IDisposable
             return;
         }
 
-        ConsumedRowInfo? row = await _database.RemoveConsumedFromDatabaseAsync(consumedId);
+        ConsumedRowInfo? row = await _database.RemoveConsumedAsync(consumedId);
         if (row == null)
         {
             string errorMessage =
@@ -241,7 +241,7 @@ public partial class WeightBot : IDisposable
         ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        List<ConsumedRowInfo> dbRows = await _database.GetStatFromDatabaseAsync(begin, end, chatId);
+        List<ConsumedRowInfo> dbRows = await _database.GetStatAsync(begin, end, chatId);
         
         // TODO: refactor shit
 
@@ -293,7 +293,7 @@ public partial class WeightBot : IDisposable
             return;
         }
 
-        bool success = await _database.SetUserTimezoneOffsetToDatabaseAsync(chatId, timezone);
+        bool success = await _database.SetUserTimezoneOffsetAsync(chatId, timezone);
         if (!success)
         {
             string errorMessage =

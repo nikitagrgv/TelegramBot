@@ -40,7 +40,7 @@ public class BotDatabase : IDisposable
 
     #region BotOperations
 
-    public async Task<double> GetConsumedCalFromDatabaseAsync(DateTime? optionalBegin, DateTime? optionalEnd,
+    public async Task<double> GetConsumedCalAsync(DateTime? optionalBegin, DateTime? optionalEnd,
         long chatId)
     {
         if (optionalBegin is { } begin && optionalEnd is { } end)
@@ -93,7 +93,7 @@ public class BotDatabase : IDisposable
         return await ExecuteDoubleSafeAsync(everythingCmd);
     }
 
-    public async Task<ConsumedRowInfo?> AddConsumedToDatabaseAsync(long chatId, string name, double kcal)
+    public async Task<ConsumedRowInfo?> AddConsumedAsync(long chatId, string name, double kcal)
     {
         string date = ToDatabaseTimeFormat(DateTime.UtcNow);
 
@@ -111,7 +111,7 @@ public class BotDatabase : IDisposable
         return await ExecuteConsumedAndGetOneAsync(cmd);
     }
 
-    public async Task<ConsumedRowInfo?> RemoveConsumedFromDatabaseAsync(long id)
+    public async Task<ConsumedRowInfo?> RemoveConsumedAsync(long id)
     {
         string sql = """
                      DELETE
@@ -125,7 +125,7 @@ public class BotDatabase : IDisposable
         return await ExecuteConsumedAndGetOneAsync(cmd);
     }
 
-    public async Task<List<ConsumedRowInfo>> GetStatFromDatabaseAsync(DateTime? optionalBegin, DateTime? optionalEnd,
+    public async Task<List<ConsumedRowInfo>> GetStatAsync(DateTime? optionalBegin, DateTime? optionalEnd,
         long chatId)
     {
         if (optionalBegin is { } begin && optionalEnd is { } end)
@@ -281,7 +281,7 @@ public class BotDatabase : IDisposable
         return Convert.ToInt32(result) == 1;
     }
 
-    public async Task<bool> SetUserTimezoneOffsetToDatabaseAsync(long chatId, int timezoneOffset)
+    public async Task<bool> SetUserTimezoneOffsetAsync(long chatId, int timezoneOffset)
     {
         string sql = "UPDATE users SET timezone = @timezone WHERE id = @id";
         await using var cmd = new SQLiteCommand(sql, _connection);
