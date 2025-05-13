@@ -82,6 +82,7 @@ public partial class WeightBot : IDisposable
     private async Task DispatchCallbackQueryAsync(long userId, string queryData, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
+        await ParseAndDispatchUserMessageAsync(userId, queryData, botClient, cancellationToken);
     }
 
     private async Task HandleMessageAsync(Message message, ITelegramBotClient botClient,
