@@ -2,6 +2,7 @@
 using System.Data.SQLite;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TelegramBot;
 
@@ -41,6 +42,40 @@ public partial class WeightBot : IDisposable
         User me = await botClient.GetMe(cancellationToken: _cancelTokenSource.Token);
         Console.WriteLine($"Start listening @{me.Username}");
 
+
+        botClient.AnswerCall.callback += async (sender, e) =>
+        {
+            var callback = e.CallbackQuery;
+            string responseText;
+
+            switch (callback.Data)
+            {
+                case "like":
+                    responseText = "You liked this!";
+                    break;
+                case "dislike":
+                    responseText = "You disliked this.";
+                    break;
+                case "refresh":
+                    responseText = "Content refreshed! 🔄";
+                    break;
+                default:
+                    responseText = "Unknown action.";
+                    break;
+            }
+
+            // Answer the callback to remove loading state on button
+            await botClient.AnswerCallbackQueryAsync(callback.Id, text: "Done!");
+
+            // Optionally edit the original message
+            await botClient.EditMessageTextAsync(
+                chatId: callback.Message.Chat.Id,
+                messageId: callback.Message.MessageId,
+                text: responseText
+            );
+        };
+
+
         await botClient.ReceiveAsync(
             updateHandler: HandleUpdateAsync,
             errorHandler: HandleErrorAsync,
@@ -52,11 +87,15 @@ public partial class WeightBot : IDisposable
     private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
         CancellationToken cancellationToken)
     {
-        if (update.Message is not { } message)
+        if (update.Message is { } message)
         {
-            return;
+            await HandleMessageAsync(message, botClient, cancellationToken);
         }
+    }
 
+    private async Task HandleMessageAsync(Message message, ITelegramBotClient botClient,
+        CancellationToken cancellationToken)
+    {
         long chatId = message.Chat.Id;
 
         if (!await RegisterChatIfNotRegisteredAsync(chatId, botClient, cancellationToken))
@@ -258,6 +297,22 @@ public partial class WeightBot : IDisposable
         }
 
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
+
+
+        var keyboard = new InlineKeyboardMarkup(new[]
+        {
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("button 1", "b1"),
+                InlineKeyboardButton.WithCallbackData("button 2", "b2"),
+            },
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("button 3", "b3"),
+                InlineKeyboardButton.WithCallbackData("button 4", "b4"),
+            }
+        });
+        await botClient.SendMessage(chatId, "test text", replyMarkup: keyboard, cancellationToken: cancellationToken);
     }
 
     private async Task PrintDayStatAsync(long chatId,
