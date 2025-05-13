@@ -14,9 +14,10 @@ public class BotDatabase : IDisposable
         _connection = new SQLiteConnection(connectionString);
     }
 
-    public async Task OpenAsync()
+    public async Task<bool> OpenAsync()
     {
         await _connection.OpenAsync();
+        return _connection.State == System.Data.ConnectionState.Open;
     }
 
     void IDisposable.Dispose()
