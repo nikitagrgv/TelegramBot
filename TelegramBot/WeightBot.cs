@@ -242,17 +242,16 @@ public partial class WeightBot : IDisposable
         CancellationToken cancellationToken)
     {
         List<ConsumedRowInfo> dbRows = await _database.GetStatFromDatabaseAsync(begin, end, chatId);
+        
+        // TODO: refactor shit
 
         List<ConsumedRowInfoStrings> strRows = dbRows
             .Select(row => DbRowToStringRow(row, timeZone, timeFormat))
             .ToList();
-        int kcalSize = strRows
-            .Max(row => row.Kcal.Length);
-        int idSize = strRows
-            .Max(row => row.Id.Length);
+        int kcalSize = strRows.Any() ? strRows.Max(row => row.Kcal.Length) : 0;
+        int idSize = strRows.Any() ? strRows.Max(row => row.Id.Length) : 0;
+        double consumedToday = dbRows.Any() ? dbRows.Sum(row => row.Kcal) : 0;
         int dateSize = LongUserTimeFormat.Length;
-        double consumedToday = dbRows
-            .Sum(row => row.Kcal);
 
         const int tableLengthBudget = 36;
         int nameSize = int.Max(8, tableLengthBudget - kcalSize - dateSize - idSize);
