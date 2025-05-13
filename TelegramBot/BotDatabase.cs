@@ -95,8 +95,6 @@ public class BotDatabase : IDisposable
 
     public async Task<ConsumedRowInfo?> AddConsumedAsync(long chatId, string name, double kcal, DateTime date)
     {
-        string dateString = ToDatabaseTimeFormat(date);
-
         string sql = """
                      INSERT INTO consumed (user_id, date, text, kcal)
                      VALUES (@user_id, @date, @text, @kcal)
@@ -104,7 +102,7 @@ public class BotDatabase : IDisposable
                      """;
         await using var cmd = new SQLiteCommand(sql, _connection);
         cmd.Parameters.AddWithValue("user_id", chatId);
-        cmd.Parameters.AddWithValue("date", dateString);
+        cmd.Parameters.AddWithValue("date", ToDatabaseTimeFormat(date));
         cmd.Parameters.AddWithValue("text", name);
         cmd.Parameters.AddWithValue("kcal", kcal);
 
@@ -309,15 +307,13 @@ public class BotDatabase : IDisposable
 
     public async Task<bool> RegisterChatIdAsync(long chatId, DateTime date)
     {
-        string dateString = ToDatabaseTimeFormat(date);
-
         string sql = """
                      INSERT INTO users (id, register_date)
                      VALUES (@id, @date);
                      """;
         await using var cmd = new SQLiteCommand(sql, _connection);
         cmd.Parameters.AddWithValue("id", chatId);
-        cmd.Parameters.AddWithValue("date", dateString);
+        cmd.Parameters.AddWithValue("date", ToDatabaseTimeFormat(date));
         int result = await cmd.ExecuteNonQueryAsync();
         return result != 0;
     }
