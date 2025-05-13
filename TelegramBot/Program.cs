@@ -15,7 +15,7 @@ class Program
 
     static async Task Main()
     {
-        string dbPath = "database_v1.sqlite";
+        string dbPath = "ConsumeDatabase.sqlite";
         string connectionString = $"Data Source={dbPath};Version=3;";
         await using var connection = new SQLiteConnection(connectionString);
         await connection.OpenAsync();
