@@ -241,7 +241,7 @@ public partial class WeightBot : IDisposable
         string message = "";
         if (limit != null)
         {
-            message = $"🔥 Consumed Today: {consumed} / {limit}\n";
+            message = $"🔥 Consumed Today: {consumed} / {limit} kcal\n";
             if (consumed < limit)
             {
                 message += $"✅ {limit - consumed} kcal left\n";
@@ -253,7 +253,7 @@ public partial class WeightBot : IDisposable
         }
         else
         {
-            message = $"🔥 Consumed Today: {consumed} (no limit set)\n";
+            message = $"🔥 Consumed Today: {consumed} kcal (no limit set)\n";
         }
 
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
