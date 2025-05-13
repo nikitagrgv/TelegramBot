@@ -1,4 +1,6 @@
-﻿using System.Data.SQLite;
+﻿using System.Data.Common;
+using System.Data.SQLite;
+using System.Globalization;
 
 namespace TelegramBot;
 
@@ -35,6 +37,206 @@ public class BotDatabase : IDisposable
 
         return true;
     }
+
+    #region BotOperations
+
+    public async Task<double> GetConsumedDayCalFromDatabaseAsync(long chatId)
+    {
+        int timezone = await GetUserTimezoneOffsetAsync(chatId);
+
+        DateTime curDateUser = DateTime.UtcNow.AddHours(+timezone);
+        DateTime dayBeginUser = new DateTime(curDateUser.Year, curDateUser.Month, curDateUser.Day, 0, 0, 0);
+        DateTime dayBeginUtc = dayBeginUser.AddHours(-timezone);
+
+        string dayBeginUserString = ToDatabaseTimeFormat(dayBeginUtc);
+
+        string sql = """
+                     SELECT SUM(kcal) FROM consumed
+                     WHERE user_id = @user_id AND date >= @start;
+                     """;
+        await using var cmd = new SQLiteCommand(sql, _connection);
+        cmd.Parameters.AddWithValue("user_id", chatId);
+        cmd.Parameters.AddWithValue("start", dayBeginUserString);
+
+        try
+        {
+            object? result = await cmd.ExecuteScalarAsync();
+            if (result == null)
+            {
+                return 0;
+            }
+
+            return Convert.ToDouble(result);
+        }
+        catch (Exception)
+        {
+            return 0;
+        }
+    }
+
+    public async Task<ConsumedRowInfo?> AddConsumedToDatabaseAsync(long chatId, string name, double kcal)
+    {
+        string date = ToDatabaseTimeFormat(DateTime.UtcNow);
+
+        string sql = """
+                     INSERT INTO consumed (user_id, date, text, kcal)
+                     VALUES (@user_id, @date, @text, @kcal)
+                     RETURNING *;
+                     """;
+        await using var cmd = new SQLiteCommand(sql, _connection);
+        cmd.Parameters.AddWithValue("user_id", chatId);
+        cmd.Parameters.AddWithValue("date", date);
+        cmd.Parameters.AddWithValue("text", name);
+        cmd.Parameters.AddWithValue("kcal", kcal);
+
+        return await ExecuteConsumedAndGetOneAsync(cmd);
+    }
+
+    public async Task<ConsumedRowInfo?> RemoveConsumedFromDatabaseAsync(long id)
+    {
+        string sql = """
+                     DELETE
+                     FROM consumed
+                     WHERE id = @id
+                     RETURNING *;
+                     """;
+        await using var cmd = new SQLiteCommand(sql, _connection);
+        cmd.Parameters.AddWithValue("id", id);
+
+        return await ExecuteConsumedAndGetOneAsync(cmd);
+    }
+
+    public async Task<List<ConsumedRowInfo>> GetStatFromDatabaseAsync(long id)
+    {
+        string sql = """
+                     SELECT *
+                     FROM consumed
+                     WHERE user_id = @id
+                     ORDER BY date;
+                     """;
+        await using var cmd = new SQLiteCommand(sql, _connection);
+        cmd.Parameters.AddWithValue("id", id);
+
+        return await ExecuteConsumedAndGetAllAsync(cmd);
+    }
+
+    private async Task<ConsumedRowInfo?> ExecuteConsumedAndGetOneAsync(SQLiteCommand cmd)
+    {
+        try
+        {
+            await using DbDataReader reader = await cmd.ExecuteReaderAsync();
+            if (!await reader.ReadAsync())
+            {
+                return null;
+            }
+
+            return ReadConsumedRowInfo(reader);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    private async Task<List<ConsumedRowInfo>> ExecuteConsumedAndGetAllAsync(SQLiteCommand cmd)
+    {
+        try
+        {
+            List<ConsumedRowInfo> rows = [];
+
+            await using DbDataReader reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                ConsumedRowInfo? info = ReadConsumedRowInfo(reader);
+                if (info != null)
+                {
+                    rows.Add(info);
+                }
+            }
+
+            return rows;
+        }
+        catch (Exception)
+        {
+            return [];
+        }
+    }
+
+    private static ConsumedRowInfo? ReadConsumedRowInfo(DbDataReader reader)
+    {
+        try
+        {
+            if (reader["date"].ToString() is not { } dateString ||
+                reader["text"].ToString() is not { } text ||
+                string.IsNullOrEmpty(dateString))
+            {
+                return null;
+            }
+
+            long consumedId = Convert.ToInt64(reader["id"]);
+            long userId = Convert.ToInt64(reader["user_id"]);
+            DateTime date = FromDatabaseTimeFormat(dateString);
+            double kcal = Convert.ToDouble(reader["kcal"]);
+
+            return new ConsumedRowInfo(consumedId, userId, date, text, kcal);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    public async Task<bool> HasChatIdAsync(long chatId)
+    {
+        string sql = "SELECT EXISTS(SELECT 1 FROM users WHERE id = @id)";
+        await using var cmd = new SQLiteCommand(sql, _connection);
+        cmd.Parameters.AddWithValue("id", chatId);
+        object? result = await cmd.ExecuteScalarAsync();
+        return Convert.ToInt32(result) == 1;
+    }
+
+    public async Task<bool> SetUserTimezoneOffsetToDatabaseAsync(long chatId, int timezoneOffset)
+    {
+        string sql = "UPDATE users SET timezone = @timezone WHERE id = @id";
+        await using var cmd = new SQLiteCommand(sql, _connection);
+        cmd.Parameters.AddWithValue("id", chatId);
+        cmd.Parameters.AddWithValue("timezone", timezoneOffset);
+        int result = await cmd.ExecuteNonQueryAsync();
+        return result != 0;
+    }
+
+    public async Task<int> GetUserTimezoneOffsetAsync(long chatId)
+    {
+        string sql = "SELECT timezone FROM users WHERE id = @id";
+        await using var cmd = new SQLiteCommand(sql, _connection);
+        cmd.Parameters.AddWithValue("id", chatId);
+        object? result = await cmd.ExecuteScalarAsync();
+        try
+        {
+            return Convert.ToInt32(result);
+        }
+        catch (Exception)
+        {
+            return 0;
+        }
+    }
+
+    public async Task<bool> RegisterChatIdAsync(long chatId)
+    {
+        string date = ToDatabaseTimeFormat(DateTime.UtcNow);
+
+        string sql = """
+                     INSERT INTO users (id, register_date)
+                     VALUES (@id, @date);
+                     """;
+        await using var cmd = new SQLiteCommand(sql, _connection);
+        cmd.Parameters.AddWithValue("id", chatId);
+        cmd.Parameters.AddWithValue("date", date);
+        int result = await cmd.ExecuteNonQueryAsync();
+        return result != 0;
+    }
+
+    #endregion
 
     #region Migration
 
@@ -97,6 +299,18 @@ public class BotDatabase : IDisposable
     }
 
     #endregion
+
+    private static string ToDatabaseTimeFormat(DateTime dateTime)
+    {
+        return dateTime.ToString(DatabaseTimeFormat, CultureInfo.InvariantCulture);
+    }
+
+    private static DateTime FromDatabaseTimeFormat(string dateTime)
+    {
+        return DateTime.ParseExact(dateTime, DatabaseTimeFormat, CultureInfo.InvariantCulture);
+    }
+
+    private const string DatabaseTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
     #region Dispose
 

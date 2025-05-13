@@ -156,7 +156,7 @@ public partial class WeightBot : IDisposable
             return;
         }
 
-        ConsumedRowInfo? row = await AddConsumedToDatabaseAsync(chatId, name, kcal);
+        ConsumedRowInfo? row = await _database.AddConsumedToDatabaseAsync(chatId, name, kcal);
 
         if (row == null)
         {
@@ -166,7 +166,7 @@ public partial class WeightBot : IDisposable
             return;
         }
 
-        int timeZone = await GetUserTimezoneOffsetAsync(chatId);
+        int timeZone = await _database.GetUserTimezoneOffsetAsync(chatId);
 
         string message = $"""
                           ✅ Product added
@@ -189,7 +189,7 @@ public partial class WeightBot : IDisposable
             return;
         }
 
-        ConsumedRowInfo? row = await RemoveConsumedFromDatabaseAsync(consumedId);
+        ConsumedRowInfo? row = await _database.RemoveConsumedFromDatabaseAsync(consumedId);
         if (row == null)
         {
             string errorMessage =
@@ -198,7 +198,7 @@ public partial class WeightBot : IDisposable
             return;
         }
 
-        int timeZone = await GetUserTimezoneOffsetAsync(chatId);
+        int timeZone = await _database.GetUserTimezoneOffsetAsync(chatId);
 
         string message = $"""
                           ❌ Product removed
@@ -213,15 +213,15 @@ public partial class WeightBot : IDisposable
     private async Task PrintStatAsync(long chatId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        List<ConsumedRowInfo> rows = await GetStatFromDatabaseAsync(chatId);
+        List<ConsumedRowInfo> rows = await _database.GetStatFromDatabaseAsync(chatId);
 
         string message = "";
         message += "<pre>";
 
-        int timeZone = await GetUserTimezoneOffsetAsync(chatId);
+        int timeZone = await _database.GetUserTimezoneOffsetAsync(chatId);
         message += $"User Time Zone: {timeZone:+#;-#;0}\n";
 
-        double consumedToday = await GetConsumedDayCalFromDatabaseAsync(chatId);
+        double consumedToday = await _database.GetConsumedDayCalFromDatabaseAsync(chatId);
         message += $"Consumed Today: {consumedToday} kcal\n";
 
 
@@ -274,7 +274,7 @@ public partial class WeightBot : IDisposable
             return;
         }
 
-        bool success = await SetUserTimezoneOffsetToDatabaseAsync(chatId, timezone);
+        bool success = await _database.SetUserTimezoneOffsetToDatabaseAsync(chatId, timezone);
         if (!success)
         {
             string errorMessage =
@@ -290,12 +290,12 @@ public partial class WeightBot : IDisposable
     private async Task<bool> RegisterChatIfNotRegisteredAsync(long chatId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        if (await HasChatIdAsync(chatId))
+        if (await _database.HasChatIdAsync(chatId))
         {
             return true;
         }
 
-        bool registered = await RegisterChatIdAsync(chatId);
+        bool registered = await _database.RegisterChatIdAsync(chatId);
         if (!registered)
         {
             Console.WriteLine($"Failed to register chat. Id = {chatId}");
@@ -315,186 +315,6 @@ public partial class WeightBot : IDisposable
     {
         Console.WriteLine($"Error: {exception.Message}");
         return Task.CompletedTask;
-    }
-
-    private async Task<double> GetConsumedDayCalFromDatabaseAsync(long chatId)
-    {
-        int timezone = await GetUserTimezoneOffsetAsync(chatId);
-
-        DateTime curDateUser = DateTime.UtcNow.AddHours(+timezone);
-        DateTime dayBeginUser = new DateTime(curDateUser.Year, curDateUser.Month, curDateUser.Day, 0, 0, 0);
-        DateTime dayBeginUtc = dayBeginUser.AddHours(-timezone);
-
-        string dayBeginUserString = ToDatabaseTimeFormat(dayBeginUtc);
-
-        string sql = """
-                     SELECT SUM(kcal) FROM consumed
-                     WHERE user_id = @user_id AND date >= @start;
-                     """;
-        await using var cmd = new SQLiteCommand(sql, _connection);
-        cmd.Parameters.AddWithValue("user_id", chatId);
-        cmd.Parameters.AddWithValue("start", dayBeginUserString);
-
-        try
-        {
-            object? result = await cmd.ExecuteScalarAsync();
-            if (result == null)
-            {
-                return 0;
-            }
-
-            return Convert.ToDouble(result);
-        }
-        catch (Exception)
-        {
-            return 0;
-        }
-    }
-
-    private async Task<ConsumedRowInfo?> AddConsumedToDatabaseAsync(long chatId, string name, double kcal)
-    {
-        string date = GetCurrentDatetime();
-
-        string sql = """
-                     INSERT INTO consumed (user_id, date, text, kcal)
-                     VALUES (@user_id, @date, @text, @kcal)
-                     RETURNING *;
-                     """;
-        await using var cmd = new SQLiteCommand(sql, _connection);
-        cmd.Parameters.AddWithValue("user_id", chatId);
-        cmd.Parameters.AddWithValue("date", date);
-        cmd.Parameters.AddWithValue("text", name);
-        cmd.Parameters.AddWithValue("kcal", kcal);
-
-        return await ExecuteConsumedAndGetOneAsync(cmd);
-    }
-
-    private async Task<ConsumedRowInfo?> RemoveConsumedFromDatabaseAsync(long id)
-    {
-        string sql = """
-                     DELETE
-                     FROM consumed
-                     WHERE id = @id
-                     RETURNING *;
-                     """;
-        await using var cmd = new SQLiteCommand(sql, _connection);
-        cmd.Parameters.AddWithValue("id", id);
-
-        return await ExecuteConsumedAndGetOneAsync(cmd);
-    }
-
-    private async Task<List<ConsumedRowInfo>> GetStatFromDatabaseAsync(long id)
-    {
-        string sql = """
-                     SELECT *
-                     FROM consumed
-                     WHERE user_id = @id
-                     ORDER BY date;
-                     """;
-        await using var cmd = new SQLiteCommand(sql, _connection);
-        cmd.Parameters.AddWithValue("id", id);
-
-        return await ExecuteConsumedAndGetAllAsync(cmd);
-    }
-
-    private async Task<ConsumedRowInfo?> ExecuteConsumedAndGetOneAsync(SQLiteCommand cmd)
-    {
-        try
-        {
-            await using DbDataReader reader = await cmd.ExecuteReaderAsync();
-            if (!await reader.ReadAsync())
-            {
-                return null;
-            }
-
-            return ReadConsumedRowInfo(reader);
-        }
-        catch (Exception)
-        {
-            return null;
-        }
-    }
-
-    private async Task<List<ConsumedRowInfo>> ExecuteConsumedAndGetAllAsync(SQLiteCommand cmd)
-    {
-        try
-        {
-            List<ConsumedRowInfo> rows = [];
-
-            await using DbDataReader reader = await cmd.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                ConsumedRowInfo info = ReadConsumedRowInfo(reader);
-                rows.Add(info);
-            }
-
-            return rows;
-        }
-        catch (Exception)
-        {
-            return [];
-        }
-    }
-
-    private static ConsumedRowInfo ReadConsumedRowInfo(DbDataReader reader)
-    {
-        string consumedId = reader["id"].ToString() ?? string.Empty;
-        string userId = reader["user_id"].ToString() ?? string.Empty;
-        string date = reader["date"].ToString() ?? string.Empty;
-        string text = reader["text"].ToString() ?? string.Empty;
-        string kcal = reader["kcal"].ToString() ?? string.Empty;
-
-        return new ConsumedRowInfo(consumedId, userId, date, text, kcal);
-    }
-
-    private async Task<bool> HasChatIdAsync(long chatId)
-    {
-        string sql = "SELECT EXISTS(SELECT 1 FROM users WHERE id = @id)";
-        await using var cmd = new SQLiteCommand(sql, _connection);
-        cmd.Parameters.AddWithValue("id", chatId);
-        object? result = await cmd.ExecuteScalarAsync();
-        return Convert.ToInt32(result) == 1;
-    }
-
-    private async Task<bool> SetUserTimezoneOffsetToDatabaseAsync(long chatId, int timezoneOffset)
-    {
-        string sql = "UPDATE users SET timezone = @timezone WHERE id = @id";
-        await using var cmd = new SQLiteCommand(sql, _connection);
-        cmd.Parameters.AddWithValue("id", chatId);
-        cmd.Parameters.AddWithValue("timezone", timezoneOffset);
-        int result = await cmd.ExecuteNonQueryAsync();
-        return result != 0;
-    }
-
-    private async Task<int> GetUserTimezoneOffsetAsync(long chatId)
-    {
-        string sql = "SELECT timezone FROM users WHERE id = @id";
-        await using var cmd = new SQLiteCommand(sql, _connection);
-        cmd.Parameters.AddWithValue("id", chatId);
-        object? result = await cmd.ExecuteScalarAsync();
-        try
-        {
-            return Convert.ToInt32(result);
-        }
-        catch (Exception)
-        {
-            return 0;
-        }
-    }
-
-    private async Task<bool> RegisterChatIdAsync(long chatId)
-    {
-        string date = GetCurrentDatetime();
-
-        string sql = """
-                     INSERT INTO users (id, register_date)
-                     VALUES (@id, @date);
-                     """;
-        await using var cmd = new SQLiteCommand(sql, _connection);
-        cmd.Parameters.AddWithValue("id", chatId);
-        cmd.Parameters.AddWithValue("date", date);
-        int result = await cmd.ExecuteNonQueryAsync();
-        return result != 0;
     }
 
     private string GetHelpMessage()
@@ -519,9 +339,8 @@ public partial class WeightBot : IDisposable
                """;
     }
 
-    private string FromDatabaseToUserTimeFormat(string dateTime, int timeZone)
+    private string FromDatabaseToUserTimeFormat(DateTime date, int timeZone)
     {
-        DateTime date = FromDatabaseTimeFormat(dateTime);
         date = date.AddHours(timeZone);
         return date.ToString("dd MMM HH:mm", CultureInfo.InvariantCulture);
     }
@@ -565,21 +384,6 @@ public partial class WeightBot : IDisposable
             NumberStyles.Number,
             CultureInfo.CurrentCulture,
             out result);
-    }
-
-    private static string GetCurrentDatetime()
-    {
-        return ToDatabaseTimeFormat(DateTime.UtcNow);
-    }
-
-    private static string ToDatabaseTimeFormat(DateTime dateTime)
-    {
-        return dateTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-    }
-
-    private static DateTime FromDatabaseTimeFormat(string dateTime)
-    {
-        return DateTime.ParseExact(dateTime, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
     }
 
     [GeneratedRegex(@"^\s*/(?<cmd>\w+)(?:\s+(?<args>\S(?:.*\S)?))?\s*$")]
