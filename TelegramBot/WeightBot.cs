@@ -239,11 +239,7 @@ public partial class WeightBot : IDisposable
         CancellationToken cancellationToken)
     {
         int timeZone = await _database.GetUserTimezoneOffsetAsync(chatId);
-
-        DateTime curDateUser = DateTime.UtcNow.AddHours(+timeZone);
-        DateTime dayBeginUser = new DateTime(curDateUser.Year, curDateUser.Month, curDateUser.Day, 0, 0, 0);
-        DateTime dayBeginUtc = dayBeginUser.AddHours(-timeZone);
-
+        DateTime dayBeginUtc = GetUserDayBeginUtc(timeZone);
         await PrintStatAsync(dayBeginUtc, null, ShortUserTimeFormat, timeZone, chatId, botClient, cancellationToken);
     }
 
@@ -431,6 +427,13 @@ public partial class WeightBot : IDisposable
     }
 
     #endregion
+
+    private static DateTime GetUserDayBeginUtc(int timeZone)
+    {
+        DateTime curDateUser = DateTime.UtcNow.AddHours(+timeZone);
+        DateTime dayBeginUser = new DateTime(curDateUser.Year, curDateUser.Month, curDateUser.Day, 0, 0, 0);
+        return dayBeginUser.AddHours(-timeZone);
+    }
 
     private static ConsumedRowInfoStrings DbRowToUserStringRow(ConsumedRowInfo row, int timezone, string timeFormat)
     {
