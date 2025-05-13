@@ -230,10 +230,11 @@ public partial class WeightBot : IDisposable
         int idSize = 0;
 
         List<ConsumedRowInfo> dbRows = await _database.GetStatFromDatabaseAsync(chatId);
-        List<ConsumedRowInfo> rows = await _database.GetStatFromDatabaseAsync(chatId);
+        List<ConsumedRowInfoStrings> rows = dbRows
+            .Select(row => DbRowToStringRow(row, timeZone))
+            .ToList();
 
-
-        foreach (ConsumedRowInfo row in rows)
+        foreach (ConsumedRowInfoStrings row in rows)
         {
             kcalSize = int.Max(kcalSize, row.Kcal.Length);
             idSize = int.Max(idSize, row.Id.Length);
@@ -245,10 +246,8 @@ public partial class WeightBot : IDisposable
 
         message += string.Format(format, "Name", "Kcal", "Date", "ID");
 
-        foreach (ConsumedRowInfo row in rows)
+        foreach (ConsumedRowInfoStrings row in rows)
         {
-            string date = FromDatabaseToUserTimeFormat(row.Date, timeZone);
-
             string curName = row.Text;
             while (curName.Length > nameSize)
             {
@@ -257,7 +256,7 @@ public partial class WeightBot : IDisposable
                 curName = curName.Substring(nameSize);
             }
 
-            message += string.Format(format, curName, row.Kcal, date, row.Id);
+            message += string.Format(format, curName, row.Kcal, row.Date, row.Id);
         }
 
         message += "</pre>";
