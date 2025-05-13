@@ -253,7 +253,7 @@ public partial class WeightBot : IDisposable
         int kcalSize = strRows.Any() ? strRows.Max(row => row.Kcal.Length) : 0;
         int idSize = strRows.Any() ? strRows.Max(row => row.Id.Length) : 0;
         double consumedToday = dbRows.Any() ? dbRows.Sum(row => row.Kcal) : 0;
-        int dateSize = LongUserTimeFormat.Length;
+        int dateSize = timeFormat.Length;
 
         const int tableLengthBudget = 36;
         int nameSize = int.Max(8, tableLengthBudget - kcalSize - dateSize - idSize);
