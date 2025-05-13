@@ -42,40 +42,6 @@ public partial class WeightBot : IDisposable
         User me = await botClient.GetMe(cancellationToken: _cancelTokenSource.Token);
         Console.WriteLine($"Start listening @{me.Username}");
 
-
-        botClient.AnswerCall.callback += async (sender, e) =>
-        {
-            var callback = e.CallbackQuery;
-            string responseText;
-
-            switch (callback.Data)
-            {
-                case "like":
-                    responseText = "You liked this!";
-                    break;
-                case "dislike":
-                    responseText = "You disliked this.";
-                    break;
-                case "refresh":
-                    responseText = "Content refreshed! 🔄";
-                    break;
-                default:
-                    responseText = "Unknown action.";
-                    break;
-            }
-
-            // Answer the callback to remove loading state on button
-            await botClient.AnswerCallbackQueryAsync(callback.Id, text: "Done!");
-
-            // Optionally edit the original message
-            await botClient.EditMessageTextAsync(
-                chatId: callback.Message.Chat.Id,
-                messageId: callback.Message.MessageId,
-                text: responseText
-            );
-        };
-
-
         await botClient.ReceiveAsync(
             updateHandler: HandleUpdateAsync,
             errorHandler: HandleErrorAsync,
