@@ -315,8 +315,7 @@ public class BotDatabase : IDisposable
         await using var cmd = new SQLiteCommand(sql, _connection);
         cmd.Parameters.AddWithValue("id", chatId);
         cmd.Parameters.AddWithValue("timezone", timezoneOffset);
-        int result = await cmd.ExecuteNonQueryAsync();
-        return result != 0;
+        return await cmd.ExecuteNonQueryAsync() != 0;
     }
 
     public async Task<int> GetUserTimezoneOffsetAsync(long chatId)
@@ -344,8 +343,7 @@ public class BotDatabase : IDisposable
         await using var cmd = new SQLiteCommand(sql, _connection);
         cmd.Parameters.AddWithValue("id", chatId);
         cmd.Parameters.AddWithValue("date", ToDatabaseTimeFormat(date));
-        int result = await cmd.ExecuteNonQueryAsync();
-        return result != 0;
+        return await cmd.ExecuteNonQueryAsync() != 0;
     }
 
     #endregion
