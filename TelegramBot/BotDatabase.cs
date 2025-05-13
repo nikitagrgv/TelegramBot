@@ -33,6 +33,13 @@ public class BotDatabase : IDisposable
         return Convert.ToInt32(ret);
     }
 
+    private async Task SetDatabaseVersion(int version)
+    {
+        await using var cmd = new SQLiteCommand("PRAGMA user_version = @version;", _connection);
+        cmd.Parameters.AddWithValue("@version", version);
+        await cmd.ExecuteNonQueryAsync();
+    }
+
     #region Dispose
 
     void IDisposable.Dispose()
