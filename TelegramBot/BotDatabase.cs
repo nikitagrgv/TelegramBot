@@ -64,6 +64,7 @@ public class BotDatabase : IDisposable
                                                         max_kcal      REAL
                                                     );
                                                     """, _connection);
+            await cmd.ExecuteNonQueryAsync();
         }
         {
             await using var cmd = new SQLiteCommand("""
@@ -77,6 +78,7 @@ public class BotDatabase : IDisposable
                                                         FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
                                                     );
                                                     """, _connection);
+            await cmd.ExecuteNonQueryAsync();
         }
     }
 
