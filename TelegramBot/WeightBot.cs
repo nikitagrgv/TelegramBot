@@ -220,20 +220,27 @@ public partial class WeightBot : IDisposable
         ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
+        int timeZone = await _database.GetUserTimezoneOffsetAsync(chatId);
+
+        DateTime curDateUser = DateTime.UtcNow.AddHours(+timeZone);
+        DateTime dayBeginUser = new DateTime(curDateUser.Year, curDateUser.Month, curDateUser.Day, 0, 0, 0);
+        DateTime dayBeginUtc = dayBeginUser.AddHours(-timeZone);
+
+        await PrintStatAsync(dayBeginUtc, null, ShortUserTimeFormat, timeZone, chatId, botClient, cancellationToken);
     }
 
     private async Task PrintAllStatAsync(long chatId,
         ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
+        int timeZone = await _database.GetUserTimezoneOffsetAsync(chatId);
+        await PrintStatAsync(null, null, LongUserTimeFormat, timeZone, chatId, botClient, cancellationToken);
     }
 
-    private async Task PrintStatAsync(DateTime? begin, DateTime? end, string timeFormat, long chatId,
+    private async Task PrintStatAsync(DateTime? begin, DateTime? end, string timeFormat, int timeZone, long chatId,
         ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        int timeZone = await _database.GetUserTimezoneOffsetAsync(chatId);
-
         List<ConsumedRowInfo> dbRows = await _database.GetStatFromDatabaseAsync(begin, end, chatId);
 
         List<ConsumedRowInfoStrings> strRows = dbRows
