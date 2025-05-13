@@ -213,8 +213,6 @@ public partial class WeightBot : IDisposable
     private async Task PrintStatAsync(long chatId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        List<ConsumedRowInfo> rows = await _database.GetStatFromDatabaseAsync(chatId);
-
         string message = "";
         message += "<pre>";
 
@@ -230,6 +228,10 @@ public partial class WeightBot : IDisposable
         int kcalSize = 0;
         int dateSize = 12;
         int idSize = 0;
+
+        List<ConsumedRowInfo> dbRows = await _database.GetStatFromDatabaseAsync(chatId);
+        List<ConsumedRowInfo> rows = await _database.GetStatFromDatabaseAsync(chatId);
+
 
         foreach (ConsumedRowInfo row in rows)
         {
@@ -339,12 +341,6 @@ public partial class WeightBot : IDisposable
                """;
     }
 
-    private string FromDatabaseToUserTimeFormat(DateTime date, int timeZone)
-    {
-        date = date.AddHours(timeZone);
-        return date.ToString("dd MMM HH:mm", CultureInfo.InvariantCulture);
-    }
-
     #region Dispose
 
     void IDisposable.Dispose()
@@ -365,6 +361,21 @@ public partial class WeightBot : IDisposable
     }
 
     #endregion
+
+    private static ConsumedRowInfoStrings DbRowToString(ConsumedRowInfo row, int timezone)
+    {
+        return new ConsumedRowInfoStrings(
+            Id: row.Id.ToString(),
+            Date: FromDatabaseToUserTimeFormat(row.Date, timezone),
+            Text: row.Text,
+            Kcal: row.Kcal.ToString("F"));
+    }
+
+    private static string FromDatabaseToUserTimeFormat(DateTime date, int timeZone)
+    {
+        date = date.AddHours(timeZone);
+        return date.ToString("dd MMM HH:mm", CultureInfo.InvariantCulture);
+    }
 
     // TODO: shit?
     private static bool TryParseDouble(string s, out double result)
@@ -391,4 +402,6 @@ public partial class WeightBot : IDisposable
 
     [GeneratedRegex(@"^\s*(?<name>.+?)\s*,?\s*(?<kcal>\d+[,.]?\d*)\s*$")]
     private static partial Regex GetAddConsumedRegex();
+
+    public record ConsumedRowInfoStrings(string Id, string Date, string Text, string Kcal);
 }
