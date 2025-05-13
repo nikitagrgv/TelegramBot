@@ -233,7 +233,7 @@ public class BotDatabase : IDisposable
             while (await reader.ReadAsync())
             {
                 ConsumedRowInfo? info = ReadConsumedRowInfo(reader);
-                if (info != null)
+                if (info is not null)
                 {
                     rows.Add(info);
                 }
