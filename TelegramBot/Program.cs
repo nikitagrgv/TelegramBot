@@ -34,7 +34,7 @@ class Program
                                      (
                                          id            INTEGER PRIMARY KEY,
                                          register_date TEXT NOT NULL,
-                                         timezone      INTEGER NOT NULL,
+                                         timezone      INTEGER NOT NULL DEFAULT 0,
                                          min_kcal      REAL,
                                          max_kcal      REAL
                                      );

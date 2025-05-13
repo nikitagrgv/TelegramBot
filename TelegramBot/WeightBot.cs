@@ -337,8 +337,20 @@ public partial class WeightBot
         cmd.Parameters.AddWithValue("user_id", chatId);
         cmd.Parameters.AddWithValue("start", dayBeginUserString);
 
-        object? result = await cmd.ExecuteScalarAsync();
-        return Convert.ToDouble(result);
+        try
+        {
+            object? result = await cmd.ExecuteScalarAsync();
+            if (result != null)
+            {
+                return 0;
+            }
+
+            return Convert.ToDouble(result);
+        }
+        catch (Exception)
+        {
+            return 0;
+        }
     }
 
     private async Task<ConsumedRowInfo?> AddConsumedToDatabaseAsync(long chatId, string name, double kcal)
