@@ -14,11 +14,27 @@ public class BotDatabase : IDisposable
         _connection = new SQLiteConnection(connectionString);
     }
 
-    public async Task<bool> OpenAsync()
+    public async Task<bool> InitializeAsync()
     {
         await _connection.OpenAsync();
-        return _connection.State == System.Data.ConnectionState.Open;
+        if (_connection.State != System.Data.ConnectionState.Open)
+        {
+            return false;
+        }
+
+        await ExecuteNonQueryAsync("PRAGMA foreign_keys = ON;");
+        
+        
     }
+
+
+    private async Task<int> ExecuteNonQueryAsync(string sql)
+    {
+        await using var cmd = new SQLiteCommand(sql, _connection);
+        return await cmd.ExecuteNonQueryAsync();
+    }
+
+    #region Dispose
 
     void IDisposable.Dispose()
     {
@@ -36,4 +52,6 @@ public class BotDatabase : IDisposable
 
         _disposed = true;
     }
+
+    #endregion
 }
