@@ -117,6 +117,9 @@ public partial class WeightBot : IDisposable
             case "timezone":
                 await SetUserTimezoneOffsetAsync(args, chatId, botClient, cancellationToken);
                 break;
+            case "limit":
+                await SetMaxKcalAsync(args, chatId, botClient, cancellationToken);
+                break;
             case "kill":
                 await ShutdownBot(chatId, botClient, cancellationToken);
                 break;
@@ -229,7 +232,6 @@ public partial class WeightBot : IDisposable
         ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        
     }
 
     private async Task PrintDayStatAsync(long chatId,
@@ -322,6 +324,30 @@ public partial class WeightBot : IDisposable
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
     }
 
+    private async Task SetMaxKcalAsync(string args, long chatId, ITelegramBotClient botClient,
+        CancellationToken cancellationToken)
+    {
+        if (!double.TryParse(args.Trim(), out double limit) || limit < 0)
+        {
+            string invalidCommandMessage =
+                $"Sorry, I didn't understand your 'limit' command. Invalid value: '{args}'. Type /help to see a list of available commands.";
+            await botClient.SendMessage(chatId, invalidCommandMessage, cancellationToken: cancellationToken);
+            return;
+        }
+
+        bool success = await _database.SetMaxKcalAsync(chatId, limit);
+        if (!success)
+        {
+            string errorMessage =
+                $"Database error. Can't set the limit. Chat ID: '{chatId}', limit: '{limit}'";
+            await botClient.SendMessage(chatId, errorMessage, cancellationToken: cancellationToken);
+            return;
+        }
+
+        string message = $"Limit updated: {limit} kcal";
+        await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
+    }
+
     private async Task<bool> RegisterChatIfNotRegisteredAsync(long chatId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
@@ -373,6 +399,9 @@ public partial class WeightBot : IDisposable
 
                Print all consumed products by all the time
                /allstat
+
+               Set kcal limit
+               /limit 123.46
 
                Set the time zone offset:
                /timezone +7
