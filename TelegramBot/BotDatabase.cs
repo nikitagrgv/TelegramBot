@@ -24,6 +24,21 @@ public class BotDatabase : IDisposable
 
         await using var cmd = new SQLiteCommand("PRAGMA foreign_keys = ON;", _connection);
         await cmd.ExecuteNonQueryAsync();
+
+        int oldVersion = await GetDatabaseVersion();
+        int newVersion = await MigrateDatabaseToLatestVersion(oldVersion);
+
+        if (oldVersion != newVersion)
+        {
+            await SetDatabaseVersion(newVersion);
+        }
+
+        return true;
+    }
+
+    private async Task<int> MigrateDatabaseToLatestVersion(int oldVersion)
+    {
+        
     }
 
     private async Task<int> GetDatabaseVersion()
