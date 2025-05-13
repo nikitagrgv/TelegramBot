@@ -42,7 +42,27 @@ public class BotDatabase : IDisposable
 
     public async Task<double?> GetMaxKcalAsync(long chatId)
     {
-        
+        const string sql = """
+                           SELECT max_kcal
+                           FROM users
+                           WHERE id = @id
+                           """;
+        await using var cmd = new SQLiteCommand(sql, _connection);
+        cmd.Parameters.AddWithValue("@id", chatId);
+        return await ExecuteDoubleAsync(cmd);
+    }
+
+    public async Task<bool> SetMaxKcalAsync(long chatId, double? maxKcal)
+    {
+        const string sql = """
+                           UPDATE users
+                           SET max_kcal = @max_kcal
+                           WHERE id = @id
+                           """;
+        await using var cmd = new SQLiteCommand(sql, _connection);
+        cmd.Parameters.AddWithValue("@id", chatId);
+        cmd.Parameters.AddWithValue("@max_kcal", maxKcal);
+        return await cmd.ExecuteNonQueryAsync() != 0;
     }
 
     public async Task<double> GetConsumedCalAsync(DateTime? optionalBegin, DateTime? optionalEnd,
