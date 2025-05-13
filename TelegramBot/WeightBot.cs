@@ -12,6 +12,8 @@ using Telegram.Bot.Types.Enums;
 
 public partial class WeightBot : IDisposable
 {
+    private const string UserTimeFormat = "dd MMM HH:mm";
+
     private static readonly Regex ParseCommandRegex = GetParseCommandRegex();
     private static readonly Regex AddConsumedRegex = GetAddConsumedRegex();
 
@@ -103,7 +105,10 @@ public partial class WeightBot : IDisposable
                 await RemoveConsumedAsync(args, chatId, botClient, cancellationToken);
                 break;
             case "daystat":
-                await PrintStatAsync(chatId, botClient, cancellationToken);
+                await PrintDayStatAsync(chatId, botClient, cancellationToken);
+                break;
+            case "allstat":
+                await PrintAllStatAsync(chatId, botClient, cancellationToken);
                 break;
             case "timezone":
                 await SetUserTimezoneOffsetAsync(args, chatId, botClient, cancellationToken);
@@ -210,7 +215,8 @@ public partial class WeightBot : IDisposable
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
     }
 
-    private async Task PrintStatAsync(long chatId, ITelegramBotClient botClient,
+    private async Task PrintStatAsync(DateTime? begin, DateTime? end, string timeFormat, long chatId,
+        ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
         string message = "";
@@ -226,12 +232,12 @@ public partial class WeightBot : IDisposable
         const int budget = 36;
 
         int kcalSize = 0;
-        int dateSize = 12;
+        int dateSize = UserTimeFormat.Length;
         int idSize = 0;
 
-        List<ConsumedRowInfo> dbRows = await _database.GetStatFromDatabaseAsync(chatId);
+        List<ConsumedRowInfo> dbRows = await _database.GetStatFromDatabaseAsync(begin, end, chatId);
         List<ConsumedRowInfoStrings> rows = dbRows
-            .Select(row => DbRowToStringRow(row, timeZone))
+            .Select(row => DbRowToStringRow(row, timeZone, timeFormat))
             .ToList();
 
         foreach (ConsumedRowInfoStrings row in rows)
@@ -332,6 +338,9 @@ public partial class WeightBot : IDisposable
                Print all consumed products by the current day from 00:00:
                /daystat
 
+               Print all consumed products by the current day from 00:00:
+               /allstat
+
                Set the time zone offset:
                /timezone +7
 
@@ -361,19 +370,19 @@ public partial class WeightBot : IDisposable
 
     #endregion
 
-    private static ConsumedRowInfoStrings DbRowToStringRow(ConsumedRowInfo row, int timezone)
+    private static ConsumedRowInfoStrings DbRowToStringRow(ConsumedRowInfo row, int timezone, string timeFormat)
     {
         return new ConsumedRowInfoStrings(
             Id: row.Id.ToString(),
-            Date: FromDatabaseToUserTimeFormat(row.Date, timezone),
+            Date: FromDatabaseToUserTimeFormat(row.Date, timezone, timeFormat),
             Text: row.Text,
             Kcal: row.Kcal.ToString("F"));
     }
 
-    private static string FromDatabaseToUserTimeFormat(DateTime date, int timeZone)
+    private static string FromDatabaseToUserTimeFormat(DateTime date, int timeZone, string format)
     {
         date = date.AddHours(timeZone);
-        return date.ToString("dd MMM HH:mm", CultureInfo.InvariantCulture);
+        return date.ToString(format, CultureInfo.InvariantCulture);
     }
 
     // TODO: shit?

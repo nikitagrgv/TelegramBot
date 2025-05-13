@@ -106,19 +106,63 @@ public class BotDatabase : IDisposable
         return await ExecuteConsumedAndGetOneAsync(cmd);
     }
 
-    public async Task<List<ConsumedRowInfo>> GetStatFromDatabaseAsync(long id)
+    public async Task<List<ConsumedRowInfo>> GetStatFromDatabaseAsync(DateTime? optionalBegin, DateTime? optionalEnd,
+        long id)
     {
-        string sql = """
-                     SELECT *
-                     FROM consumed
-                     WHERE user_id = @id
-                     ORDER BY date;
-                     """;
-        await using var cmd = new SQLiteCommand(sql, _connection);
-        cmd.Parameters.AddWithValue("id", id);
+        if (optionalBegin is { } begin && optionalEnd is { } end)
+        {
+            const string sql = """
+                               SELECT *
+                               FROM consumed
+                               WHERE user_id = @id AND date BETWEEN @begin AND @end
+                               ORDER BY date;
+                               """;
+            await using var cmd = new SQLiteCommand(sql, _connection);
+            cmd.Parameters.AddWithValue("begin", ToDatabaseTimeFormat(begin));
+            cmd.Parameters.AddWithValue("end", ToDatabaseTimeFormat(end));
+            cmd.Parameters.AddWithValue("id", id);
+            return await ExecuteConsumedAndGetAllAsync(cmd);
+        }
 
-        return await ExecuteConsumedAndGetAllAsync(cmd);
+        if (optionalBegin is { } singleBegin)
+        {
+            const string sql = """
+                               SELECT *
+                               FROM consumed
+                               WHERE user_id = @id AND date >= @begin
+                               ORDER BY date;
+                               """;
+            await using var cmd = new SQLiteCommand(sql, _connection);
+            cmd.Parameters.AddWithValue("begin", ToDatabaseTimeFormat(singleBegin));
+            cmd.Parameters.AddWithValue("id", id);
+            return await ExecuteConsumedAndGetAllAsync(cmd);
+        }
+
+        if (optionalEnd is { } singleEnd)
+        {
+            const string sql = """
+                               SELECT *
+                               FROM consumed
+                               WHERE user_id = @id AND date <= @end
+                               ORDER BY date;
+                               """;
+            await using var cmd = new SQLiteCommand(sql, _connection);
+            cmd.Parameters.AddWithValue("end", ToDatabaseTimeFormat(singleEnd));
+            cmd.Parameters.AddWithValue("id", id);
+            return await ExecuteConsumedAndGetAllAsync(cmd);
+        }
+
+        const string everythingSql = """
+                                     SELECT *
+                                     FROM consumed
+                                     WHERE user_id = @id
+                                     ORDER BY date;
+                                     """;
+        await using var everythingCmd = new SQLiteCommand(everythingSql, _connection);
+        everythingCmd.Parameters.AddWithValue("id", id);
+        return await ExecuteConsumedAndGetAllAsync(everythingCmd);
     }
+
 
     private async Task<ConsumedRowInfo?> ExecuteConsumedAndGetOneAsync(SQLiteCommand cmd)
     {
