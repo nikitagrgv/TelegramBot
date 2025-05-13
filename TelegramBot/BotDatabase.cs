@@ -19,7 +19,6 @@ public class BotDatabase : IDisposable
         await _connection.OpenAsync();
     }
 
-
     void IDisposable.Dispose()
     {
         Dispose(true);
