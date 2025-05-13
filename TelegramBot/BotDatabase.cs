@@ -40,38 +40,57 @@ public class BotDatabase : IDisposable
 
     #region BotOperations
 
-    private async Task<double> GetConsumedDayCalFromDatabaseAsync(long chatId)
+    private async Task<double> GetConsumedDayCalFromDatabaseAsync(DateTime? optionalBegin, DateTime? optionalEnd,
+        long chatId)
     {
-        int timezone = await GetUserTimezoneOffsetAsync(chatId);
-
-        DateTime curDateUser = DateTime.UtcNow.AddHours(+timezone);
-        DateTime dayBeginUser = new DateTime(curDateUser.Year, curDateUser.Month, curDateUser.Day, 0, 0, 0);
-        DateTime dayBeginUtc = dayBeginUser.AddHours(-timezone);
-
-        string dayBeginUserString = ToDatabaseTimeFormat(dayBeginUtc);
-
-        string sql = """
-                     SELECT SUM(kcal) FROM consumed
-                     WHERE user_id = @user_id AND date >= @start;
-                     """;
-        await using var cmd = new SQLiteCommand(sql, _connection);
-        cmd.Parameters.AddWithValue("user_id", chatId);
-        cmd.Parameters.AddWithValue("start", dayBeginUserString);
-
-        try
+        if (optionalBegin is { } begin && optionalEnd is { } end)
         {
-            object? result = await cmd.ExecuteScalarAsync();
-            if (result == null)
-            {
-                return 0;
-            }
+            const string sql = """
+                               SELECT SUM(kcal)
+                               FROM consumed
+                               WHERE user_id = @id AND date BETWEEN @begin AND @end
+                               """;
+            await using var cmd = new SQLiteCommand(sql, _connection);
+            cmd.Parameters.AddWithValue("begin", ToDatabaseTimeFormat(begin));
+            cmd.Parameters.AddWithValue("end", ToDatabaseTimeFormat(end));
+            cmd.Parameters.AddWithValue("id", chatId);
+            return await ExecuteDoubleSafeAsync(cmd);
+        }
 
-            return Convert.ToDouble(result);
-        }
-        catch (Exception)
+        if (optionalBegin is { } singleBegin)
         {
-            return 0;
+            const string sql = """
+                               SELECT SUM(kcal)
+                               FROM consumed
+                               WHERE user_id = @id AND date >= @begin
+                               """;
+            await using var cmd = new SQLiteCommand(sql, _connection);
+            cmd.Parameters.AddWithValue("begin", ToDatabaseTimeFormat(singleBegin));
+            cmd.Parameters.AddWithValue("id", chatId);
+            return await ExecuteDoubleSafeAsync(cmd);
         }
+
+        if (optionalEnd is { } singleEnd)
+        {
+            const string sql = """
+                               SELECT SUM(kcal)
+                               FROM consumed
+                               WHERE user_id = @id AND date <= @end
+                               """;
+            await using var cmd = new SQLiteCommand(sql, _connection);
+            cmd.Parameters.AddWithValue("end", ToDatabaseTimeFormat(singleEnd));
+            cmd.Parameters.AddWithValue("id", chatId);
+            return await ExecuteDoubleSafeAsync(cmd);
+        }
+
+        const string everythingSql = """
+                                     SELECT SUM(kcal)
+                                     FROM consumed
+                                     WHERE user_id = @id
+                                     """;
+        await using var everythingCmd = new SQLiteCommand(everythingSql, _connection);
+        everythingCmd.Parameters.AddWithValue("id", chatId);
+        return await ExecuteDoubleSafeAsync(everythingCmd);
     }
 
     public async Task<ConsumedRowInfo?> AddConsumedToDatabaseAsync(long chatId, string name, double kcal)
@@ -107,7 +126,7 @@ public class BotDatabase : IDisposable
     }
 
     public async Task<List<ConsumedRowInfo>> GetStatFromDatabaseAsync(DateTime? optionalBegin, DateTime? optionalEnd,
-        long id)
+        long chatId)
     {
         if (optionalBegin is { } begin && optionalEnd is { } end)
         {
@@ -120,7 +139,7 @@ public class BotDatabase : IDisposable
             await using var cmd = new SQLiteCommand(sql, _connection);
             cmd.Parameters.AddWithValue("begin", ToDatabaseTimeFormat(begin));
             cmd.Parameters.AddWithValue("end", ToDatabaseTimeFormat(end));
-            cmd.Parameters.AddWithValue("id", id);
+            cmd.Parameters.AddWithValue("id", chatId);
             return await ExecuteConsumedAndGetAllAsync(cmd);
         }
 
@@ -134,7 +153,7 @@ public class BotDatabase : IDisposable
                                """;
             await using var cmd = new SQLiteCommand(sql, _connection);
             cmd.Parameters.AddWithValue("begin", ToDatabaseTimeFormat(singleBegin));
-            cmd.Parameters.AddWithValue("id", id);
+            cmd.Parameters.AddWithValue("id", chatId);
             return await ExecuteConsumedAndGetAllAsync(cmd);
         }
 
@@ -148,7 +167,7 @@ public class BotDatabase : IDisposable
                                """;
             await using var cmd = new SQLiteCommand(sql, _connection);
             cmd.Parameters.AddWithValue("end", ToDatabaseTimeFormat(singleEnd));
-            cmd.Parameters.AddWithValue("id", id);
+            cmd.Parameters.AddWithValue("id", chatId);
             return await ExecuteConsumedAndGetAllAsync(cmd);
         }
 
@@ -159,7 +178,7 @@ public class BotDatabase : IDisposable
                                      ORDER BY date;
                                      """;
         await using var everythingCmd = new SQLiteCommand(everythingSql, _connection);
-        everythingCmd.Parameters.AddWithValue("id", id);
+        everythingCmd.Parameters.AddWithValue("id", chatId);
         return await ExecuteConsumedAndGetAllAsync(everythingCmd);
     }
 
@@ -202,6 +221,24 @@ public class BotDatabase : IDisposable
         catch (Exception)
         {
             return [];
+        }
+    }
+
+    private async Task<double> ExecuteDoubleSafeAsync(SQLiteCommand cmd)
+    {
+        try
+        {
+            object? result = await cmd.ExecuteScalarAsync();
+            if (result == null)
+            {
+                return 0;
+            }
+
+            return Convert.ToDouble(result);
+        }
+        catch (Exception)
+        {
+            return 0;
         }
     }
 
