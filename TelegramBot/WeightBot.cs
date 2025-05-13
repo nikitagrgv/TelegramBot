@@ -275,19 +275,16 @@ public partial class WeightBot : IDisposable
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
 
 
-        var keyboard = new InlineKeyboardMarkup(new[]
-        {
-            new[]
-            {
+        var keyboard = new InlineKeyboardMarkup([
+            [
                 InlineKeyboardButton.WithCallbackData("button 1", "b1"),
-                InlineKeyboardButton.WithCallbackData("button 2", "b2"),
-            },
-            new[]
-            {
+                InlineKeyboardButton.WithCallbackData("button 2", "b2")
+            ],
+            [
                 InlineKeyboardButton.WithCallbackData("button 3", "b3"),
-                InlineKeyboardButton.WithCallbackData("button 4", "b4"),
-            }
-        });
+                InlineKeyboardButton.WithCallbackData("button 4", "b4")
+            ]
+        ]);
         await botClient.SendMessage(chatId, "test text", replyMarkup: keyboard, cancellationToken: cancellationToken);
     }
 
