@@ -242,7 +242,7 @@ public partial class WeightBot : IDisposable
         CancellationToken cancellationToken)
     {
         List<ConsumedRowInfo> dbRows = await _database.GetStatAsync(begin, end, chatId);
-        
+
         // TODO: refactor shit
 
         List<ConsumedRowInfoStrings> strRows = dbRows
@@ -314,7 +314,9 @@ public partial class WeightBot : IDisposable
             return true;
         }
 
-        bool registered = await _database.RegisterChatIdAsync(chatId);
+        DateTime registerDate = DateTime.Now;
+
+        bool registered = await _database.RegisterChatIdAsync(chatId, registerDate);
         if (!registered)
         {
             Console.WriteLine($"Failed to register chat. Id = {chatId}");
