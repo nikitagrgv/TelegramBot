@@ -9,7 +9,7 @@ class Program
 {
     private static async Task<int> RunSqliteNonQueryAsync(string sql, SQLiteConnection connection)
     {
-        var cmd = new SQLiteCommand(sql, connection);
+        await using var cmd = new SQLiteCommand(sql, connection);
         return await cmd.ExecuteNonQueryAsync();
     }
 
