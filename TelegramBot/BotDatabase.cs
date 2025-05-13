@@ -36,6 +36,8 @@ public class BotDatabase : IDisposable
         return true;
     }
 
+    #region Migration
+
     private async Task<int> MigrateDatabaseToLatestVersion(int oldVersion)
     {
         int newVersion = oldVersion;
@@ -51,6 +53,31 @@ public class BotDatabase : IDisposable
 
     private async Task MigrateDatabaseToVersion1()
     {
+        {
+            await using var cmd = new SQLiteCommand("""
+                                                    CREATE TABLE users
+                                                    (
+                                                        id            INTEGER PRIMARY KEY,
+                                                        register_date TEXT NOT NULL,
+                                                        timezone      INTEGER NOT NULL DEFAULT 0,
+                                                        min_kcal      REAL,
+                                                        max_kcal      REAL
+                                                    );
+                                                    """, _connection);
+        }
+        {
+            await using var cmd = new SQLiteCommand("""
+                                                    CREATE TABLE consumed
+                                                    (
+                                                        id      INTEGER PRIMARY KEY AUTOINCREMENT,
+                                                        user_id INTEGER NOT NULL,
+                                                        date    TEXT    NOT NULL,
+                                                        text    TEXT    NOT NULL,
+                                                        kcal    REAL,
+                                                        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+                                                    );
+                                                    """, _connection);
+        }
     }
 
     private async Task<int> GetDatabaseVersion()
@@ -66,6 +93,8 @@ public class BotDatabase : IDisposable
         cmd.Parameters.AddWithValue("@version", version);
         await cmd.ExecuteNonQueryAsync();
     }
+
+    #endregion
 
     #region Dispose
 
