@@ -12,8 +12,6 @@ using Telegram.Bot.Types.Enums;
 
 public partial class WeightBot
 {
-    private record ConsumedRowInfo(string Id, string UserId, string Date, string Text, string Kcal);
-
     private static readonly Regex ParseCommandRegex = GetParseCommandRegex();
     private static readonly Regex AddConsumedRegex = GetAddConsumedRegex();
 
