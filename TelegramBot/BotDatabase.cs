@@ -252,16 +252,15 @@ public class BotDatabase : IDisposable
         try
         {
             object? result = await cmd.ExecuteScalarAsync();
-            if (result == null)
+            return result switch
             {
-                return 0;
-            }
-
-            return Convert.ToDouble(result);
+                null => null,
+                _ => Convert.ToDouble(result)
+            };
         }
         catch (Exception)
         {
-            return 0;
+            return null;
         }
     }
 
