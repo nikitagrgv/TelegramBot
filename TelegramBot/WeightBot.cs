@@ -72,7 +72,7 @@ public partial class WeightBot : IDisposable
     private async Task HandleMessageAsync(Message message, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        long userId = message.From.Id;
+        if (message.From is not { Id: var userId }) return;
 
         if (!await RegisterUserIfNotRegisteredAsync(userId, botClient, cancellationToken))
         {
