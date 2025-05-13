@@ -10,25 +10,25 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
 
-public partial class WeightBot
+public partial class WeightBot : IDisposable
 {
     private static readonly Regex ParseCommandRegex = GetParseCommandRegex();
     private static readonly Regex AddConsumedRegex = GetAddConsumedRegex();
 
-    private readonly SQLiteConnection _connection;
+    private bool _disposed;
+    private readonly BotDatabase _database;
+    private readonly CancellationTokenSource _cancelTokenSource;
 
-    private CancellationTokenSource _cancelTokenSource;
-
-    public WeightBot(SQLiteConnection connection)
+    public WeightBot(BotDatabase database)
     {
-        _connection = connection;
+        _database = database;
+        _cancelTokenSource = new CancellationTokenSource();
     }
 
     public async Task Run(string token)
     {
         var botClient = new TelegramBotClient(token);
 
-        _cancelTokenSource = new CancellationTokenSource();
 
         var receiverOptions = new ReceiverOptions
         {
@@ -525,6 +525,27 @@ public partial class WeightBot
         date = date.AddHours(timeZone);
         return date.ToString("dd MMM HH:mm", CultureInfo.InvariantCulture);
     }
+
+    #region Dispose
+
+    void IDisposable.Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed) return;
+        if (disposing)
+        {
+            _cancelTokenSource.Dispose();
+        }
+
+        _disposed = true;
+    }
+
+    #endregion
 
     // TODO: shit?
     private static bool TryParseDouble(string s, out double result)
