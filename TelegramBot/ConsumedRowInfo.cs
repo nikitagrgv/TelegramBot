@@ -1,3 +1,3 @@
 ﻿namespace TelegramBot;
 
-record ConsumedRowInfo(string Id, string UserId, string Date, string Text, string Kcal);
+internal record ConsumedRowInfo(string Id, string UserId, string Date, string Text, string Kcal);
