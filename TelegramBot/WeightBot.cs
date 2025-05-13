@@ -177,11 +177,11 @@ public partial class WeightBot : IDisposable
         int timeZone = await _database.GetUserTimezoneOffsetAsync(chatId);
 
         string message = $"""
-                          ✅ Product added
-                          🍽️ Name: {row.Text}
-                          🔥 Kcal: {row.Kcal}
-                          📅 Date: {FromDatabaseToUserTimeFormat(row.Date, timeZone, LongUserTimeFormat)}
-                          🆔 ID: {row.Id}
+                          ✅ Added
+                          🍽️ {row.Text}
+                          🔥 {row.Kcal} kcal
+                          📅 {FromDatabaseToUserTimeFormat(row.Date, timeZone, LongUserTimeFormat)}
+                          🆔 {row.Id}
                           """;
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
     }
@@ -209,11 +209,11 @@ public partial class WeightBot : IDisposable
         int timeZone = await _database.GetUserTimezoneOffsetAsync(chatId);
 
         string message = $"""
-                          ❌ Product removed
-                          🍽 Name: {row.Text}
-                          🔥 Kcal: {row.Kcal}
-                          📅 Date: {FromDatabaseToUserTimeFormat(row.Date, timeZone, LongUserTimeFormat)}
-                          🆔 ID: {row.Id}
+                          ❌ Removed
+                          🍽 {row.Text}
+                          🔥 {row.Kcal} kcal
+                          📅 {FromDatabaseToUserTimeFormat(row.Date, timeZone, LongUserTimeFormat)}
+                          🆔 {row.Id}
                           """;
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
     }
