@@ -173,12 +173,13 @@ public partial class WeightBot : IDisposable
 
         var keyboard = new InlineKeyboardMarkup([
             [
-                InlineKeyboardButton.WithCallbackData("button 1", "b1"),
-                InlineKeyboardButton.WithCallbackData("button 2", "b2")
+                InlineKeyboardButton.WithCallbackData("🔥 Consumed Today", "/stat"),
             ],
             [
-                InlineKeyboardButton.WithCallbackData("button 3", "b3"),
-                InlineKeyboardButton.WithCallbackData("button 4", "b4")
+                InlineKeyboardButton.WithCallbackData("📊 Day Statistics", "/daystat"),
+            ],
+            [
+                InlineKeyboardButton.WithCallbackData("📈 Total Statistics", "/allstat"),
             ]
         ]);
         await botClient.SendMessage(userId, "test text", replyMarkup: keyboard, cancellationToken: cancellationToken);
@@ -306,7 +307,8 @@ public partial class WeightBot : IDisposable
     {
         int timeZone = await _database.GetUserTimezoneOffsetAsync(userId);
         DateTime dayBeginUtc = GetUserDayBeginUtc(timeZone);
-        await PrintStatAsync(dayBeginUtc, null, ShortUserTimeFormat, timeZone, userId, botClient, cancellationToken);
+        await PrintStatAsync(dayBeginUtc, null, "📊 Day Statistics", ShortUserTimeFormat, timeZone, userId, botClient,
+            cancellationToken);
     }
 
     private async Task PrintAllStatAsync(long userId,
@@ -314,10 +316,12 @@ public partial class WeightBot : IDisposable
         CancellationToken cancellationToken)
     {
         int timeZone = await _database.GetUserTimezoneOffsetAsync(userId);
-        await PrintStatAsync(null, null, LongUserTimeFormat, timeZone, userId, botClient, cancellationToken);
+        await PrintStatAsync(null, null, "📈 Total Statistics", LongUserTimeFormat, timeZone, userId, botClient,
+            cancellationToken);
     }
 
-    private async Task PrintStatAsync(DateTime? begin, DateTime? end, string timeFormat, int timeZone, long userId,
+    private async Task PrintStatAsync(DateTime? begin, DateTime? end, string titleMessage, string timeFormat,
+        int timeZone, long userId,
         ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
@@ -339,9 +343,11 @@ public partial class WeightBot : IDisposable
         string rowFormat = $"{{0, -{nameSize}}}| {{1, {kcalSize}}}| {{2, {dateSize}}}| {{3, {idSize}}}\n";
 
         string message = "";
+        message += titleMessage + '\n';
+        message += $"🌍 Time Zone: {timeZone:+#;-#;0}\n";
+        message += $"🔥 Consumed: {consumedToday} kcal\n";
+
         message += "<pre>";
-        message += $"Time Zone: {timeZone:+#;-#;0}\n";
-        message += $"Consumed: {consumedToday} kcal\n";
         message += string.Format(rowFormat, "Name", "Kcal", "Date", "ID");
 
         foreach (ConsumedRowInfoStrings row in strRows)
