@@ -241,7 +241,8 @@ public partial class WeightBot : IDisposable
         string message = "";
         if (limit != null)
         {
-            message = $"🔥 Consumed Today: {consumed} / {limit} kcal\n";
+            int consumedPercents = (int)(consumed / limit * 100);
+            message = $"🔥 Consumed Today: {consumed} / {limit} kcal ({consumedPercents} %)\n";
             if (consumed < limit)
             {
                 message += $"✅ {limit - consumed} kcal left\n";
