@@ -232,6 +232,31 @@ public partial class WeightBot : IDisposable
         ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
+        int timeZone = await _database.GetUserTimezoneOffsetAsync(chatId);
+        DateTime dayBeginUtc = GetUserDayBeginUtc(timeZone);
+
+        double consumed = await _database.GetConsumedCalAsync(dayBeginUtc, null, chatId);
+        double? limit = await _database.GetMaxKcalAsync(chatId);
+
+        string message = "";
+        if (limit != null)
+        {
+            message = $"🔥 Consumed Today: {consumed} / {limit}\n";
+            if (consumed < limit)
+            {
+                message += $"✅ {limit - consumed} kcal left\n";
+            }
+            else
+            {
+                message += $"❌ {consumed - limit} kcal overeat!\n";
+            }
+        }
+        else
+        {
+            message = $"🔥 Consumed Today: {consumed} (no limit set)\n";
+        }
+
+        await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
     }
 
     private async Task PrintDayStatAsync(long chatId,
