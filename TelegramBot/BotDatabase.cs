@@ -40,7 +40,7 @@ public class BotDatabase : IDisposable
 
     #region BotOperations
 
-    private async Task<double> GetConsumedDayCalFromDatabaseAsync(DateTime? optionalBegin, DateTime? optionalEnd,
+    public async Task<double> GetConsumedCalFromDatabaseAsync(DateTime? optionalBegin, DateTime? optionalEnd,
         long chatId)
     {
         if (optionalBegin is { } begin && optionalEnd is { } end)
