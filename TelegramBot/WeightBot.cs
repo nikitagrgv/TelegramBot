@@ -12,7 +12,8 @@ using Telegram.Bot.Types.Enums;
 
 public partial class WeightBot : IDisposable
 {
-    private const string UserTimeFormat = "dd MMM HH:mm";
+    private const string ShortUserTimeFormat = "HH:mm";
+    private const string LongUserTimeFormat = "dd MMM HH:mm";
 
     private static readonly Regex ParseCommandRegex = GetParseCommandRegex();
     private static readonly Regex AddConsumedRegex = GetAddConsumedRegex();
@@ -177,7 +178,7 @@ public partial class WeightBot : IDisposable
                           ✅ Product added
                           🍽️ Name: {row.Text}
                           🔥 Kcal: {row.Kcal}
-                          📅 Date: {FromDatabaseToUserTimeFormat(row.Date, timeZone)}
+                          📅 Date: {FromDatabaseToUserTimeFormat(row.Date, timeZone, LongUserTimeFormat)}
                           🆔 ID: {row.Id}
                           """;
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
@@ -209,7 +210,7 @@ public partial class WeightBot : IDisposable
                           ❌ Product removed
                           🍽 Name: {row.Text}
                           🔥 Kcal: {row.Kcal}
-                          📅 Date: {FromDatabaseToUserTimeFormat(row.Date, timeZone)}
+                          📅 Date: {FromDatabaseToUserTimeFormat(row.Date, timeZone, LongUserTimeFormat)}
                           🆔 ID: {row.Id}
                           """;
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
@@ -232,7 +233,7 @@ public partial class WeightBot : IDisposable
         const int budget = 36;
 
         int kcalSize = 0;
-        int dateSize = UserTimeFormat.Length;
+        int dateSize = LongUserTimeFormat.Length;
         int idSize = 0;
 
         List<ConsumedRowInfo> dbRows = await _database.GetStatFromDatabaseAsync(begin, end, chatId);
