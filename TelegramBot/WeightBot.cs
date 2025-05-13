@@ -105,6 +105,9 @@ public partial class WeightBot : IDisposable
             case "remove":
                 await RemoveConsumedAsync(args, chatId, botClient, cancellationToken);
                 break;
+            case "stat":
+                await PrintShortStatAsync(chatId, botClient, cancellationToken);
+                break;
             case "daystat":
                 await PrintDayStatAsync(chatId, botClient, cancellationToken);
                 break;
@@ -184,6 +187,8 @@ public partial class WeightBot : IDisposable
                           🆔 {row.Id}
                           """;
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
+
+        await PrintShortStatAsync(chatId, botClient, cancellationToken);
     }
 
     private async Task RemoveConsumedAsync(string args, long chatId, ITelegramBotClient botClient,
@@ -216,6 +221,15 @@ public partial class WeightBot : IDisposable
                           🆔 {row.Id}
                           """;
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
+
+        await PrintShortStatAsync(chatId, botClient, cancellationToken);
+    }
+
+    private async Task PrintShortStatAsync(long chatId,
+        ITelegramBotClient botClient,
+        CancellationToken cancellationToken)
+    {
+        
     }
 
     private async Task PrintDayStatAsync(long chatId,
@@ -351,10 +365,13 @@ public partial class WeightBot : IDisposable
                Remove a consumed product by id:
                /remove 6
 
+               Print consumed kcal by the current day
+               /stat
+
                Print all consumed products by the current day from 00:00:
                /daystat
 
-               Print all consumed products by the current day from 00:00:
+               Print all consumed products by all the time
                /allstat
 
                Set the time zone offset:
