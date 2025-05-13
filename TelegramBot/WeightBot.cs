@@ -67,6 +67,21 @@ public partial class WeightBot : IDisposable
     private async Task HandleCallbackQueryAsync(CallbackQuery callbackQuery, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
+        if (callbackQuery.From is not { Id: var userId }) return;
+
+        if (!await RegisterUserIfNotRegisteredAsync(userId, botClient, cancellationToken))
+        {
+            return;
+        }
+
+        if (callbackQuery.Data is not { } queryData) return;
+
+        await DispatchCallbackQueryAsync(userId, queryData, botClient, cancellationToken);
+    }
+
+    private async Task DispatchCallbackQueryAsync(long userId, string queryData, ITelegramBotClient botClient,
+        CancellationToken cancellationToken)
+    {
     }
 
     private async Task HandleMessageAsync(Message message, ITelegramBotClient botClient,
