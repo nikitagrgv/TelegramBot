@@ -24,10 +24,14 @@ public class BotDatabase : IDisposable
 
         await using var cmd = new SQLiteCommand("PRAGMA foreign_keys = ON;", _connection);
         await cmd.ExecuteNonQueryAsync();
-        
-        
     }
 
+    private async Task<int> GetDatabaseVersion()
+    {
+        await using var cmd = new SQLiteCommand("PRAGMA user_version;", _connection);
+        object? ret = await cmd.ExecuteScalarAsync();
+        return Convert.ToInt32(ret);
+    }
 
     #region Dispose
 
