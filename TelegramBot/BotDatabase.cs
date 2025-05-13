@@ -38,7 +38,17 @@ public class BotDatabase : IDisposable
 
     private async Task<int> MigrateDatabaseToLatestVersion(int oldVersion)
     {
-        
+        if (oldVersion == 0)
+        {
+            await MigrateDatabaseToVersion1();
+            return 1;
+        }
+
+        return oldVersion;
+    }
+
+    private async Task MigrateDatabaseToVersion1()
+    {
     }
 
     private async Task<int> GetDatabaseVersion()
