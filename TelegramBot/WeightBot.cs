@@ -162,7 +162,9 @@ public partial class WeightBot : IDisposable
             return;
         }
 
-        ConsumedRowInfo? row = await _database.AddConsumedAsync(chatId, name, kcal);
+        DateTime now = DateTime.UtcNow;
+
+        ConsumedRowInfo? row = await _database.AddConsumedAsync(chatId, name, kcal, now);
 
         if (row == null)
         {
@@ -314,7 +316,7 @@ public partial class WeightBot : IDisposable
             return true;
         }
 
-        DateTime registerDate = DateTime.Now;
+        DateTime registerDate = DateTime.UtcNow;
 
         bool registered = await _database.RegisterChatIdAsync(chatId, registerDate);
         if (!registered)
