@@ -40,6 +40,11 @@ public class BotDatabase : IDisposable
 
     #region BotOperations
 
+    public async Task<double?> GetMaxKcalAsync(long chatId)
+    {
+        
+    }
+
     public async Task<double> GetConsumedCalAsync(DateTime? optionalBegin, DateTime? optionalEnd,
         long chatId)
     {

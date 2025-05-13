@@ -262,8 +262,8 @@ public partial class WeightBot : IDisposable
 
         string message = "";
         message += "<pre>";
-        message += $"User Time Zone: {timeZone:+#;-#;0}\n";
-        message += $"Consumed Today: {consumedToday} kcal\n";
+        message += $"Time Zone: {timeZone:+#;-#;0}\n";
+        message += $"Consumed: {consumedToday} kcal\n";
         message += string.Format(rowFormat, "Name", "Kcal", "Date", "ID");
 
         foreach (ConsumedRowInfoStrings row in strRows)
