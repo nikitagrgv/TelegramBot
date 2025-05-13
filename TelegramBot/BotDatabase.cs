@@ -54,7 +54,7 @@ public class BotDatabase : IDisposable
             cmd.Parameters.AddWithValue("begin", ToDatabaseTimeFormat(begin));
             cmd.Parameters.AddWithValue("end", ToDatabaseTimeFormat(end));
             cmd.Parameters.AddWithValue("id", chatId);
-            return await ExecuteDoubleSafeAsync(cmd);
+            return await ExecuteDoubleAsync(cmd, 0);
         }
 
         if (optionalBegin is { } singleBegin)
@@ -67,7 +67,7 @@ public class BotDatabase : IDisposable
             await using var cmd = new SQLiteCommand(sql, _connection);
             cmd.Parameters.AddWithValue("begin", ToDatabaseTimeFormat(singleBegin));
             cmd.Parameters.AddWithValue("id", chatId);
-            return await ExecuteDoubleSafeAsync(cmd);
+            return await ExecuteDoubleAsync(cmd, 0);
         }
 
         if (optionalEnd is { } singleEnd)
@@ -80,7 +80,7 @@ public class BotDatabase : IDisposable
             await using var cmd = new SQLiteCommand(sql, _connection);
             cmd.Parameters.AddWithValue("end", ToDatabaseTimeFormat(singleEnd));
             cmd.Parameters.AddWithValue("id", chatId);
-            return await ExecuteDoubleSafeAsync(cmd);
+            return await ExecuteDoubleAsync(cmd, 0);
         }
 
         const string everythingSql = """
@@ -90,7 +90,7 @@ public class BotDatabase : IDisposable
                                      """;
         await using var everythingCmd = new SQLiteCommand(everythingSql, _connection);
         everythingCmd.Parameters.AddWithValue("id", chatId);
-        return await ExecuteDoubleSafeAsync(everythingCmd);
+        return await ExecuteDoubleAsync(everythingCmd, 0);
     }
 
     public async Task<ConsumedRowInfo?> AddConsumedAsync(long chatId, string name, double kcal, DateTime date)
@@ -222,7 +222,7 @@ public class BotDatabase : IDisposable
         }
     }
 
-    private async Task<double> ExecuteDoubleSafeAsync(SQLiteCommand cmd)
+    private async Task<double?> ExecuteDoubleAsync(SQLiteCommand cmd)
     {
         try
         {
@@ -238,6 +238,11 @@ public class BotDatabase : IDisposable
         {
             return 0;
         }
+    }
+
+    private async Task<double> ExecuteDoubleAsync(SQLiteCommand cmd, double defaultValue)
+    {
+        return await ExecuteDoubleAsync(cmd) ?? defaultValue;
     }
 
     private static ConsumedRowInfo? ReadConsumedRowInfo(DbDataReader reader)
