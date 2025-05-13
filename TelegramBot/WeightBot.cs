@@ -72,9 +72,9 @@ public partial class WeightBot : IDisposable
     private async Task HandleMessageAsync(Message message, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        long chatId = message.Chat.Id;
+        long userId = message.From.Id;
 
-        if (!await RegisterChatIfNotRegisteredAsync(chatId, botClient, cancellationToken))
+        if (!await RegisterUserIfNotRegisteredAsync(userId, botClient, cancellationToken))
         {
             return;
         }
@@ -84,10 +84,10 @@ public partial class WeightBot : IDisposable
             return;
         }
 
-        await ParseAndDispatchUserMessageAsync(chatId, userText.Trim(), botClient, cancellationToken);
+        await ParseAndDispatchUserMessageAsync(userId, userText.Trim(), botClient, cancellationToken);
     }
 
-    private async Task ParseAndDispatchUserMessageAsync(long chatId, string userText, ITelegramBotClient botClient,
+    private async Task ParseAndDispatchUserMessageAsync(long userId, string userText, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
         Match m = ParseCommandRegex.Match(userText);
@@ -96,70 +96,70 @@ public partial class WeightBot : IDisposable
         {
             const string invalidCommandMessage =
                 "Sorry, I didn't understand that. Type /help to see a list of available commands.";
-            await botClient.SendMessage(chatId, invalidCommandMessage, cancellationToken: cancellationToken);
+            await botClient.SendMessage(userId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
         }
 
         string cmd = m.Groups["cmd"].Value;
         string args = m.Groups["args"].Value;
 
-        await DispatchUserMessageAsync(cmd, args, chatId, botClient, cancellationToken);
+        await DispatchUserMessageAsync(cmd, args, userId, botClient, cancellationToken);
     }
 
-    private async Task DispatchUserMessageAsync(string cmd, string args, long chatId, ITelegramBotClient botClient,
+    private async Task DispatchUserMessageAsync(string cmd, string args, long userId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
         switch (cmd)
         {
             case "help":
-                await PrintHelpAsync(chatId, botClient, cancellationToken);
+                await PrintHelpAsync(userId, botClient, cancellationToken);
                 break;
             case "add":
-                await AddConsumedAsync(args, chatId, botClient, cancellationToken);
+                await AddConsumedAsync(args, userId, botClient, cancellationToken);
                 break;
             case "remove":
-                await RemoveConsumedAsync(args, chatId, botClient, cancellationToken);
+                await RemoveConsumedAsync(args, userId, botClient, cancellationToken);
                 break;
             case "stat":
-                await PrintShortStatAsync(chatId, botClient, cancellationToken);
+                await PrintShortStatAsync(userId, botClient, cancellationToken);
                 break;
             case "daystat":
-                await PrintDayStatAsync(chatId, botClient, cancellationToken);
+                await PrintDayStatAsync(userId, botClient, cancellationToken);
                 break;
             case "allstat":
-                await PrintAllStatAsync(chatId, botClient, cancellationToken);
+                await PrintAllStatAsync(userId, botClient, cancellationToken);
                 break;
             case "timezone":
-                await SetUserTimezoneOffsetAsync(args, chatId, botClient, cancellationToken);
+                await SetUserTimezoneOffsetAsync(args, userId, botClient, cancellationToken);
                 break;
             case "limit":
-                await SetMaxKcalAsync(args, chatId, botClient, cancellationToken);
+                await SetMaxKcalAsync(args, userId, botClient, cancellationToken);
                 break;
             case "kill":
-                await ShutdownBot(chatId, botClient, cancellationToken);
+                await ShutdownBot(userId, botClient, cancellationToken);
                 break;
             default:
                 string message = $"Unknown command: {cmd}. Type /help to see a list of available commands.";
-                await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
+                await botClient.SendMessage(userId, message, cancellationToken: cancellationToken);
                 break;
         }
     }
 
-    private async Task ShutdownBot(long chatId, ITelegramBotClient botClient,
+    private async Task ShutdownBot(long userId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
         string message = "Shutdown...";
-        await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
+        await botClient.SendMessage(userId, message, cancellationToken: cancellationToken);
         _cancelTokenSource.CancelAfter(1000);
     }
 
-    private async Task PrintHelpAsync(long chatId, ITelegramBotClient botClient,
+    private async Task PrintHelpAsync(long userId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        await botClient.SendMessage(chatId, GetHelpMessage(), cancellationToken: cancellationToken);
+        await botClient.SendMessage(userId, GetHelpMessage(), cancellationToken: cancellationToken);
     }
 
-    private async Task AddConsumedAsync(string args, long chatId, ITelegramBotClient botClient,
+    private async Task AddConsumedAsync(string args, long userId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
         Match m = AddConsumedRegex.Match(args);
@@ -168,7 +168,7 @@ public partial class WeightBot : IDisposable
         {
             string invalidCommandMessage =
                 $"Sorry, I didn't understand your 'add' command. Invalid arguments: '{args}'. Type /help to see a list of available commands.";
-            await botClient.SendMessage(chatId, invalidCommandMessage, cancellationToken: cancellationToken);
+            await botClient.SendMessage(userId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
         }
 
@@ -179,23 +179,23 @@ public partial class WeightBot : IDisposable
         {
             string invalidCommandMessage =
                 $"Sorry, I didn't understand your 'add' command. Invalid kcal number: '{kcalString}'. Type /help to see a list of available commands.";
-            await botClient.SendMessage(chatId, invalidCommandMessage, cancellationToken: cancellationToken);
+            await botClient.SendMessage(userId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
         }
 
         DateTime now = DateTime.UtcNow;
 
-        ConsumedRowInfo? row = await _database.AddConsumedAsync(chatId, name, kcal, now);
+        ConsumedRowInfo? row = await _database.AddConsumedAsync(userId, name, kcal, now);
 
         if (row == null)
         {
             string errorMessage =
-                $"Database error. Can't add the row. Chat ID: '{chatId}', name: '{name}', kcal: '{kcal}'";
-            await botClient.SendMessage(chatId, errorMessage, cancellationToken: cancellationToken);
+                $"Database error. Can't add the row. User ID: '{userId}', name: '{name}', kcal: '{kcal}'";
+            await botClient.SendMessage(userId, errorMessage, cancellationToken: cancellationToken);
             return;
         }
 
-        int timeZone = await _database.GetUserTimezoneOffsetAsync(chatId);
+        int timeZone = await _database.GetUserTimezoneOffsetAsync(userId);
 
         string message = $"""
                           ✅ Added
@@ -204,19 +204,19 @@ public partial class WeightBot : IDisposable
                           📅 {FromDatabaseToUserTimeFormat(row.Date, timeZone, LongUserTimeFormat)}
                           🆔 {row.Id}
                           """;
-        await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
+        await botClient.SendMessage(userId, message, cancellationToken: cancellationToken);
 
-        await PrintShortStatAsync(chatId, botClient, cancellationToken);
+        await PrintShortStatAsync(userId, botClient, cancellationToken);
     }
 
-    private async Task RemoveConsumedAsync(string args, long chatId, ITelegramBotClient botClient,
+    private async Task RemoveConsumedAsync(string args, long userId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
         if (!long.TryParse(args.Trim(), out long consumedId) || consumedId < 0)
         {
             string invalidCommandMessage =
                 $"Sorry, I didn't understand your 'remove' command. Invalid id: '{args}'. Type /help to see a list of available commands.";
-            await botClient.SendMessage(chatId, invalidCommandMessage, cancellationToken: cancellationToken);
+            await botClient.SendMessage(userId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
         }
 
@@ -224,12 +224,12 @@ public partial class WeightBot : IDisposable
         if (row == null)
         {
             string errorMessage =
-                $"Database error. Can't remove the row. Chat ID: '{chatId}', consumed ID: '{consumedId}'";
-            await botClient.SendMessage(chatId, errorMessage, cancellationToken: cancellationToken);
+                $"Database error. Can't remove the row. User ID: '{userId}', consumed ID: '{consumedId}'";
+            await botClient.SendMessage(userId, errorMessage, cancellationToken: cancellationToken);
             return;
         }
 
-        int timeZone = await _database.GetUserTimezoneOffsetAsync(chatId);
+        int timeZone = await _database.GetUserTimezoneOffsetAsync(userId);
 
         string message = $"""
                           ❌ Removed
@@ -238,20 +238,20 @@ public partial class WeightBot : IDisposable
                           📅 {FromDatabaseToUserTimeFormat(row.Date, timeZone, LongUserTimeFormat)}
                           🆔 {row.Id}
                           """;
-        await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
+        await botClient.SendMessage(userId, message, cancellationToken: cancellationToken);
 
-        await PrintShortStatAsync(chatId, botClient, cancellationToken);
+        await PrintShortStatAsync(userId, botClient, cancellationToken);
     }
 
-    private async Task PrintShortStatAsync(long chatId,
+    private async Task PrintShortStatAsync(long userId,
         ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        int timeZone = await _database.GetUserTimezoneOffsetAsync(chatId);
+        int timeZone = await _database.GetUserTimezoneOffsetAsync(userId);
         DateTime dayBeginUtc = GetUserDayBeginUtc(timeZone);
 
-        double consumed = await _database.GetConsumedCalAsync(dayBeginUtc, null, chatId);
-        double? limit = await _database.GetMaxKcalAsync(chatId);
+        double consumed = await _database.GetConsumedCalAsync(dayBeginUtc, null, userId);
+        double? limit = await _database.GetMaxKcalAsync(userId);
 
         string message = "";
         if (limit != null)
@@ -272,7 +272,7 @@ public partial class WeightBot : IDisposable
             message = $"🔥 Consumed Today: {consumed} kcal (no limit set)\n";
         }
 
-        await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
+        await botClient.SendMessage(userId, message, cancellationToken: cancellationToken);
 
 
         var keyboard = new InlineKeyboardMarkup([
@@ -285,31 +285,31 @@ public partial class WeightBot : IDisposable
                 InlineKeyboardButton.WithCallbackData("button 4", "b4")
             ]
         ]);
-        await botClient.SendMessage(chatId, "test text", replyMarkup: keyboard, cancellationToken: cancellationToken);
+        await botClient.SendMessage(userId, "test text", replyMarkup: keyboard, cancellationToken: cancellationToken);
     }
 
-    private async Task PrintDayStatAsync(long chatId,
+    private async Task PrintDayStatAsync(long userId,
         ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        int timeZone = await _database.GetUserTimezoneOffsetAsync(chatId);
+        int timeZone = await _database.GetUserTimezoneOffsetAsync(userId);
         DateTime dayBeginUtc = GetUserDayBeginUtc(timeZone);
-        await PrintStatAsync(dayBeginUtc, null, ShortUserTimeFormat, timeZone, chatId, botClient, cancellationToken);
+        await PrintStatAsync(dayBeginUtc, null, ShortUserTimeFormat, timeZone, userId, botClient, cancellationToken);
     }
 
-    private async Task PrintAllStatAsync(long chatId,
+    private async Task PrintAllStatAsync(long userId,
         ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        int timeZone = await _database.GetUserTimezoneOffsetAsync(chatId);
-        await PrintStatAsync(null, null, LongUserTimeFormat, timeZone, chatId, botClient, cancellationToken);
+        int timeZone = await _database.GetUserTimezoneOffsetAsync(userId);
+        await PrintStatAsync(null, null, LongUserTimeFormat, timeZone, userId, botClient, cancellationToken);
     }
 
-    private async Task PrintStatAsync(DateTime? begin, DateTime? end, string timeFormat, int timeZone, long chatId,
+    private async Task PrintStatAsync(DateTime? begin, DateTime? end, string timeFormat, int timeZone, long userId,
         ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        List<ConsumedRowInfo> dbRows = await _database.GetStatAsync(begin, end, chatId);
+        List<ConsumedRowInfo> dbRows = await _database.GetStatAsync(begin, end, userId);
 
         // TODO: refactor shit
 
@@ -347,79 +347,79 @@ public partial class WeightBot : IDisposable
 
         message += "</pre>";
 
-        await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken, parseMode: ParseMode.Html);
+        await botClient.SendMessage(userId, message, cancellationToken: cancellationToken, parseMode: ParseMode.Html);
     }
 
-    private async Task SetUserTimezoneOffsetAsync(string args, long chatId, ITelegramBotClient botClient,
+    private async Task SetUserTimezoneOffsetAsync(string args, long userId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
         if (!int.TryParse(args.Trim(), out int timezone) || timezone < 0)
         {
             string invalidCommandMessage =
                 $"Sorry, I didn't understand your 'timezone' command. Invalid offset: '{args}'. Type /help to see a list of available commands.";
-            await botClient.SendMessage(chatId, invalidCommandMessage, cancellationToken: cancellationToken);
+            await botClient.SendMessage(userId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
         }
 
-        bool success = await _database.SetUserTimezoneOffsetAsync(chatId, timezone);
+        bool success = await _database.SetUserTimezoneOffsetAsync(userId, timezone);
         if (!success)
         {
             string errorMessage =
-                $"Database error. Can't set the timezone. Chat ID: '{chatId}', timezone: '{timezone}'";
-            await botClient.SendMessage(chatId, errorMessage, cancellationToken: cancellationToken);
+                $"Database error. Can't set the timezone. User ID: '{userId}', timezone: '{timezone}'";
+            await botClient.SendMessage(userId, errorMessage, cancellationToken: cancellationToken);
             return;
         }
 
         string message = $"Timezone updated: {timezone:+#;-#;0}";
-        await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
+        await botClient.SendMessage(userId, message, cancellationToken: cancellationToken);
     }
 
-    private async Task SetMaxKcalAsync(string args, long chatId, ITelegramBotClient botClient,
+    private async Task SetMaxKcalAsync(string args, long userId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
         if (!double.TryParse(args.Trim(), out double limit) || limit < 0)
         {
             string invalidCommandMessage =
                 $"Sorry, I didn't understand your 'limit' command. Invalid value: '{args}'. Type /help to see a list of available commands.";
-            await botClient.SendMessage(chatId, invalidCommandMessage, cancellationToken: cancellationToken);
+            await botClient.SendMessage(userId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
         }
 
-        bool success = await _database.SetMaxKcalAsync(chatId, limit);
+        bool success = await _database.SetMaxKcalAsync(userId, limit);
         if (!success)
         {
             string errorMessage =
-                $"Database error. Can't set the limit. Chat ID: '{chatId}', limit: '{limit}'";
-            await botClient.SendMessage(chatId, errorMessage, cancellationToken: cancellationToken);
+                $"Database error. Can't set the limit. User ID: '{userId}', limit: '{limit}'";
+            await botClient.SendMessage(userId, errorMessage, cancellationToken: cancellationToken);
             return;
         }
 
         string message = $"Limit updated: {limit} kcal";
-        await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
+        await botClient.SendMessage(userId, message, cancellationToken: cancellationToken);
     }
 
-    private async Task<bool> RegisterChatIfNotRegisteredAsync(long chatId, ITelegramBotClient botClient,
+    private async Task<bool> RegisterUserIfNotRegisteredAsync(long userId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        if (await _database.HasChatIdAsync(chatId))
+        if (await _database.HasUserIdAsync(userId))
         {
             return true;
         }
 
         DateTime registerDate = DateTime.UtcNow;
 
-        bool registered = await _database.RegisterChatIdAsync(chatId, registerDate);
+        bool registered = await _database.RegisterUserIdAsync(userId, registerDate);
         if (!registered)
         {
-            Console.WriteLine($"Failed to register chat. Id = {chatId}");
+            Console.WriteLine($"Failed to register user. Id = {userId}");
             return false;
         }
 
-        Console.WriteLine($"Registered chat. Id = {chatId}");
+        Console.WriteLine($"Registered user. Id = {userId}");
 
         const string message = "You are registered! Welcome!";
-        await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
-        await botClient.SendMessage(chatId, GetHelpMessage(), cancellationToken: cancellationToken);
+        await botClient.SendMessage(userId, message, cancellationToken: cancellationToken);
+        await botClient.SendMessage(userId, GetHelpMessage(), cancellationToken: cancellationToken);
         return true;
     }
 

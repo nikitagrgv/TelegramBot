@@ -40,7 +40,7 @@ public class BotDatabase : IDisposable
 
     #region BotOperations
 
-    public async Task<double?> GetMaxKcalAsync(long chatId)
+    public async Task<double?> GetMaxKcalAsync(long userId)
     {
         const string sql = """
                            SELECT max_kcal
@@ -48,11 +48,11 @@ public class BotDatabase : IDisposable
                            WHERE id = @id
                            """;
         await using var cmd = new SQLiteCommand(sql, _connection);
-        cmd.Parameters.AddWithValue("@id", chatId);
+        cmd.Parameters.AddWithValue("@id", userId);
         return await ExecuteDoubleAsync(cmd);
     }
 
-    public async Task<bool> SetMaxKcalAsync(long chatId, double? maxKcal)
+    public async Task<bool> SetMaxKcalAsync(long userId, double? maxKcal)
     {
         const string sql = """
                            UPDATE users
@@ -60,13 +60,13 @@ public class BotDatabase : IDisposable
                            WHERE id = @id
                            """;
         await using var cmd = new SQLiteCommand(sql, _connection);
-        cmd.Parameters.AddWithValue("@id", chatId);
+        cmd.Parameters.AddWithValue("@id", userId);
         cmd.Parameters.AddWithValue("@max_kcal", maxKcal);
         return await cmd.ExecuteNonQueryAsync() != 0;
     }
 
     public async Task<double> GetConsumedCalAsync(DateTime? optionalBegin, DateTime? optionalEnd,
-        long chatId)
+        long userId)
     {
         if (optionalBegin is { } begin && optionalEnd is { } end)
         {
@@ -78,7 +78,7 @@ public class BotDatabase : IDisposable
             await using var cmd = new SQLiteCommand(sql, _connection);
             cmd.Parameters.AddWithValue("begin", ToDatabaseTimeFormat(begin));
             cmd.Parameters.AddWithValue("end", ToDatabaseTimeFormat(end));
-            cmd.Parameters.AddWithValue("id", chatId);
+            cmd.Parameters.AddWithValue("id", userId);
             return await ExecuteDoubleAsync(cmd, 0);
         }
 
@@ -91,7 +91,7 @@ public class BotDatabase : IDisposable
                                """;
             await using var cmd = new SQLiteCommand(sql, _connection);
             cmd.Parameters.AddWithValue("begin", ToDatabaseTimeFormat(singleBegin));
-            cmd.Parameters.AddWithValue("id", chatId);
+            cmd.Parameters.AddWithValue("id", userId);
             return await ExecuteDoubleAsync(cmd, 0);
         }
 
@@ -104,7 +104,7 @@ public class BotDatabase : IDisposable
                                """;
             await using var cmd = new SQLiteCommand(sql, _connection);
             cmd.Parameters.AddWithValue("end", ToDatabaseTimeFormat(singleEnd));
-            cmd.Parameters.AddWithValue("id", chatId);
+            cmd.Parameters.AddWithValue("id", userId);
             return await ExecuteDoubleAsync(cmd, 0);
         }
 
@@ -114,11 +114,11 @@ public class BotDatabase : IDisposable
                                      WHERE user_id = @id
                                      """;
         await using var everythingCmd = new SQLiteCommand(everythingSql, _connection);
-        everythingCmd.Parameters.AddWithValue("id", chatId);
+        everythingCmd.Parameters.AddWithValue("id", userId);
         return await ExecuteDoubleAsync(everythingCmd, 0);
     }
 
-    public async Task<ConsumedRowInfo?> AddConsumedAsync(long chatId, string name, double kcal, DateTime date)
+    public async Task<ConsumedRowInfo?> AddConsumedAsync(long userId, string name, double kcal, DateTime date)
     {
         string sql = """
                      INSERT INTO consumed (user_id, date, text, kcal)
@@ -126,7 +126,7 @@ public class BotDatabase : IDisposable
                      RETURNING *;
                      """;
         await using var cmd = new SQLiteCommand(sql, _connection);
-        cmd.Parameters.AddWithValue("user_id", chatId);
+        cmd.Parameters.AddWithValue("user_id", userId);
         cmd.Parameters.AddWithValue("date", ToDatabaseTimeFormat(date));
         cmd.Parameters.AddWithValue("text", name);
         cmd.Parameters.AddWithValue("kcal", kcal);
@@ -149,7 +149,7 @@ public class BotDatabase : IDisposable
     }
 
     public async Task<List<ConsumedRowInfo>> GetStatAsync(DateTime? optionalBegin, DateTime? optionalEnd,
-        long chatId)
+        long userId)
     {
         if (optionalBegin is { } begin && optionalEnd is { } end)
         {
@@ -162,7 +162,7 @@ public class BotDatabase : IDisposable
             await using var cmd = new SQLiteCommand(sql, _connection);
             cmd.Parameters.AddWithValue("begin", ToDatabaseTimeFormat(begin));
             cmd.Parameters.AddWithValue("end", ToDatabaseTimeFormat(end));
-            cmd.Parameters.AddWithValue("id", chatId);
+            cmd.Parameters.AddWithValue("id", userId);
             return await ExecuteConsumedAndGetAllAsync(cmd);
         }
 
@@ -176,7 +176,7 @@ public class BotDatabase : IDisposable
                                """;
             await using var cmd = new SQLiteCommand(sql, _connection);
             cmd.Parameters.AddWithValue("begin", ToDatabaseTimeFormat(singleBegin));
-            cmd.Parameters.AddWithValue("id", chatId);
+            cmd.Parameters.AddWithValue("id", userId);
             return await ExecuteConsumedAndGetAllAsync(cmd);
         }
 
@@ -190,7 +190,7 @@ public class BotDatabase : IDisposable
                                """;
             await using var cmd = new SQLiteCommand(sql, _connection);
             cmd.Parameters.AddWithValue("end", ToDatabaseTimeFormat(singleEnd));
-            cmd.Parameters.AddWithValue("id", chatId);
+            cmd.Parameters.AddWithValue("id", userId);
             return await ExecuteConsumedAndGetAllAsync(cmd);
         }
 
@@ -201,7 +201,7 @@ public class BotDatabase : IDisposable
                                      ORDER BY date;
                                      """;
         await using var everythingCmd = new SQLiteCommand(everythingSql, _connection);
-        everythingCmd.Parameters.AddWithValue("id", chatId);
+        everythingCmd.Parameters.AddWithValue("id", userId);
         return await ExecuteConsumedAndGetAllAsync(everythingCmd);
     }
 
@@ -300,29 +300,29 @@ public class BotDatabase : IDisposable
         }
     }
 
-    public async Task<bool> HasChatIdAsync(long chatId)
+    public async Task<bool> HasUserIdAsync(long userId)
     {
         string sql = "SELECT EXISTS(SELECT 1 FROM users WHERE id = @id)";
         await using var cmd = new SQLiteCommand(sql, _connection);
-        cmd.Parameters.AddWithValue("id", chatId);
+        cmd.Parameters.AddWithValue("id", userId);
         object? result = await cmd.ExecuteScalarAsync();
         return Convert.ToInt32(result) == 1;
     }
 
-    public async Task<bool> SetUserTimezoneOffsetAsync(long chatId, int timezoneOffset)
+    public async Task<bool> SetUserTimezoneOffsetAsync(long userId, int timezoneOffset)
     {
         string sql = "UPDATE users SET timezone = @timezone WHERE id = @id";
         await using var cmd = new SQLiteCommand(sql, _connection);
-        cmd.Parameters.AddWithValue("id", chatId);
+        cmd.Parameters.AddWithValue("id", userId);
         cmd.Parameters.AddWithValue("timezone", timezoneOffset);
         return await cmd.ExecuteNonQueryAsync() != 0;
     }
 
-    public async Task<int> GetUserTimezoneOffsetAsync(long chatId)
+    public async Task<int> GetUserTimezoneOffsetAsync(long userId)
     {
         string sql = "SELECT timezone FROM users WHERE id = @id";
         await using var cmd = new SQLiteCommand(sql, _connection);
-        cmd.Parameters.AddWithValue("id", chatId);
+        cmd.Parameters.AddWithValue("id", userId);
         object? result = await cmd.ExecuteScalarAsync();
         try
         {
@@ -334,14 +334,14 @@ public class BotDatabase : IDisposable
         }
     }
 
-    public async Task<bool> RegisterChatIdAsync(long chatId, DateTime date)
+    public async Task<bool> RegisterUserIdAsync(long userId, DateTime date)
     {
         string sql = """
                      INSERT INTO users (id, register_date)
                      VALUES (@id, @date);
                      """;
         await using var cmd = new SQLiteCommand(sql, _connection);
-        cmd.Parameters.AddWithValue("id", chatId);
+        cmd.Parameters.AddWithValue("id", userId);
         cmd.Parameters.AddWithValue("date", ToDatabaseTimeFormat(date));
         return await cmd.ExecuteNonQueryAsync() != 0;
     }
