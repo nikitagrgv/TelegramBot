@@ -79,10 +79,7 @@ public partial class WeightBot : IDisposable
             return;
         }
 
-        if (message is not { Text: { } userText })
-        {
-            return;
-        }
+        if (message.Text is not { } userText) return;
 
         await ParseAndDispatchUserMessageAsync(userId, userText.Trim(), botClient, cancellationToken);
     }
