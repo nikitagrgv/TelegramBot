@@ -362,7 +362,7 @@ public partial class WeightBot : IDisposable
 
     #endregion
 
-    private static ConsumedRowInfoStrings DbRowToString(ConsumedRowInfo row, int timezone)
+    private static ConsumedRowInfoStrings DbRowToStringRow(ConsumedRowInfo row, int timezone)
     {
         return new ConsumedRowInfoStrings(
             Id: row.Id.ToString(),
