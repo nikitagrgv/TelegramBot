@@ -170,6 +170,18 @@ public partial class WeightBot : IDisposable
         CancellationToken cancellationToken)
     {
         await botClient.SendMessage(userId, GetHelpMessage(), cancellationToken: cancellationToken);
+
+        var keyboard = new InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton.WithCallbackData("button 1", "b1"),
+                InlineKeyboardButton.WithCallbackData("button 2", "b2")
+            ],
+            [
+                InlineKeyboardButton.WithCallbackData("button 3", "b3"),
+                InlineKeyboardButton.WithCallbackData("button 4", "b4")
+            ]
+        ]);
+        await botClient.SendMessage(userId, "test text", replyMarkup: keyboard, cancellationToken: cancellationToken);
     }
 
     private async Task AddConsumedAsync(string args, long userId, ITelegramBotClient botClient,
@@ -286,19 +298,6 @@ public partial class WeightBot : IDisposable
         }
 
         await botClient.SendMessage(userId, message, cancellationToken: cancellationToken);
-
-
-        var keyboard = new InlineKeyboardMarkup([
-            [
-                InlineKeyboardButton.WithCallbackData("button 1", "b1"),
-                InlineKeyboardButton.WithCallbackData("button 2", "b2")
-            ],
-            [
-                InlineKeyboardButton.WithCallbackData("button 3", "b3"),
-                InlineKeyboardButton.WithCallbackData("button 4", "b4")
-            ]
-        ]);
-        await botClient.SendMessage(userId, "test text", replyMarkup: keyboard, cancellationToken: cancellationToken);
     }
 
     private async Task PrintDayStatAsync(long userId,
