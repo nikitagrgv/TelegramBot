@@ -255,6 +255,7 @@ public class BotDatabase : IDisposable
             return result switch
             {
                 null => null,
+                DBNull => null,
                 _ => Convert.ToDouble(result)
             };
         }
