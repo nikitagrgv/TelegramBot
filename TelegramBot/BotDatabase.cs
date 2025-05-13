@@ -93,9 +93,9 @@ public class BotDatabase : IDisposable
         return await ExecuteDoubleSafeAsync(everythingCmd);
     }
 
-    public async Task<ConsumedRowInfo?> AddConsumedAsync(long chatId, string name, double kcal)
+    public async Task<ConsumedRowInfo?> AddConsumedAsync(long chatId, string name, double kcal, DateTime date)
     {
-        string date = ToDatabaseTimeFormat(DateTime.UtcNow);
+        string dateString = ToDatabaseTimeFormat(date);
 
         string sql = """
                      INSERT INTO consumed (user_id, date, text, kcal)
@@ -104,7 +104,7 @@ public class BotDatabase : IDisposable
                      """;
         await using var cmd = new SQLiteCommand(sql, _connection);
         cmd.Parameters.AddWithValue("user_id", chatId);
-        cmd.Parameters.AddWithValue("date", date);
+        cmd.Parameters.AddWithValue("date", dateString);
         cmd.Parameters.AddWithValue("text", name);
         cmd.Parameters.AddWithValue("kcal", kcal);
 
