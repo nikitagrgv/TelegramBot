@@ -340,7 +340,7 @@ public partial class WeightBot
         try
         {
             object? result = await cmd.ExecuteScalarAsync();
-            if (result != null)
+            if (result == null)
             {
                 return 0;
             }
