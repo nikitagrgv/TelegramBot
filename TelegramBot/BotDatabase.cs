@@ -163,7 +163,6 @@ public class BotDatabase : IDisposable
         return await ExecuteConsumedAndGetAllAsync(everythingCmd);
     }
 
-
     private async Task<ConsumedRowInfo?> ExecuteConsumedAndGetOneAsync(SQLiteCommand cmd)
     {
         try
