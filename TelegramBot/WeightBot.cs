@@ -102,7 +102,7 @@ public partial class WeightBot : IDisposable
             case "remove":
                 await RemoveConsumedAsync(args, chatId, botClient, cancellationToken);
                 break;
-            case "stat":
+            case "daystat":
                 await PrintStatAsync(chatId, botClient, cancellationToken);
                 break;
             case "timezone":
@@ -329,8 +329,8 @@ public partial class WeightBot : IDisposable
                Remove a consumed product by id:
                /remove 6
 
-               Print all consumed products:
-               /stat
+               Print all consumed products by the current day from 00:00:
+               /daystat
 
                Set the time zone offset:
                /timezone +7
