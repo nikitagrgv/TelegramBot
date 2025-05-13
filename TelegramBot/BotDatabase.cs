@@ -299,8 +299,7 @@ public class BotDatabase : IDisposable
 
     private async Task SetDatabaseVersion(int version)
     {
-        await using var cmd = new SQLiteCommand("PRAGMA user_version = @version;", _connection);
-        cmd.Parameters.AddWithValue("version", version);
+        await using var cmd = new SQLiteCommand($"PRAGMA user_version = {version};", _connection);
         await cmd.ExecuteNonQueryAsync();
     }
 
