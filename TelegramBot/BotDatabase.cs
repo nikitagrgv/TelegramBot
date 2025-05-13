@@ -22,17 +22,12 @@ public class BotDatabase : IDisposable
             return false;
         }
 
-        await ExecuteNonQueryAsync("PRAGMA foreign_keys = ON;");
+        await using var cmd = new SQLiteCommand("PRAGMA foreign_keys = ON;", _connection);
+        await cmd.ExecuteNonQueryAsync();
         
         
     }
 
-
-    private async Task<int> ExecuteNonQueryAsync(string sql)
-    {
-        await using var cmd = new SQLiteCommand(sql, _connection);
-        return await cmd.ExecuteNonQueryAsync();
-    }
 
     #region Dispose
 
