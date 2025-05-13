@@ -10,12 +10,15 @@ public class BotDatabase : IDisposable
     public BotDatabase(string databasePath)
     {
         string connectionString = $"Data Source={databasePath};Version=3;";
-        
+
         _connection = new SQLiteConnection(connectionString);
-        // await connection.OpenAsync();
     }
-    
-    
+
+    public async Task OpenAsync()
+    {
+        await _connection.OpenAsync();
+    }
+
 
     void IDisposable.Dispose()
     {
