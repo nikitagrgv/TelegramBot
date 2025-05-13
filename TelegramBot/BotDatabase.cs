@@ -307,9 +307,9 @@ public class BotDatabase : IDisposable
         }
     }
 
-    public async Task<bool> RegisterChatIdAsync(long chatId)
+    public async Task<bool> RegisterChatIdAsync(long chatId, DateTime date)
     {
-        string date = ToDatabaseTimeFormat(DateTime.UtcNow);
+        string dateString = ToDatabaseTimeFormat(date);
 
         string sql = """
                      INSERT INTO users (id, register_date)
@@ -317,7 +317,7 @@ public class BotDatabase : IDisposable
                      """;
         await using var cmd = new SQLiteCommand(sql, _connection);
         cmd.Parameters.AddWithValue("id", chatId);
-        cmd.Parameters.AddWithValue("date", date);
+        cmd.Parameters.AddWithValue("date", dateString);
         int result = await cmd.ExecuteNonQueryAsync();
         return result != 0;
     }
