@@ -264,7 +264,7 @@ public partial class WeightBot : IDisposable
         // TODO: refactor shit
 
         List<ConsumedRowInfoStrings> strRows = dbRows
-            .Select(row => DbRowToStringRow(row, timeZone, timeFormat))
+            .Select(row => DbRowToUserStringRow(row, timeZone, timeFormat))
             .ToList();
         int kcalSize = strRows.Any() ? strRows.Max(row => row.Kcal.Length) : 0;
         int idSize = strRows.Any() ? strRows.Max(row => row.Id.Length) : 0;
@@ -432,7 +432,7 @@ public partial class WeightBot : IDisposable
 
     #endregion
 
-    private static ConsumedRowInfoStrings DbRowToStringRow(ConsumedRowInfo row, int timezone, string timeFormat)
+    private static ConsumedRowInfoStrings DbRowToUserStringRow(ConsumedRowInfo row, int timezone, string timeFormat)
     {
         return new ConsumedRowInfoStrings(
             Id: row.Id.ToString(),
