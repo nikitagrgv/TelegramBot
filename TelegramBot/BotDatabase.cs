@@ -40,7 +40,7 @@ public class BotDatabase : IDisposable
 
     #region BotOperations
 
-    public async Task<double> GetConsumedDayCalFromDatabaseAsync(long chatId)
+    private async Task<double> GetConsumedDayCalFromDatabaseAsync(long chatId)
     {
         int timezone = await GetUserTimezoneOffsetAsync(chatId);
 

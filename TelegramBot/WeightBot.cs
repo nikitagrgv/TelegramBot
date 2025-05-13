@@ -216,54 +216,59 @@ public partial class WeightBot : IDisposable
         await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
     }
 
+    private async Task PrintDayStatAsync(long chatId,
+        ITelegramBotClient botClient,
+        CancellationToken cancellationToken)
+    {
+    }
+
+    private async Task PrintAllStatAsync(long chatId,
+        ITelegramBotClient botClient,
+        CancellationToken cancellationToken)
+    {
+    }
+
     private async Task PrintStatAsync(DateTime? begin, DateTime? end, string timeFormat, long chatId,
         ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        string message = "";
-        message += "<pre>";
-
         int timeZone = await _database.GetUserTimezoneOffsetAsync(chatId);
-        message += $"User Time Zone: {timeZone:+#;-#;0}\n";
-
-        double consumedToday = await _database.GetConsumedDayCalFromDatabaseAsync(chatId);
-        message += $"Consumed Today: {consumedToday} kcal\n";
-
-
-        const int budget = 36;
-
-        int kcalSize = 0;
-        int dateSize = LongUserTimeFormat.Length;
-        int idSize = 0;
 
         List<ConsumedRowInfo> dbRows = await _database.GetStatFromDatabaseAsync(begin, end, chatId);
-        List<ConsumedRowInfoStrings> rows = dbRows
+
+        List<ConsumedRowInfoStrings> strRows = dbRows
             .Select(row => DbRowToStringRow(row, timeZone, timeFormat))
             .ToList();
+        int kcalSize = strRows
+            .Max(row => row.Kcal.Length);
+        int idSize = strRows
+            .Max(row => row.Id.Length);
+        int dateSize = LongUserTimeFormat.Length;
+        double consumedToday = dbRows
+            .Sum(row => row.Kcal);
 
-        foreach (ConsumedRowInfoStrings row in rows)
-        {
-            kcalSize = int.Max(kcalSize, row.Kcal.Length);
-            idSize = int.Max(idSize, row.Id.Length);
-        }
+        const int tableLengthBudget = 36;
+        int nameSize = int.Max(8, tableLengthBudget - kcalSize - dateSize - idSize);
 
-        int nameSize = int.Max(8, budget - kcalSize - dateSize - idSize);
+        string rowFormat = $"{{0, -{nameSize}}}| {{1, {kcalSize}}}| {{2, {dateSize}}}| {{3, {idSize}}}\n";
 
-        string format = $"{{0, -{nameSize}}}| {{1, {kcalSize}}}| {{2, {dateSize}}}| {{3, {idSize}}}\n";
+        string message = "";
+        message += "<pre>";
+        message += $"User Time Zone: {timeZone:+#;-#;0}\n";
+        message += $"Consumed Today: {consumedToday} kcal\n";
+        message += string.Format(rowFormat, "Name", "Kcal", "Date", "ID");
 
-        message += string.Format(format, "Name", "Kcal", "Date", "ID");
-
-        foreach (ConsumedRowInfoStrings row in rows)
+        foreach (ConsumedRowInfoStrings row in strRows)
         {
             string curName = row.Text;
             while (curName.Length > nameSize)
             {
-                message += string.Format(format, curName.Substring(0, nameSize), string.Empty, string.Empty,
+                message += string.Format(rowFormat, curName[..nameSize], string.Empty, string.Empty,
                     string.Empty);
-                curName = curName.Substring(nameSize);
+                curName = curName[nameSize..];
             }
 
-            message += string.Format(format, curName, row.Kcal, row.Date, row.Id);
+            message += string.Format(rowFormat, curName, row.Kcal, row.Date, row.Id);
         }
 
         message += "</pre>";
