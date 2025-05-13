@@ -203,7 +203,7 @@ public partial class WeightBot
         int timeZone = await GetUserTimezoneOffsetAsync(chatId);
 
         string message = $"""
-                          ✅ Product removed
+                          ❌ Product removed
                           🍽 Name: {row.Text}
                           🔥 Kcal: {row.Kcal}
                           📅 Date: {FromDatabaseToUserTimeFormat(row.Date, timeZone)}
