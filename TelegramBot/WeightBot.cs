@@ -335,7 +335,7 @@ public partial class WeightBot : IDisposable
         const int tableLengthBudget = 36;
         int nameSize = int.Max(8, tableLengthBudget - kcalSize - dateSize - idSize);
 
-        string rowFormat = $"{{0, -{nameSize}}}| {{1, {kcalSize}}}| {{2, {dateSize}}}| {{3, {idSize}}}\n";
+        string rowFormat = $"{{0, {idSize}}}| {{1, -{nameSize}}}| {{2, {kcalSize}}}| {{3, {dateSize}}}\n";
 
         string message = "";
         message += titleMessage + '\n';
@@ -343,7 +343,7 @@ public partial class WeightBot : IDisposable
         message += $"🔥 Consumed: {consumedToday} kcal\n";
 
         message += "<pre>";
-        message += string.Format(rowFormat, "Name", "Kcal", "Date", "ID");
+        message += string.Format(rowFormat, "ID", "Name", "Kcal", "Date");
 
         foreach (ConsumedRowInfoStrings row in strRows)
         {
@@ -355,7 +355,7 @@ public partial class WeightBot : IDisposable
                 curName = curName[nameSize..];
             }
 
-            message += string.Format(rowFormat, curName, row.Kcal, row.Date, row.Id);
+            message += string.Format(rowFormat, row.Id, curName, row.Kcal, row.Date);
         }
 
         message += "</pre>";
