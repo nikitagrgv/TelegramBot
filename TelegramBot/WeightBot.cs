@@ -350,8 +350,7 @@ public partial class WeightBot : IDisposable
             string curName = row.Text;
             while (curName.Length > nameSize)
             {
-                message += string.Format(rowFormat, string.Empty, curName[..nameSize], string.Empty,
-                    string.Empty);
+                message += string.Format(rowFormat, string.Empty, curName[..nameSize], string.Empty, string.Empty);
                 curName = curName[nameSize..];
             }
 
