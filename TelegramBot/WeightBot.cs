@@ -1,8 +1,5 @@
-﻿using System.Data.Common;
-using System.Data.SQLite;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TelegramBot;
 
