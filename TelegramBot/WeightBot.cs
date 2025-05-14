@@ -357,7 +357,7 @@ public partial class WeightBot : IDisposable
                 }
                 else
                 {
-                    message += string.Format(rowFormat, row.Id, chunk, string.Empty, string.Empty);
+                    message += string.Format(rowFormat, string.Empty, chunk, string.Empty, string.Empty);
                 }
             }
         }
