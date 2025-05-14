@@ -124,6 +124,7 @@ public partial class WeightBot : IDisposable
     {
         switch (cmd)
         {
+            case "start":
             case "help":
                 await PrintHelpAsync(userId, botClient, cancellationToken);
                 break;
