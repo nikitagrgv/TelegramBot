@@ -530,7 +530,7 @@ public partial class WeightBot : IDisposable
             out result);
     }
 
-    [GeneratedRegex(@"`^\s*/?(?<cmd>[а-яА-Яa-zA-Z0-9_]+)(?:\s+(?<args>\S(?:.*\S)?))?\s*$")]
+    [GeneratedRegex(@"^\s*/?(?<cmd>[а-яА-Яa-zA-Z0-9_]+)(?:\s+(?<args>\S(?:.*\S)?))?\s*$")]
     private static partial Regex GetParseCommandRegex();
 
     [GeneratedRegex(@"^\s*(?<name>.+?)\s*,?\s*(?<kcal>\d+[,.]?\d*)\s*$")]
