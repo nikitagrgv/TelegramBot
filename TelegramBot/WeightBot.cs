@@ -8,7 +8,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
 
-public partial class WeightBot : IDisposable
+public partial class WeightBot
 {
     private const string ShortUserTimeFormat = "HH:mm";
     private const string LongUserTimeFormat = "dd MMM HH:mm";
@@ -16,16 +16,15 @@ public partial class WeightBot : IDisposable
     private static readonly Regex ParseCommandRegex = GetParseCommandRegex();
     private static readonly Regex AddConsumedRegex = GetAddConsumedRegex();
 
-    private bool _disposed;
     private readonly long _adminId;
     private readonly BotDatabase _database;
     private readonly CancellationTokenSource _cancelTokenSource;
 
-    public WeightBot(BotDatabase database, long adminId)
+    public WeightBot(BotDatabase database, long adminId, CancellationTokenSource cancelTokenSource)
     {
         _database = database;
         _adminId = adminId;
-        _cancelTokenSource = new CancellationTokenSource();
+        _cancelTokenSource = cancelTokenSource;
     }
 
     public async Task Run(string token)
@@ -489,27 +488,6 @@ public partial class WeightBot : IDisposable
                help
                """;
     }
-
-    #region Dispose
-
-    void IDisposable.Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (_disposed) return;
-        if (disposing)
-        {
-            _cancelTokenSource.Dispose();
-        }
-
-        _disposed = true;
-    }
-
-    #endregion
 
     private static DateTime GetUserDayBeginUtc(int timeZone)
     {

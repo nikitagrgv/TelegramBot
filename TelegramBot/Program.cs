@@ -15,7 +15,7 @@ class Program
         }
 
         Console.WriteLine($"Token length is {token.Length}");
-        
+
         string? adminIdString = Environment.GetEnvironmentVariable("ADMIN_ID");
         if (string.IsNullOrEmpty(adminIdString))
         {
@@ -30,7 +30,7 @@ class Program
         }
 
         Console.WriteLine($"Admin ID is {adminId}");
-        
+
         var database = new BotDatabase("ConsumeDatabase.sqlite");
 
         if (!await database.InitializeAsync())
@@ -41,9 +41,11 @@ class Program
 
         Console.WriteLine("Database initialized");
 
-        var bot = new WeightBot(database, adminId);
+        CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
+
+        var bot = new WeightBot(database, adminId, cancelTokenSource);
         Task botTask = bot.Run(token);
-        
+
         Console.WriteLine("Print anything to finish");
         Console.ReadLine();
 
