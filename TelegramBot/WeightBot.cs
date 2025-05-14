@@ -212,7 +212,7 @@ public partial class WeightBot : IDisposable
         int timeZone = await _database.GetUserTimezoneOffsetAsync(userId);
 
         string message = $"""
-                          ✅ Added
+                          🍽️ Added
                           🍽️ {row.Text}
                           🔥 {row.Kcal} kcal
                           📅 {FromDatabaseToUserTimeFormat(row.Date, timeZone, LongUserTimeFormat)}
