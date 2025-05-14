@@ -155,7 +155,7 @@ public partial class WeightBot : IDisposable
             case "лимит":
                 await SetMaxKcalAsync(args, userId, botClient, cancellationToken);
                 break;
-            case "killmeplease":
+            case "kill":
                 await ShutdownBot(userId, botClient, cancellationToken);
                 break;
             default:
@@ -168,6 +168,11 @@ public partial class WeightBot : IDisposable
     private async Task ShutdownBot(long userId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
+        if (userId != _adminId)
+        {
+            return;
+        }
+
         string message = "Shutdown...";
         await botClient.SendMessage(userId, message, cancellationToken: cancellationToken);
         _cancelTokenSource.CancelAfter(1000);
