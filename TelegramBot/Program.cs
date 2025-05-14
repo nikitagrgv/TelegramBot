@@ -27,6 +27,20 @@ class Program
         }
 
         Console.WriteLine($"Token length is {token.Length}");
+        
+        string? adminIdString = Environment.GetEnvironmentVariable("ADMIN_ID");
+        if (string.IsNullOrEmpty(adminIdString))
+        {
+            Console.WriteLine("Environment variable 'ADMIN_ID' is not set");
+            return;
+        }
+
+        if (!long.TryParse(adminIdString, out long adminId))
+        {
+            Console.WriteLine($"'ADMIN_ID' is invalid: {adminIdString}");
+        }
+
+        Console.WriteLine($"Admin ID is {adminId}");
 
         var bot = new WeightBot(database);
         await bot.Run(token);
