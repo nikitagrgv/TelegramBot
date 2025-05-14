@@ -38,6 +38,7 @@ class Program
         if (!long.TryParse(adminIdString, out long adminId))
         {
             Console.WriteLine($"'ADMIN_ID' is invalid: {adminIdString}");
+            return;
         }
 
         Console.WriteLine($"Admin ID is {adminId}");
