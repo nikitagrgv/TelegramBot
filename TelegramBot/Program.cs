@@ -3,8 +3,6 @@ using System.Data.Common;
 
 namespace TelegramBot;
 
-using System.Data.SQLite;
-
 class Program
 {
     static async Task Main()
