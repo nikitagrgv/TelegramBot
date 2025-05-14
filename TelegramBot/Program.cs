@@ -9,16 +9,6 @@ class Program
 {
     static async Task Main()
     {
-        var database = new BotDatabase("ConsumeDatabase.sqlite");
-
-        if (!await database.InitializeAsync())
-        {
-            Console.WriteLine("Can't open the database");
-            return;
-        }
-
-        Console.WriteLine("Database initialized");
-
         string? token = Environment.GetEnvironmentVariable("BOT_TOKEN");
         if (string.IsNullOrEmpty(token))
         {
@@ -42,6 +32,16 @@ class Program
         }
 
         Console.WriteLine($"Admin ID is {adminId}");
+        
+        var database = new BotDatabase("ConsumeDatabase.sqlite");
+
+        if (!await database.InitializeAsync())
+        {
+            Console.WriteLine("Can't open the database");
+            return;
+        }
+
+        Console.WriteLine("Database initialized");
 
         var bot = new WeightBot(database);
         await bot.Run(token);
