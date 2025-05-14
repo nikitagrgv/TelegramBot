@@ -133,6 +133,7 @@ public partial class WeightBot : IDisposable
                 await AddConsumedAsync(args, userId, botClient, cancellationToken);
                 break;
             case "remove":
+            case "delete":
             case "удалить":
                 await RemoveConsumedAsync(args, userId, botClient, cancellationToken);
                 break;
