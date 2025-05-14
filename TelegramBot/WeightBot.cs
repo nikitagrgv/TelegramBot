@@ -17,12 +17,14 @@ public partial class WeightBot : IDisposable
     private static readonly Regex AddConsumedRegex = GetAddConsumedRegex();
 
     private bool _disposed;
+    private readonly long _adminId;
     private readonly BotDatabase _database;
     private readonly CancellationTokenSource _cancelTokenSource;
 
-    public WeightBot(BotDatabase database)
+    public WeightBot(BotDatabase database, long adminId)
     {
         _database = database;
+        _adminId = adminId;
         _cancelTokenSource = new CancellationTokenSource();
     }
 
