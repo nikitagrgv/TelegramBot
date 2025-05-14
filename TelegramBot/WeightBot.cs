@@ -457,17 +457,14 @@ public partial class WeightBot : IDisposable
 
                🔥 Print consumed kcal by the current day
                /stat
-               stat
                стат
 
                📅 Print all consumed products by the current day starting from 00:00:
                /daystat
-               daystat
                дейстат
 
                📊 Print all consumed products by all the time
                /longstat
-               longstat
                лонгстат
 
                🎯 Set kcal limit
@@ -480,7 +477,6 @@ public partial class WeightBot : IDisposable
 
                ❓ Print this help:
                /start
-               start
                help
                """;
     }
