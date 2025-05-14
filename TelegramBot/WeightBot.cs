@@ -274,7 +274,7 @@ public partial class WeightBot : IDisposable
         double consumed = await _database.GetConsumedCalAsync(dayBeginUtc, null, userId);
         double? limit = await _database.GetMaxKcalAsync(userId);
 
-        string message = "";
+        string message;
         if (limit != null)
         {
             int consumedPercents = (int)(consumed / limit * 100);
