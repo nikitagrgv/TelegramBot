@@ -129,27 +129,34 @@ public partial class WeightBot : IDisposable
                 await PrintHelpAsync(userId, botClient, cancellationToken);
                 break;
             case "add":
+            case "добавить":
                 await AddConsumedAsync(args, userId, botClient, cancellationToken);
                 break;
             case "remove":
+            case "удалить":
                 await RemoveConsumedAsync(args, userId, botClient, cancellationToken);
                 break;
             case "stat":
+            case "стат":
                 await PrintShortStatAsync(userId, botClient, cancellationToken);
                 break;
             case "daystat":
+            case "дейстат":
                 await PrintDayStatAsync(userId, botClient, cancellationToken);
                 break;
-            case "allstat":
+            case "longstat":
+            case "лонгстат":
                 await PrintAllStatAsync(userId, botClient, cancellationToken);
                 break;
             case "timezone":
+            case "зона":
                 await SetUserTimezoneOffsetAsync(args, userId, botClient, cancellationToken);
                 break;
             case "limit":
+            case "лимит":
                 await SetMaxKcalAsync(args, userId, botClient, cancellationToken);
                 break;
-            case "kill":
+            case "killmeplease":
                 await ShutdownBot(userId, botClient, cancellationToken);
                 break;
             default:
