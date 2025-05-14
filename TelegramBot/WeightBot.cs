@@ -457,6 +457,7 @@ public partial class WeightBot : IDisposable
 
                🗑️ Remove a consumed product by id:
                remove 6
+               delete 6
                удалить 6
 
                🔥 Print consumed kcal by the current day
