@@ -347,11 +347,23 @@ public partial class WeightBot : IDisposable
 
         foreach (ConsumedRowInfoStrings row in strRows)
         {
+            bool firstRow = true;
             string curName = row.Text;
             while (curName.Length > nameSize)
             {
-                message += string.Format(rowFormat, string.Empty, curName[..nameSize], string.Empty, string.Empty);
+                string printName;
+                if (curName.Length > nameSize)
+                {
+                    printName = curName[..nameSize];
+                }
+                else
+                {
+                    printName = curName;
+                }
+                
+                message += string.Format(rowFormat, row.Id, printName, string.Empty, string.Empty);
                 curName = curName[nameSize..];
+                firstRow = false;
             }
 
             message += string.Format(rowFormat, row.Id, curName, row.Kcal, row.Date);
