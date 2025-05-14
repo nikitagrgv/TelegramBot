@@ -108,7 +108,7 @@ public partial class WeightBot : IDisposable
         if (!m.Success)
         {
             const string invalidCommandMessage =
-                "Sorry, I didn't understand that. Type /help to see a list of available commands.";
+                "Sorry, I didn't understand that. Type /start to see a list of available commands.";
             await botClient.SendMessage(userId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
         }
@@ -152,7 +152,7 @@ public partial class WeightBot : IDisposable
                 await ShutdownBot(userId, botClient, cancellationToken);
                 break;
             default:
-                string message = $"Unknown command: {cmd}. Type /help to see a list of available commands.";
+                string message = $"Unknown command: {cmd}. Type /start to see a list of available commands.";
                 await botClient.SendMessage(userId, message, cancellationToken: cancellationToken);
                 break;
         }
@@ -180,7 +180,7 @@ public partial class WeightBot : IDisposable
         if (!m.Success)
         {
             string invalidCommandMessage =
-                $"Sorry, I didn't understand your 'add' command. Invalid arguments: '{args}'. Type /help to see a list of available commands.";
+                $"Sorry, I didn't understand your 'add' command. Invalid arguments: '{args}'. Type /start to see a list of available commands.";
             await botClient.SendMessage(userId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
         }
@@ -191,7 +191,7 @@ public partial class WeightBot : IDisposable
         if (!TryParseDouble(kcalString, out double kcal))
         {
             string invalidCommandMessage =
-                $"Sorry, I didn't understand your 'add' command. Invalid kcal number: '{kcalString}'. Type /help to see a list of available commands.";
+                $"Sorry, I didn't understand your 'add' command. Invalid kcal number: '{kcalString}'. Type /start to see a list of available commands.";
             await botClient.SendMessage(userId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
         }
@@ -228,7 +228,7 @@ public partial class WeightBot : IDisposable
         if (!long.TryParse(args.Trim(), out long consumedId) || consumedId < 0)
         {
             string invalidCommandMessage =
-                $"Sorry, I didn't understand your 'remove' command. Invalid id: '{args}'. Type /help to see a list of available commands.";
+                $"Sorry, I didn't understand your 'remove' command. Invalid id: '{args}'. Type /start to see a list of available commands.";
             await botClient.SendMessage(userId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
         }
@@ -361,7 +361,7 @@ public partial class WeightBot : IDisposable
         if (!int.TryParse(args.Trim(), out int timezone) || timezone < 0)
         {
             string invalidCommandMessage =
-                $"Sorry, I didn't understand your 'timezone' command. Invalid offset: '{args}'. Type /help to see a list of available commands.";
+                $"Sorry, I didn't understand your 'timezone' command. Invalid offset: '{args}'. Type /start to see a list of available commands.";
             await botClient.SendMessage(userId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
         }
@@ -385,7 +385,7 @@ public partial class WeightBot : IDisposable
         if (!double.TryParse(args.Trim(), out double limit) || limit < 0)
         {
             string invalidCommandMessage =
-                $"Sorry, I didn't understand your 'limit' command. Invalid value: '{args}'. Type /help to see a list of available commands.";
+                $"Sorry, I didn't understand your 'limit' command. Invalid value: '{args}'. Type /start to see a list of available commands.";
             await botClient.SendMessage(userId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
         }
@@ -462,7 +462,7 @@ public partial class WeightBot : IDisposable
                /timezone +7
 
                Print this help:
-               /help
+               /start
                """;
     }
 
