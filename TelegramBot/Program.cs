@@ -41,7 +41,7 @@ class Program
 
         Console.WriteLine("Database initialized");
 
-        var bot = new WeightBot(database);
+        var bot = new WeightBot(database, adminId);
         await bot.Run(token);
 
         Console.WriteLine("Done");
