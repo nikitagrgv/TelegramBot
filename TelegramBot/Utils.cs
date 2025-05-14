@@ -2,7 +2,7 @@
 
 public static class Utils
 {
-    public static IEnumerable<string> SplitStringByChanks(string str, int maxLen)
+    public static IEnumerable<string> SplitStringByChunks(string str, int maxLen)
     {
         if (maxLen < 1)
         {
