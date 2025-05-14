@@ -33,7 +33,6 @@ public partial class WeightBot : IDisposable
     {
         var botClient = new TelegramBotClient(token);
 
-
         var receiverOptions = new ReceiverOptions
         {
             AllowedUpdates = [],
