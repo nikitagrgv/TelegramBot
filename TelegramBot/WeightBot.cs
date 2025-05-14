@@ -439,31 +439,42 @@ public partial class WeightBot : IDisposable
     private string GetHelpMessage()
     {
         return """
-               ---- Bot commands ----
+               * Add a consumed product:
+               add молочная каша, 12
+               добавить молочная каша, 12
+               добавить молочная каша 12
 
-               Add a consumed product:
-               /add porridge, 12
+               * Remove a consumed product by id:
+               remove 6
+               удалить 6
 
-               Remove a consumed product by id:
-               /remove 6
-
-               Print consumed kcal by the current day
+               * Print consumed kcal by the current day
                /stat
+               stat
+               стат
 
-               Print all consumed products by the current day from 00:00:
+               * Print all consumed products by the current day starting from 00:00:
                /daystat
+               daystat
+               дейстат
 
-               Print all consumed products by all the time
-               /allstat
+               * Print all consumed products by all the time
+               /longstat
+               longstat
+               лонгстат
 
-               Set kcal limit
-               /limit 123.46
+               * Set kcal limit
+               limit 123.45
+               лимит 123.45
 
-               Set the time zone offset:
-               /timezone +7
+               * Set the time zone offset:
+               timezone +7
+               пояс 7
 
-               Print this help:
+               * Print this help:
                /start
+               start
+               help
                """;
     }
 
