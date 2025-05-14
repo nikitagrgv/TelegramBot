@@ -48,6 +48,8 @@ class Program
 
         Console.WriteLine("Print anything to finish");
         Console.ReadLine();
+        
+        await cancelTokenSource.CancelAsync();
 
         await botTask;
 
