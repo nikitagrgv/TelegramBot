@@ -444,34 +444,34 @@ public partial class WeightBot : IDisposable
                добавить молочная каша, 12
                добавить молочная каша 12
 
-               * Remove a consumed product by id:
+               🗑️ Remove a consumed product by id:
                remove 6
                удалить 6
 
-               * Print consumed kcal by the current day
+               🔥 Print consumed kcal by the current day
                /stat
                stat
                стат
 
-               * Print all consumed products by the current day starting from 00:00:
+               📅 Print all consumed products by the current day starting from 00:00:
                /daystat
                daystat
                дейстат
 
-               * Print all consumed products by all the time
+               📊 Print all consumed products by all the time
                /longstat
                longstat
                лонгстат
 
-               * Set kcal limit
+               🎯 Set kcal limit
                limit 123.45
                лимит 123.45
 
-               * Set the time zone offset:
+               🌍 Set the time zone offset:
                timezone +7
                пояс 7
 
-               * Print this help:
+               ❓ Print this help:
                /start
                start
                help
