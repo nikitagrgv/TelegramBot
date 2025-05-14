@@ -170,19 +170,6 @@ public partial class WeightBot : IDisposable
         CancellationToken cancellationToken)
     {
         await botClient.SendMessage(userId, GetHelpMessage(), cancellationToken: cancellationToken);
-
-        var keyboard = new InlineKeyboardMarkup([
-            [
-                InlineKeyboardButton.WithCallbackData("🔥 Consumed Today", "/stat"),
-            ],
-            [
-                InlineKeyboardButton.WithCallbackData("📊 Day Statistics", "/daystat"),
-            ],
-            [
-                InlineKeyboardButton.WithCallbackData("📈 Total Statistics", "/allstat"),
-            ]
-        ]);
-        await botClient.SendMessage(userId, "test text", replyMarkup: keyboard, cancellationToken: cancellationToken);
     }
 
     private async Task AddConsumedAsync(string args, long userId, ITelegramBotClient botClient,
