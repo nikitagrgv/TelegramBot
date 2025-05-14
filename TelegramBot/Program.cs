@@ -1,31 +1,91 @@
-﻿using System.Data;
+﻿using System.Configuration;
+using System.Data;
 using System.Data.Common;
+using System.Text.Json;
 
 namespace TelegramBot;
 
 class Program
 {
+    private record Config(string? BotToken, string? AdminId);
+
+    private static Config? GetConfig()
+    {
+        const string configPath = "botconf.json";
+
+        if (!File.Exists(configPath))
+        {
+            Console.WriteLine("No config found");
+            return null;
+        }
+
+        string json = File.ReadAllText(configPath);
+        return JsonSerializer.Deserialize<Config>(json);
+    }
+
+    private static string? GetToken(Config? config)
+    {
+        string? str = Environment.GetEnvironmentVariable("BOT_TOKEN");
+        if (!string.IsNullOrEmpty(str))
+        {
+            Console.WriteLine("Get token from environment variable 'BOT_TOKEN'");
+            return str;
+        }
+
+        str = config?.BotToken;
+        if (str != null)
+        {
+            Console.WriteLine("Get token from config");
+            return str;
+        }
+
+        Console.WriteLine("No token found in config");
+        return null;
+    }
+
+    private static string? GetAdminIdString(Config? config)
+    {
+        string? str = Environment.GetEnvironmentVariable("ADMIN_ID");
+        if (!string.IsNullOrEmpty(str))
+        {
+            Console.WriteLine("Get admin ID from environment variable 'ADMIN_ID'");
+            return str;
+        }
+
+        str = config?.AdminId;
+        if (str != null)
+        {
+            Console.WriteLine("Get admin ID from config");
+            return str;
+        }
+
+        Console.WriteLine("No admin ID found in config");
+        return null;
+    }
+
     static async Task Main()
     {
-        string? token = Environment.GetEnvironmentVariable("BOT_TOKEN");
+        Console.WriteLine("TelegramBot");
+
+        Config? config = GetConfig();
+
+        string? token = GetToken(config);
         if (string.IsNullOrEmpty(token))
         {
-            Console.WriteLine("Environment variable 'BOT_TOKEN' is not set");
             return;
         }
 
         Console.WriteLine($"Token length is {token.Length}");
 
-        string? adminIdString = Environment.GetEnvironmentVariable("ADMIN_ID");
+        string? adminIdString = GetAdminIdString(config);
         if (string.IsNullOrEmpty(adminIdString))
         {
-            Console.WriteLine("Environment variable 'ADMIN_ID' is not set");
             return;
         }
 
         if (!long.TryParse(adminIdString, out long adminId))
         {
-            Console.WriteLine($"'ADMIN_ID' is invalid: {adminIdString}");
+            Console.WriteLine($"Admin ID is invalid: {adminIdString}");
             return;
         }
 
@@ -48,7 +108,7 @@ class Program
 
         Console.WriteLine("Print anything to finish");
         Console.ReadLine();
-        
+
         await cancelTokenSource.CancelAsync();
 
         await botTask;
