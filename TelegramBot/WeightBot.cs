@@ -343,7 +343,7 @@ public partial class WeightBot : IDisposable
         message += $"🔥 Consumed: {consumedToday} kcal\n";
 
         message += "<pre>";
-        message += string.Format(rowFormat, "ID", "Name", "Kcal", "Date");
+        message += string.Format(rowFormat, "ID", "Name", "Kcal", "Time");
 
         foreach (ConsumedRowInfoStrings row in strRows)
         {
