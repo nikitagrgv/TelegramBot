@@ -149,14 +149,17 @@ public class BotDatabase : IDisposable
     }
 
     public async Task<List<ConsumedRowInfo>> GetStatAsync(DateTime? optionalBegin, DateTime? optionalEnd,
-        long userId)
+        long? userId)
     {
         if (optionalBegin is { } begin && optionalEnd is { } end)
         {
             const string sql = """
                                SELECT *
                                FROM consumed
-                               WHERE user_id = @id AND date BETWEEN @begin AND @end
+                               WHERE
+                                   user_id = @id 
+                                 AND
+                                   date BETWEEN @begin AND @end
                                ORDER BY date;
                                """;
             await using var cmd = new SQLiteCommand(sql, _connection);
@@ -171,7 +174,10 @@ public class BotDatabase : IDisposable
             const string sql = """
                                SELECT *
                                FROM consumed
-                               WHERE user_id = @id AND date >= @begin
+                               WHERE 
+                                   user_id = @id
+                                 AND
+                                   date >= @begin
                                ORDER BY date;
                                """;
             await using var cmd = new SQLiteCommand(sql, _connection);
@@ -185,7 +191,10 @@ public class BotDatabase : IDisposable
             const string sql = """
                                SELECT *
                                FROM consumed
-                               WHERE user_id = @id AND date <= @end
+                               WHERE
+                                   user_id = @id
+                                 AND
+                                   date <= @end
                                ORDER BY date;
                                """;
             await using var cmd = new SQLiteCommand(sql, _connection);
@@ -197,7 +206,8 @@ public class BotDatabase : IDisposable
         const string everythingSql = """
                                      SELECT *
                                      FROM consumed
-                                     WHERE user_id = @id
+                                     WHERE
+                                         user_id = @id
                                      ORDER BY date;
                                      """;
         await using var everythingCmd = new SQLiteCommand(everythingSql, _connection);
