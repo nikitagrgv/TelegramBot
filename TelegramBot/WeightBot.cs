@@ -156,6 +156,9 @@ public partial class WeightBot
             case "лимит":
                 await SetMaxKcalAsync(args, userId, botClient, cancellationToken);
                 break;
+            case "superstat":
+                await PrintSuperStatAsync(userId, botClient, cancellationToken);
+                break;
             case "kill":
                 await ShutdownBot(userId, botClient, cancellationToken);
                 break;
@@ -327,12 +330,6 @@ public partial class WeightBot
     {
         List<ConsumedRowInfo> dbRows = await _database.GetStatAsync(begin, end, userId);
 
-        // TODO: refactor shit
-        //
-        // ID| Name                    |  Kcal|  Time
-        // 20| ве                      | 45,00| 09:59
-        //     
-
         const string idRowName = "ID";
         const string nameRowName = "Name";
         const string kcalRowName = "Kcal";
@@ -349,7 +346,7 @@ public partial class WeightBot
             kcalSize = Int32.Max(kcalSize, row.Kcal.Length);
             idSize = Int32.Max(idSize, row.Id.Length);
         }
-        
+
         double consumedToday = dbRows.Any() ? dbRows.Sum(row => row.Kcal) : 0;
 
         int tableLengthBudget = strRows.Count >= 5 ? 36 : 30;
@@ -385,6 +382,18 @@ public partial class WeightBot
         message += "</pre>";
 
         await botClient.SendMessage(userId, message, cancellationToken: cancellationToken, parseMode: ParseMode.Html);
+    }
+
+    private async Task PrintSuperStatAsync(long userId,
+        ITelegramBotClient botClient,
+        CancellationToken cancellationToken)
+    {
+        if (userId != _adminId)
+        {
+            return;
+        }
+        
+        
     }
 
     private async Task SetUserTimezoneOffsetAsync(string args, long userId, ITelegramBotClient botClient,
