@@ -42,10 +42,10 @@ public partial class WeightBot
 
         IEnumerable<BotCommand> commands =
         [
-            new BotCommand("start", "Get the help"),
-            new BotCommand("stat", "Print consumed kcal by the current day"),
-            new BotCommand("daystat", "Print all consumed products by the current day"),
-            new BotCommand("longstat", "Print all consumed products by all the time"),
+            new("start", "Get the help"),
+            new("stat", "Print consumed kcal by the current day"),
+            new("daystat", "Print all consumed products by the current day"),
+            new("longstat", "Print all consumed products by all the time"),
         ];
         await botClient.SetMyCommands(commands, cancellationToken: _cancelTokenSource.Token);
 
