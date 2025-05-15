@@ -103,7 +103,11 @@ class Program
 
         CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
 
-        Console.CancelKeyPress += (_, _) => { cancelTokenSource.Cancel(); };
+        Console.CancelKeyPress += (_, _) =>
+        {
+            Console.WriteLine("Canceling pressed...");
+            cancelTokenSource.Cancel();
+        };
 
         var bot = new WeightBot(database, adminId, cancelTokenSource);
         await bot.Run(token);
