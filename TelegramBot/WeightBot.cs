@@ -463,7 +463,7 @@ public partial class WeightBot
                delete 6
                удалить 6
 
-               🔥 Print consumed kcal by the current day
+               🔥 Print consumed kcal by the current day:
                /stat
                стат
 
@@ -471,11 +471,11 @@ public partial class WeightBot
                /daystat
                дейстат
 
-               📊 Print all consumed products by all the time
+               📊 Print all consumed products by all the time:
                /longstat
                лонгстат
 
-               🎯 Set kcal limit
+               🎯 Set kcal limit:
                limit 123.45
                лимит 123.45
 
