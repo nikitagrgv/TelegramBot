@@ -119,7 +119,7 @@ public partial class WeightBot
     private async Task DispatchUserMessageAsync(string cmd, string args, long userId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        switch (cmd)
+        switch (cmd.ToLower())
         {
             case "start":
             case "help":
