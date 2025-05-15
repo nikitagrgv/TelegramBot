@@ -249,7 +249,7 @@ public partial class WeightBot
             return;
         }
 
-        ConsumedRowInfo? row = await _database.RemoveConsumedAsync(consumedId);
+        ConsumedRowInfo? row = await _database.RemoveConsumedAsync(consumedId, userId == _adminId ? null : userId);
         if (row == null)
         {
             string errorMessage =
@@ -392,8 +392,6 @@ public partial class WeightBot
         {
             return;
         }
-        
-        
     }
 
     private async Task SetUserTimezoneOffsetAsync(string args, long userId, ITelegramBotClient botClient,
