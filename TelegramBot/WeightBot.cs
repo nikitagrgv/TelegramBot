@@ -129,19 +129,37 @@ public partial class WeightBot
     private async Task DispatchUserMessageAsync(string cmd, string args, long userId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        switch (cmd.ToLower())
+        string cmdLower = cmd.ToLower();
+        
+        if (userId == _adminId)
+        {
+            switch (cmdLower)
+            {
+                case "removeforce":
+                    await RemoveConsumedAsync(args, userId, force: true, botClient, cancellationToken);
+                    return;
+                case "superstat":
+                    await PrintSuperStatAsync(userId, botClient, cancellationToken);
+                    return;
+                case "kill":
+                    await ShutdownBot(userId, botClient, cancellationToken);
+                    return;
+            }
+        }
+
+        switch (cmdLower)
         {
             case "start":
             case "help":
                 await PrintHelpAsync(userId, botClient, cancellationToken);
-                break;
+                return;
             case "add":
             case "добавить":
             case "адд":
             case "доб":
             case "д":
                 await AddConsumedAsync(args, userId, botClient, cancellationToken);
-                break;
+                return;
             case "remove":
             case "delete":
             case "удал":
@@ -149,38 +167,32 @@ public partial class WeightBot
             case "удалить":
             case "делит":
             case "дел":
-                await RemoveConsumedAsync(args, userId, botClient, cancellationToken);
-                break;
+                await RemoveConsumedAsync(args, userId, force: false, botClient, cancellationToken);
+                return;
             case "stat":
             case "стат":
                 await PrintShortStatAsync(userId, botClient, cancellationToken);
-                break;
+                return;
             case "daystat":
             case "дейстат":
                 await PrintDayStatAsync(userId, botClient, cancellationToken);
-                break;
+                return;
             case "longstat":
             case "лонгстат":
                 await PrintAllStatAsync(userId, botClient, cancellationToken);
-                break;
+                return;
             case "timezone":
             case "зона":
                 await SetUserTimezoneOffsetAsync(args, userId, botClient, cancellationToken);
-                break;
+                return;
             case "limit":
             case "лимит":
                 await SetMaxKcalAsync(args, userId, botClient, cancellationToken);
-                break;
-            case "superstat":
-                await PrintSuperStatAsync(userId, botClient, cancellationToken);
-                break;
-            case "kill":
-                await ShutdownBot(userId, botClient, cancellationToken);
-                break;
+                return;
             default:
                 string message = $"Unknown command: {cmd}. Type /start to see a list of available commands.";
                 await botClient.SendMessage(userId, message, cancellationToken: cancellationToken);
-                break;
+                return;
         }
     }
 
@@ -254,7 +266,7 @@ public partial class WeightBot
         await PrintShortStatAsync(userId, botClient, cancellationToken);
     }
 
-    private async Task RemoveConsumedAsync(string args, long userId, ITelegramBotClient botClient,
+    private async Task RemoveConsumedAsync(string args, long userId, bool force, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
         if (!long.TryParse(args.Trim(), out long consumedId) || consumedId < 0)
@@ -265,7 +277,8 @@ public partial class WeightBot
             return;
         }
 
-        ConsumedRowInfo? row = await _database.RemoveConsumedAsync(consumedId, userId == _adminId ? null : userId);
+        ConsumedRowInfo? row = await _database.RemoveConsumedAsync(consumedId, force ? null : userId);
+
         if (row == null)
         {
             string errorMessage =
