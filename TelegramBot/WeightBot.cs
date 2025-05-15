@@ -127,11 +127,13 @@ public partial class WeightBot
                 break;
             case "add":
             case "добавить":
+            case "адд":
                 await AddConsumedAsync(args, userId, botClient, cancellationToken);
                 break;
             case "remove":
             case "delete":
             case "удалить":
+            case "делит":
                 await RemoveConsumedAsync(args, userId, botClient, cancellationToken);
                 break;
             case "stat":
