@@ -39,6 +39,16 @@ public partial class WeightBot
         User me = await botClient.GetMe(cancellationToken: _cancelTokenSource.Token);
         Console.WriteLine($"Start listening @{me.Username}");
 
+
+        IEnumerable<BotCommand> commands =
+        [
+            new BotCommand("start", "Get the help"),
+            new BotCommand("stat", "Print consumed kcal by the current day"),
+            new BotCommand("daystat", "Print all consumed products by the current day"),
+            new BotCommand("longstat", "Print all consumed products by all the time"),
+        ];
+        await botClient.SetMyCommands(commands, cancellationToken: _cancelTokenSource.Token);
+
         await botClient.ReceiveAsync(
             updateHandler: HandleUpdateAsync,
             errorHandler: HandleErrorAsync,
