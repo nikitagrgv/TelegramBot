@@ -104,14 +104,7 @@ class Program
         CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
 
         var bot = new WeightBot(database, adminId, cancelTokenSource);
-        Task botTask = bot.Run(token);
-
-        Console.WriteLine("Print anything to finish");
-        Console.ReadLine();
-
-        await cancelTokenSource.CancelAsync();
-
-        await botTask;
+        await bot.Run(token);
 
         Console.WriteLine("Done");
     }
