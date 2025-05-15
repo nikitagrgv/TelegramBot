@@ -130,8 +130,8 @@ public partial class WeightBot
         CancellationToken cancellationToken)
     {
         string cmdLower = cmd.ToLower();
-        
-        if (userId == _adminId)
+
+        if (IsAdmin(userId))
         {
             switch (cmdLower)
             {
@@ -199,7 +199,7 @@ public partial class WeightBot
     private async Task ShutdownBot(long userId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        if (userId != _adminId)
+        if (!IsAdmin(userId))
         {
             return;
         }
@@ -417,7 +417,7 @@ public partial class WeightBot
         ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        if (userId != _adminId)
+        if (!IsAdmin(userId))
         {
             return;
         }
@@ -558,6 +558,11 @@ public partial class WeightBot
     {
         Console.WriteLine($"Error: {exception.Message}");
         return Task.CompletedTask;
+    }
+
+    private bool IsAdmin(long userId)
+    {
+        return userId == _adminId;
     }
 
     private string GetHelpMessage()
