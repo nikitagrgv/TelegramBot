@@ -134,6 +134,8 @@ public partial class WeightBot
                 break;
             case "remove":
             case "delete":
+            case "удал":
+            case "удали":
             case "удалить":
             case "делит":
             case "дел":
