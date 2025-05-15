@@ -351,7 +351,7 @@ public partial class WeightBot
         double consumedToday = dbRows.Any() ? dbRows.Sum(row => row.Kcal) : 0;
 
         const int tableLengthBudget = 36;
-        int nameSize = int.Max(8, tableLengthBudget - kcalSize - dateSize - idSize);
+        int nameSize = int.Max(6, tableLengthBudget - kcalSize - dateSize - idSize);
 
         string rowFormat = $"{{0, {idSize}}}| {{1, -{nameSize}}}| {{2, {kcalSize}}}| {{3, {dateSize}}}\n";
 
