@@ -621,7 +621,7 @@ public partial class WeightBot
     [GeneratedRegex(@"^\s*/?(?<cmd>[а-яА-Яa-zA-Z0-9_]+)(?:\s+(?<args>\S(?:.*\S)?))?\s*$")]
     private static partial Regex GetParseCommandRegex();
 
-    [GeneratedRegex(@"^\s*(?<name>.+?)\s*,?\s*(?<kcal>\d+[,.]?\d*)\s*$")]
+    [GeneratedRegex(@"^\s*(?<name>.+?)\s*,?\s*(?<kcal>\d+[,.]?\d*)?\s*$")]
     private static partial Regex GetAddConsumedRegex();
 
     public record ConsumedRowInfoStrings(string Id, string UserId, string Date, string Text, string Kcal);
