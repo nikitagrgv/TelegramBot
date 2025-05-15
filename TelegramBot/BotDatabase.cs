@@ -134,15 +134,23 @@ public class BotDatabase : IDisposable
         return await ExecuteConsumedAndGetOneAsync(cmd);
     }
 
-    public async Task<ConsumedRowInfo?> RemoveConsumedAsync(long id)
+    public async Task<ConsumedRowInfo?> RemoveConsumedAsync(long id, long? userId)
     {
-        string sql = """
-                     DELETE
-                     FROM consumed
-                     WHERE id = @id
-                     RETURNING *;
-                     """;
+        string userIdString = userId == null ? "" : "user_id = @user_id AND";
+        string sql = $"""
+                      DELETE
+                      FROM consumed
+                      WHERE
+                          {userIdString}
+                          id = @id
+                      RETURNING *;
+                      """;
         await using var cmd = new SQLiteCommand(sql, _connection);
+        if (userId != null)
+        {
+            cmd.Parameters.AddWithValue("user_id", userId);
+        }
+
         cmd.Parameters.AddWithValue("id", id);
 
         return await ExecuteConsumedAndGetOneAsync(cmd);
