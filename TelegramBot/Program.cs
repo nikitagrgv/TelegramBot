@@ -1,14 +1,9 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Data.Common;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace TelegramBot;
 
 class Program
 {
-    private record Config(string? BotToken, string? AdminId);
-
     private static Config? GetConfig()
     {
         const string configPath = "botconf.json";
@@ -115,4 +110,6 @@ class Program
 
         Console.WriteLine("Done");
     }
+
+    private record Config(string? BotToken, string? AdminId);
 }

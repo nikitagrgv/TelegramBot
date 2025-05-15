@@ -6,6 +6,7 @@ namespace TelegramBot;
 
 public class BotDatabase : IDisposable
 {
+    private const string DatabaseTimeFormat = "yyyy-MM-dd HH:mm:ss";
     private readonly SQLiteConnection _connection;
     private bool _disposed;
 
@@ -14,6 +15,12 @@ public class BotDatabase : IDisposable
         string connectionString = $"Data Source={databasePath};Version=3;";
 
         _connection = new SQLiteConnection(connectionString);
+    }
+
+    void IDisposable.Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
     public async Task<bool> InitializeAsync()
@@ -37,8 +44,6 @@ public class BotDatabase : IDisposable
 
         return true;
     }
-
-    #region BotOperations
 
     public async Task<double?> GetMaxKcalAsync(long userId)
     {
@@ -380,9 +385,6 @@ public class BotDatabase : IDisposable
         return await cmd.ExecuteNonQueryAsync() != 0;
     }
 
-    #endregion
-
-    #region Migration
 
     private async Task<int> MigrateDatabaseToLatestVersion(int oldVersion)
     {
@@ -441,28 +443,6 @@ public class BotDatabase : IDisposable
         await cmd.ExecuteNonQueryAsync();
     }
 
-    #endregion
-
-    private static string ToDatabaseTimeFormat(DateTime dateTime)
-    {
-        return dateTime.ToString(DatabaseTimeFormat, CultureInfo.InvariantCulture);
-    }
-
-    private static DateTime FromDatabaseTimeFormat(string dateTime)
-    {
-        return DateTime.ParseExact(dateTime, DatabaseTimeFormat, CultureInfo.InvariantCulture);
-    }
-
-    private const string DatabaseTimeFormat = "yyyy-MM-dd HH:mm:ss";
-
-    #region Dispose
-
-    void IDisposable.Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
     protected virtual void Dispose(bool disposing)
     {
         if (_disposed) return;
@@ -474,5 +454,14 @@ public class BotDatabase : IDisposable
         _disposed = true;
     }
 
-    #endregion
+
+    private static string ToDatabaseTimeFormat(DateTime dateTime)
+    {
+        return dateTime.ToString(DatabaseTimeFormat, CultureInfo.InvariantCulture);
+    }
+
+    private static DateTime FromDatabaseTimeFormat(string dateTime)
+    {
+        return DateTime.ParseExact(dateTime, DatabaseTimeFormat, CultureInfo.InvariantCulture);
+    }
 }

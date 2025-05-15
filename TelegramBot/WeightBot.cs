@@ -17,8 +17,8 @@ public partial class WeightBot
     private static readonly Regex AddConsumedRegex = GetAddConsumedRegex();
 
     private readonly long _adminId;
-    private readonly BotDatabase _database;
     private readonly CancellationTokenSource _cancelTokenSource;
+    private readonly BotDatabase _database;
 
     public WeightBot(BotDatabase database, long adminId, CancellationTokenSource cancelTokenSource)
     {
