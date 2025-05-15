@@ -360,7 +360,7 @@ public partial class WeightBot
         message += $"🔥 Consumed: {consumedToday} kcal\n";
 
         message += "<pre>";
-        message += string.Format(rowFormat, "ID", "Name", "Kcal", "Time");
+        message += string.Format(rowFormat, idRowName, nameRowName, kcalRowName, timeRowName);
 
         foreach (ConsumedRowInfoStrings row in strRows)
         {
@@ -392,6 +392,63 @@ public partial class WeightBot
         {
             return;
         }
+
+        List<ConsumedRowInfo> dbRows = await _database.GetStatAsync(null, null, null);
+
+        const string idRowName = "ID";
+        const string userRowName = "User";
+        const string nameRowName = "Name";
+        const string kcalRowName = "Kcal";
+        const string timeRowName = "Time";
+
+        const string timeFormat = LongUserTimeFormat;
+
+        List<ConsumedRowInfoStrings> strRows = dbRows
+            .Select(row => DbRowToUserStringRow(row, 0, timeFormat))
+            .ToList();
+        int idSize = idRowName.Length;
+        int userIdSize = userRowName.Length;
+        int kcalSize = kcalRowName.Length;
+        int dateSize = timeRowName.Length;
+        foreach (ConsumedRowInfoStrings row in strRows)
+        {
+            idSize = Int32.Max(idSize, row.Id.Length);
+            userIdSize = Int32.Max(userIdSize, row.UserId.Length);
+            kcalSize = Int32.Max(kcalSize, row.Kcal.Length);
+            dateSize = Int32.Max(dateSize, row.Date.Length);
+        }
+
+        int tableLengthBudget = strRows.Count >= 5 ? 36 : 30;
+        int nameSize = int.Max(6, tableLengthBudget - kcalSize - dateSize - idSize - userIdSize);
+
+        string rowFormat =
+            $"{{0, {idSize}}}| {{1, {userIdSize}}}| {{2, -{nameSize}}}| {{3, {kcalSize}}}| {{4, {dateSize}}}\n";
+
+        string message = "";
+
+        message += "<pre>";
+        message += string.Format(rowFormat, idRowName, userRowName, nameRowName, kcalRowName, timeRowName);
+
+        foreach (ConsumedRowInfoStrings row in strRows)
+        {
+            bool firstRow = true;
+            foreach (string chunk in Utils.SplitStringByChunks(row.Text, nameSize))
+            {
+                if (firstRow)
+                {
+                    message += string.Format(rowFormat, row.Id, row.UserId, chunk, row.Kcal, row.Date);
+                    firstRow = false;
+                }
+                else
+                {
+                    message += string.Format(rowFormat, string.Empty, string.Empty, chunk, string.Empty, string.Empty);
+                }
+            }
+        }
+
+        message += "</pre>";
+
+        await botClient.SendMessage(userId, message, cancellationToken: cancellationToken, parseMode: ParseMode.Html);
     }
 
     private async Task SetUserTimezoneOffsetAsync(string args, long userId, ITelegramBotClient botClient,
@@ -524,6 +581,7 @@ public partial class WeightBot
     {
         return new ConsumedRowInfoStrings(
             Id: row.Id.ToString(),
+            UserId: row.UserId.ToString(),
             Date: FromDatabaseToUserTimeFormat(row.Date, timezone, timeFormat),
             Text: row.Text,
             Kcal: row.Kcal.ToString("F"));
@@ -561,5 +619,5 @@ public partial class WeightBot
     [GeneratedRegex(@"^\s*(?<name>.+?)\s*,?\s*(?<kcal>\d+[,.]?\d*)\s*$")]
     private static partial Regex GetAddConsumedRegex();
 
-    public record ConsumedRowInfoStrings(string Id, string Date, string Text, string Kcal);
+    public record ConsumedRowInfoStrings(string Id, string UserId, string Date, string Text, string Kcal);
 }
