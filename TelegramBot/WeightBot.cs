@@ -326,14 +326,29 @@ public partial class WeightBot
         List<ConsumedRowInfo> dbRows = await _database.GetStatAsync(begin, end, userId);
 
         // TODO: refactor shit
+        //
+        // ID| Name                    |  Kcal|  Time
+        // 20| ве                      | 45,00| 09:59
+        //     
+
+        const string idRowName = "ID";
+        const string nameRowName = "Name";
+        const string kcalRowName = "Kcal";
+        const string timeRowName = "Time";
 
         List<ConsumedRowInfoStrings> strRows = dbRows
             .Select(row => DbRowToUserStringRow(row, timeZone, timeFormat))
             .ToList();
-        int kcalSize = strRows.Any() ? strRows.Max(row => row.Kcal.Length) : 0;
-        int idSize = strRows.Any() ? strRows.Max(row => row.Id.Length) : 0;
-        double consumedToday = dbRows.Any() ? dbRows.Sum(row => row.Kcal) : 0;
         int dateSize = timeFormat.Length;
+        int kcalSize = kcalRowName.Length;
+        int idSize = idRowName.Length;
+        foreach (ConsumedRowInfoStrings row in strRows)
+        {
+            kcalSize = Int32.Max(kcalSize, row.Kcal.Length);
+            idSize = Int32.Max(idSize, row.Id.Length);
+        }
+        
+        double consumedToday = dbRows.Any() ? dbRows.Sum(row => row.Kcal) : 0;
 
         const int tableLengthBudget = 36;
         int nameSize = int.Max(8, tableLengthBudget - kcalSize - dateSize - idSize);
