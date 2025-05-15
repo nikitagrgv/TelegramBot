@@ -206,7 +206,8 @@ public partial class WeightBot
         string name = m.Groups["name"].Value;
         string kcalString = m.Groups["kcal"].Value;
 
-        if (!TryParseDouble(kcalString, out double kcal))
+        double kcal = 0;
+        if (!string.IsNullOrEmpty(kcalString) && !TryParseDouble(kcalString, out kcal))
         {
             string invalidCommandMessage =
                 $"Sorry, I didn't understand your 'add' command. Invalid kcal number: '{kcalString}'. Type /start to see a list of available commands.";
