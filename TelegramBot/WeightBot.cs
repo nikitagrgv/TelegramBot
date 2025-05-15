@@ -128,12 +128,14 @@ public partial class WeightBot
             case "add":
             case "добавить":
             case "адд":
+            case "доб":
                 await AddConsumedAsync(args, userId, botClient, cancellationToken);
                 break;
             case "remove":
             case "delete":
             case "удалить":
             case "делит":
+            case "дел":
                 await RemoveConsumedAsync(args, userId, botClient, cancellationToken);
                 break;
             case "stat":
@@ -538,11 +540,13 @@ public partial class WeightBot
                add молочная каша, 12
                добавить молочная каша, 12
                добавить молочная каша 12
+               доб 12
 
                🗑️ Remove a consumed product by id:
                remove 6
                delete 6
                удалить 6
+               дел 6
 
                🔥 Print consumed kcal by the current day:
                /stat
