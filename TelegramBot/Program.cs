@@ -103,9 +103,10 @@ class Program
 
         CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
 
-        Console.CancelKeyPress += (_, _) =>
+        Console.CancelKeyPress += (_, e) =>
         {
             Console.WriteLine("Canceling pressed...");
+            e.Cancel = true;
             cancelTokenSource.Cancel();
         };
 
