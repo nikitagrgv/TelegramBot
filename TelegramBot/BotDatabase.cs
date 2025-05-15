@@ -153,65 +153,81 @@ public class BotDatabase : IDisposable
     {
         if (optionalBegin is { } begin && optionalEnd is { } end)
         {
-            const string sql = """
-                               SELECT *
-                               FROM consumed
-                               WHERE
-                                   user_id = @id 
-                                 AND
-                                   date BETWEEN @begin AND @end
-                               ORDER BY date;
-                               """;
+            string userIdString = userId == null ? "" : "user_id = @id AND";
+            string sql = $"""
+                          SELECT *
+                          FROM consumed
+                          WHERE
+                              {userIdString}
+                              date BETWEEN @begin AND @end
+                          ORDER BY date;
+                          """;
             await using var cmd = new SQLiteCommand(sql, _connection);
             cmd.Parameters.AddWithValue("begin", ToDatabaseTimeFormat(begin));
             cmd.Parameters.AddWithValue("end", ToDatabaseTimeFormat(end));
-            cmd.Parameters.AddWithValue("id", userId);
+            if (userId != null)
+            {
+                cmd.Parameters.AddWithValue("id", userId);
+            }
+
             return await ExecuteConsumedAndGetAllAsync(cmd);
         }
 
         if (optionalBegin is { } singleBegin)
         {
-            const string sql = """
-                               SELECT *
-                               FROM consumed
-                               WHERE 
-                                   user_id = @id
-                                 AND
-                                   date >= @begin
-                               ORDER BY date;
-                               """;
+            string userIdString = userId == null ? "" : "user_id = @id AND";
+            string sql = $"""
+                          SELECT *
+                          FROM consumed
+                          WHERE
+                              {userIdString}
+                              date >= @begin
+                          ORDER BY date;
+                          """;
             await using var cmd = new SQLiteCommand(sql, _connection);
             cmd.Parameters.AddWithValue("begin", ToDatabaseTimeFormat(singleBegin));
-            cmd.Parameters.AddWithValue("id", userId);
+            if (userId != null)
+            {
+                cmd.Parameters.AddWithValue("id", userId);
+            }
+
             return await ExecuteConsumedAndGetAllAsync(cmd);
         }
 
         if (optionalEnd is { } singleEnd)
         {
-            const string sql = """
-                               SELECT *
-                               FROM consumed
-                               WHERE
-                                   user_id = @id
-                                 AND
-                                   date <= @end
-                               ORDER BY date;
-                               """;
+            string userIdString = userId == null ? "" : "user_id = @id AND";
+            string sql = $"""
+                          SELECT *
+                          FROM consumed
+                          WHERE
+                              {userIdString}
+                              date <= @end
+                          ORDER BY date;
+                          """;
             await using var cmd = new SQLiteCommand(sql, _connection);
             cmd.Parameters.AddWithValue("end", ToDatabaseTimeFormat(singleEnd));
-            cmd.Parameters.AddWithValue("id", userId);
+            if (userId != null)
+            {
+                cmd.Parameters.AddWithValue("id", userId);
+            }
+
             return await ExecuteConsumedAndGetAllAsync(cmd);
         }
 
-        const string everythingSql = """
-                                     SELECT *
-                                     FROM consumed
-                                     WHERE
-                                         user_id = @id
-                                     ORDER BY date;
-                                     """;
+        string everythingEserIdString = userId == null ? "" : "WHERE user_id = @id";
+        string everythingSql = $"""
+                                SELECT *
+                                FROM consumed
+                                {everythingEserIdString}
+                                ORDER BY date;
+                                """;
         await using var everythingCmd = new SQLiteCommand(everythingSql, _connection);
-        everythingCmd.Parameters.AddWithValue("id", userId);
+        if (userId != null)
+        {
+            everythingCmd.Parameters.AddWithValue("id", userId);
+        }
+
         return await ExecuteConsumedAndGetAllAsync(everythingCmd);
     }
 
