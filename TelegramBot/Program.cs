@@ -65,7 +65,7 @@ class Program
     {
         [Column("id")] public long Id { get; set; }
         [Column("register_date")] public string RegisterDate { get; set; }
-        [Column("time_zone")] public int Timezone { get; set; }
+        [Column("timezone")] public int Timezone { get; set; }
         [Column("min_kcal")] public double? MinKcal { get; set; }
         [Column("max_kcal")] public double? MaxKcal { get; set; }
     }
