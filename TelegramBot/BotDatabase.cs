@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace TelegramBot;
 
-public class BotDatabase : IDisposable
+public class BotDatabase : IDisposable, IBotDatabase
 {
     private const string DatabaseTimeFormat = "yyyy-MM-dd HH:mm:ss";
     private readonly SQLiteConnection _connection;
@@ -45,7 +45,7 @@ public class BotDatabase : IDisposable
         return true;
     }
 
-    public async Task<double?> GetMaxKcalAsync(long userId)
+    async Task<double?> IBotDatabase.GetMaxKcalAsync(long userId)
     {
         const string sql = """
                            SELECT max_kcal
@@ -57,7 +57,7 @@ public class BotDatabase : IDisposable
         return await ExecuteDoubleAsync(cmd);
     }
 
-    public async Task<bool> SetMaxKcalAsync(long userId, double? maxKcal)
+    async Task<bool> IBotDatabase.SetMaxKcalAsync(long userId, double? maxKcal)
     {
         const string sql = """
                            UPDATE users
@@ -70,7 +70,7 @@ public class BotDatabase : IDisposable
         return await cmd.ExecuteNonQueryAsync() != 0;
     }
 
-    public async Task<double> GetConsumedCalAsync(DateTime? optionalBegin, DateTime? optionalEnd,
+    async Task<double> IBotDatabase.GetConsumedKcalAsync(DateTime? optionalBegin, DateTime? optionalEnd,
         long userId)
     {
         if (optionalBegin is { } begin && optionalEnd is { } end)
@@ -123,7 +123,7 @@ public class BotDatabase : IDisposable
         return await ExecuteDoubleAsync(everythingCmd, 0);
     }
 
-    public async Task<ConsumedRowInfo?> AddConsumedAsync(long userId, string name, double kcal, DateTime date)
+    async Task<ConsumedRowInfo?> IBotDatabase.AddConsumedAsync(long userId, string name, double kcal, DateTime date)
     {
         string sql = """
                      INSERT INTO consumed (user_id, date, text, kcal)
@@ -139,7 +139,7 @@ public class BotDatabase : IDisposable
         return await ExecuteConsumedAndGetOneAsync(cmd);
     }
 
-    public async Task<ConsumedRowInfo?> RemoveConsumedAsync(long id, long? userId)
+    async Task<ConsumedRowInfo?> IBotDatabase.RemoveConsumedAsync(long id, long? userId)
     {
         string userIdString = userId == null ? "" : "user_id = @user_id AND";
         string sql = $"""
@@ -161,7 +161,7 @@ public class BotDatabase : IDisposable
         return await ExecuteConsumedAndGetOneAsync(cmd);
     }
 
-    public async Task<List<ConsumedRowInfo>> GetStatAsync(DateTime? optionalBegin, DateTime? optionalEnd,
+    async Task<List<ConsumedRowInfo>> IBotDatabase.GetStatAsync(DateTime? optionalBegin, DateTime? optionalEnd,
         long? userId)
     {
         if (optionalBegin is { } begin && optionalEnd is { } end)
@@ -339,7 +339,7 @@ public class BotDatabase : IDisposable
         }
     }
 
-    public async Task<bool> HasUserIdAsync(long userId)
+    async Task<bool> IBotDatabase.HasUserIdAsync(long userId)
     {
         string sql = "SELECT EXISTS(SELECT 1 FROM users WHERE id = @id)";
         await using var cmd = new SQLiteCommand(sql, _connection);
@@ -348,7 +348,7 @@ public class BotDatabase : IDisposable
         return Convert.ToInt32(result) == 1;
     }
 
-    public async Task<bool> SetUserTimezoneOffsetAsync(long userId, int timezoneOffset)
+    async Task<bool> IBotDatabase.SetUserTimezoneOffsetAsync(long userId, int timezoneOffset)
     {
         string sql = "UPDATE users SET timezone = @timezone WHERE id = @id";
         await using var cmd = new SQLiteCommand(sql, _connection);
@@ -357,7 +357,7 @@ public class BotDatabase : IDisposable
         return await cmd.ExecuteNonQueryAsync() != 0;
     }
 
-    public async Task<int> GetUserTimezoneOffsetAsync(long userId)
+    async Task<int> IBotDatabase.GetUserTimezoneOffsetAsync(long userId)
     {
         string sql = "SELECT timezone FROM users WHERE id = @id";
         await using var cmd = new SQLiteCommand(sql, _connection);
@@ -373,7 +373,7 @@ public class BotDatabase : IDisposable
         }
     }
 
-    public async Task<bool> RegisterUserIdAsync(long userId, DateTime date)
+    async Task<bool> IBotDatabase.RegisterUserIdAsync(long userId, DateTime date)
     {
         string sql = """
                      INSERT INTO users (id, register_date)

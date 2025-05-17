@@ -18,9 +18,9 @@ public partial class WeightBot
 
     private readonly long _adminId;
     private readonly CancellationTokenSource _cancelTokenSource;
-    private readonly BotDatabase _database;
+    private readonly IBotDatabase _database;
 
-    public WeightBot(BotDatabase database, long adminId, CancellationTokenSource cancelTokenSource)
+    public WeightBot(IBotDatabase database, long adminId, CancellationTokenSource cancelTokenSource)
     {
         _database = database;
         _adminId = adminId;
@@ -308,7 +308,7 @@ public partial class WeightBot
         int timeZone = await _database.GetUserTimezoneOffsetAsync(userId);
         DateTime dayBeginUtc = GetUserDayBeginUtc(timeZone);
 
-        double consumed = await _database.GetConsumedCalAsync(dayBeginUtc, null, userId);
+        double consumed = await _database.GetConsumedKcalAsync(dayBeginUtc, null, userId);
         double? limit = await _database.GetMaxKcalAsync(userId);
 
         string message;
