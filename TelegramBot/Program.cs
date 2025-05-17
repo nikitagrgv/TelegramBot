@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace TelegramBot;
 
@@ -58,6 +60,26 @@ class Program
         return null;
     }
 
+    [Table("users")]
+    public class UserInfo
+    {
+        [Column("id")] public long Id { get; set; }
+        [Column("register_date")] public string RegisterDate { get; set; }
+        [Column("time_zone")] public int Timezone { get; set; }
+        [Column("min_kcal")] public double? MinKcal { get; set; }
+        [Column("max_kcal")] public double? MaxKcal { get; set; }
+    }
+
+    public class AppDbContext : DbContext
+    {
+        public DbSet<UserInfo> Users { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlite("Data Source=ConsumeDatabase.sqlite");
+        }
+    }
+
     static async Task Main()
     {
         Console.WriteLine("TelegramBot");
@@ -85,6 +107,20 @@ class Program
         }
 
         Console.WriteLine($"Admin ID is {adminId}");
+
+        using var db = new AppDbContext();
+        await db.Database.MigrateAsync("20250515185015_RenameMyColumn");
+        await db.Database.EnsureCreatedAsync();
+        var u = db.Users;
+        await db.Users.LoadAsync();
+ 
+        
+        UserInfo us = db.Users.First();
+
+        us.MaxKcal = 14;
+        await db.SaveChangesAsync();
+
+        return;
 
         var database = new BotDatabase("ConsumeDatabase.sqlite");
 
