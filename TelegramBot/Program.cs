@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace TelegramBot;
 
@@ -61,22 +63,119 @@ class Program
     }
 
     [Table("users")]
-    public class UserInfo
+    public class UserRow
     {
         [Column("id")] public long Id { get; set; }
         [Column("register_date")] public string RegisterDate { get; set; }
-        [Column("timezone")] public int Timezone { get; set; }
+        [Column("timezone")] public int DateTimeOffset { get; set; }
         [Column("min_kcal")] public double? MinKcal { get; set; }
         [Column("max_kcal")] public double? MaxKcal { get; set; }
+
+        public ICollection<ConsumedRow> ConsumedItems { get; set; }
+    }
+
+    [Table("consumed")]
+    public class ConsumedRow
+    {
+        [Column("id")] public long Id { get; set; }
+        [Column("user_id")] public long UserId { get; set; }
+        [Column("user_date")] public DateTime Date { get; set; }
+        [Column("user_date")] public string Text { get; set; }
+        [Column("user_date")] public double? Kcal { get; set; }
+
+        public UserRow User { get; set; }
     }
 
     public class AppDbContext : DbContext
     {
-        public DbSet<UserInfo> Users { get; set; }
+        public DbSet<UserRow> Users { get; set; }
+        public DbSet<ConsumedRow> Consumed { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite("Data Source=ConsumeDatabase.sqlite");
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            const string dateFormat = "yyyy-MM-dd HH:mm:ss";
+
+            var dateConverter = new ValueConverter<DateTime, string>(
+                dt => dt.ToString(dateFormat),
+                str => DateTime.ParseExact(str, dateFormat, CultureInfo.InvariantCulture)
+            );
+
+            modelBuilder.Entity<UserRow>(entity =>
+            {
+                entity.ToTable("users");
+
+                entity.HasKey(u => u.Id);
+
+                entity.Property(u => u.Id)
+                    .HasColumnName("user_id")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(u => u.RegisterDate)
+                    .HasColumnName("register_date")
+                    .HasConversion(dateConverter)
+                    .HasColumnType("TEXT")
+                    .IsRequired();
+
+                entity.Property(u => u.DateTimeOffset)
+                    .HasColumnName("date_time_offset")
+                    .IsRequired()
+                    .HasDefaultValue(0);
+
+                entity.Property(u => u.MinKcal)
+                    .HasColumnName("min_kcal")
+                    .HasColumnType("REAL");
+
+                entity.Property(u => u.MaxKcal)
+                    .HasColumnName("max_kcal")
+                    .HasColumnType("REAL");
+
+                entity.HasMany(u => u.ConsumedItems)
+                    .WithOne(c => c.User)
+                    .HasForeignKey(c => c.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<ConsumedRow>(entity =>
+            {
+                entity.ToTable("consumed");
+
+                entity.HasKey(u => u.Id);
+
+                entity.Property(c => c.Id)
+                    .HasColumnName("id")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(c => c.UserId)
+                    .HasColumnName("user_id")
+                    .IsRequired();
+
+                entity.Property(c => c.Date)
+                    .HasColumnName("date")
+                    .HasConversion(dateConverter)
+                    .HasColumnType("TEXT")
+                    .IsRequired();
+
+                entity.Property(c => c.Text)
+                    .HasColumnName("text")
+                    .HasColumnType("TEXT")
+                    .IsRequired();
+
+                entity.Property(c => c.Kcal)
+                    .HasColumnName("kcal")
+                    .HasColumnType("REAL");
+
+                entity.HasOne(c => c.User)
+                    .WithMany(u => u.ConsumedItems)
+                    .HasForeignKey(c => c.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
         }
     }
 
@@ -109,13 +208,9 @@ class Program
         Console.WriteLine($"Admin ID is {adminId}");
 
         using var db = new AppDbContext();
-        await db.Database.MigrateAsync("20250515185015_RenameMyColumn");
         await db.Database.EnsureCreatedAsync();
-        var u = db.Users;
-        await db.Users.LoadAsync();
- 
-        
-        UserInfo us = db.Users.First();
+
+        UserRow us = db.Users.First();
 
         us.MaxKcal = 14;
         await db.SaveChangesAsync();
