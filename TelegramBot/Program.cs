@@ -66,7 +66,7 @@ class Program
     public class UserRow
     {
         [Column("id")] public long Id { get; set; }
-        [Column("register_date")] public string RegisterDate { get; set; }
+        [Column("register_date")] public DateTime RegisterDate { get; set; }
         [Column("timezone")] public int DateTimeOffset { get; set; }
         [Column("min_kcal")] public double? MinKcal { get; set; }
         [Column("max_kcal")] public double? MaxKcal { get; set; }
@@ -207,13 +207,8 @@ class Program
 
         Console.WriteLine($"Admin ID is {adminId}");
 
-        using var db = new AppDbContext();
+        await using var db = new AppDbContext();
         await db.Database.EnsureCreatedAsync();
-
-        UserRow us = db.Users.First();
-
-        us.MaxKcal = 14;
-        await db.SaveChangesAsync();
 
         return;
 
