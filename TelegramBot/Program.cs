@@ -115,7 +115,7 @@ class Program
 
                 entity.Property(u => u.Id)
                     .HasColumnName("user_id")
-                    .ValueGeneratedOnAdd();
+                    .IsRequired();
 
                 entity.Property(u => u.RegisterDate)
                     .HasColumnName("register_date")
