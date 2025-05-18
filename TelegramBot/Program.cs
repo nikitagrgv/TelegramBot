@@ -67,7 +67,7 @@ class Program
     {
         [Column("id")] public long Id { get; set; }
         [Column("register_date")] public DateTime RegisterDate { get; set; }
-        [Column("timezone")] public int DateTimeOffset { get; set; }
+        [Column("timezone")] public int? DateTimeOffset { get; set; }
         [Column("min_kcal")] public double? MinKcal { get; set; }
         [Column("max_kcal")] public double? MaxKcal { get; set; }
 
@@ -124,9 +124,7 @@ class Program
                     .IsRequired();
 
                 entity.Property(u => u.DateTimeOffset)
-                    .HasColumnName("date_time_offset")
-                    .IsRequired()
-                    .HasDefaultValue(0);
+                    .HasColumnName("date_time_offset");
 
                 entity.Property(u => u.MinKcal)
                     .HasColumnName("min_kcal")
