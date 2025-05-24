@@ -106,12 +106,13 @@ public class BotDatabase : IDisposable, IBotDatabase
         Expression<Func<ConsumedRow, bool>> filterDateFunction = BuildFilterDateFunction(begin, end);
         Expression<Func<ConsumedRow, bool>> filterUserFunction = BuildFilterUserIdFunction(userId);
 
-        var entities = await _dbContext
+        List<ConsumedRow> entities = await _dbContext
             .Consumed
             .AsNoTracking()
             .Where(filterUserFunction)
             .Where(filterDateFunction)
             .ToListAsync();
+        return entities;
     }
 
     // private async Task<ConsumedRowInfo?> ExecuteConsumedAndGetOneAsync(SQLiteCommand cmd)
