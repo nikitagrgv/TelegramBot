@@ -89,7 +89,6 @@ public class BotDatabase : IDisposable, IBotDatabase
 
     async Task<ConsumedRow?> IBotDatabase.AddConsumedAsync(long userId, string name, double? kcal, DateTime date)
     {
-
         return null;
         // var newConsumedRow = new ConsumedRow()
         // {
@@ -325,12 +324,11 @@ public class BotDatabase : IDisposable, IBotDatabase
 
     async Task<bool> IBotDatabase.HasUserIdAsync(long userId)
     {
-        return true;
-        // string sql = "SELECT EXISTS(SELECT 1 FROM users WHERE id = @id)";
-        // await using var cmd = new SQLiteCommand(sql, _connection);
-        // cmd.Parameters.AddWithValue("id", userId);
-        // object? result = await cmd.ExecuteScalarAsync();
-        // return Convert.ToInt32(result) == 1;
+        return await _dbContext
+            .Consumed
+            .AsNoTracking()
+            .Where(c => c.UserId == userId)
+            .AnyAsync();
     }
 
     async Task<bool> IBotDatabase.SetUserTimezoneOffsetAsync(long userId, int timezoneOffset)
