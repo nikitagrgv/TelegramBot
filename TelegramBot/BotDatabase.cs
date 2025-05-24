@@ -360,6 +360,17 @@ public class BotDatabase : IDisposable, IBotDatabase
 
     async Task<bool> IBotDatabase.RegisterUserIdAsync(long userId, DateTime date)
     {
+        var newUser = new UserRow()
+        {
+            Id = userId,
+            RegisterDate = date
+        };
+        await _dbContext.Users.AddAsync(newUser);
+
+        await _dbContext.SaveChangesAsync();
+
+        return true;
+
         return true;
         // string sql = """
         //              INSERT INTO users (id, register_date)
