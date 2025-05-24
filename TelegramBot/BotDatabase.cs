@@ -136,6 +136,9 @@ public class BotDatabase : IDisposable, IBotDatabase
         }
 
         entity.DateTimeOffset = dateTimeOffset;
+        
+        await _dbContext.SaveChangesAsync();
+        
         return true;
     }
 
