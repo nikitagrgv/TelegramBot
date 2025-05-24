@@ -252,7 +252,7 @@ public partial class WeightBot
             return;
         }
 
-        int timeZone = await _database.GetUserTimezoneOffsetAsync(userId);
+        int timeZone = await _database.GetUserTimezoneOffsetAsync(userId) ?? 0;
 
         string message = $"""
                           🍽️ Added
@@ -287,7 +287,7 @@ public partial class WeightBot
             return;
         }
 
-        int timeZone = await _database.GetUserTimezoneOffsetAsync(userId);
+        int timeZone = await _database.GetUserTimezoneOffsetAsync(userId) ?? 0;
 
         string message = $"""
                           🗑️ Removed
