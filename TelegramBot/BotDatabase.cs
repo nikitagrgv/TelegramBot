@@ -77,61 +77,12 @@ public class BotDatabase : IDisposable, IBotDatabase
                 c.UserId == userId;
         }
 
-        // = c => c.UserId == userId;
         double value = await _dbContext
             .Consumed
             .AsNoTracking()
             .Where(expression)
             .SumAsync(c => c.Kcal ?? 0);
         return value;
-        // if (optionalBegin is { } begin && optionalEnd is { } end)
-        // {
-        //     const string sql = """
-        //                        SELECT SUM(kcal)
-        //                        FROM consumed
-        //                        WHERE user_id = @id AND date BETWEEN @begin AND @end
-        //                        """;
-        //     await using var cmd = new SQLiteCommand(sql, _connection);
-        //     cmd.Parameters.AddWithValue("begin", ToDatabaseTimeFormat(begin));
-        //     cmd.Parameters.AddWithValue("end", ToDatabaseTimeFormat(end));
-        //     cmd.Parameters.AddWithValue("id", userId);
-        //     return await ExecuteDoubleAsync(cmd, 0);
-        // }
-        //
-        // if (optionalBegin is { } singleBegin)
-        // {
-        //     const string sql = """
-        //                        SELECT SUM(kcal)
-        //                        FROM consumed
-        //                        WHERE user_id = @id AND date >= @begin
-        //                        """;
-        //     await using var cmd = new SQLiteCommand(sql, _connection);
-        //     cmd.Parameters.AddWithValue("begin", ToDatabaseTimeFormat(singleBegin));
-        //     cmd.Parameters.AddWithValue("id", userId);
-        //     return await ExecuteDoubleAsync(cmd, 0);
-        // }
-        //
-        // if (optionalEnd is { } singleEnd)
-        // {
-        //     const string sql = """
-        //                        SELECT SUM(kcal)
-        //                        FROM consumed
-        //                        WHERE user_id = @id AND date <= @end
-        //                        """;
-        //     await using var cmd = new SQLiteCommand(sql, _connection);
-        //     cmd.Parameters.AddWithValue("end", ToDatabaseTimeFormat(singleEnd));
-        //     cmd.Parameters.AddWithValue("id", userId);
-        //     return await ExecuteDoubleAsync(cmd, 0);
-        // }
-        //
-        // const string everythingSql = """
-        //                              SELECT SUM(kcal)
-        //                              FROM consumed
-        //                              WHERE user_id = @id
-        //                              """;
-        // await using var everythingCmd = new SQLiteCommand(everythingSql, _connection);
-        // everythingCmd.Parameters.AddWithValue("id", userId);
-        // return await ExecuteDoubleAsync(everythingCmd, 0);
     }
 
     async Task<ConsumedRow?> IBotDatabase.AddConsumedAsync(long userId, string name, double kcal, DateTime date)
