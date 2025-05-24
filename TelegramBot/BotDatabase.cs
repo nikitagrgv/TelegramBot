@@ -96,26 +96,12 @@ public class BotDatabase : IDisposable, IBotDatabase
             Text = name,
             Kcal = kcal
         };
+        
         await _dbContext.Consumed.AddAsync(newConsumedRow);
-        
+
         await _dbContext.SaveChangesAsync();
-        
+
         return newConsumedRow;
-
-
-        // return new ConsumedRow();
-        // string sql = """
-        //              INSERT INTO consumed (user_id, date, text, kcal)
-        //              VALUES (@user_id, @date, @text, @kcal)
-        //              RETURNING *;
-        //              """;
-        // await using var cmd = new SQLiteCommand(sql, _connection);
-        // cmd.Parameters.AddWithValue("user_id", userId);
-        // cmd.Parameters.AddWithValue("date", ToDatabaseTimeFormat(date));
-        // cmd.Parameters.AddWithValue("text", name);
-        // cmd.Parameters.AddWithValue("kcal", kcal);
-        //
-        // return await ExecuteConsumedAndGetOneAsync(cmd);
     }
 
     async Task<ConsumedRow?> IBotDatabase.RemoveConsumedAsync(long id, long? userId)
