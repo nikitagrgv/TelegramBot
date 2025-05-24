@@ -89,19 +89,18 @@ public class BotDatabase : IDisposable, IBotDatabase
 
     async Task<ConsumedRow?> IBotDatabase.AddConsumedAsync(long userId, string name, double? kcal, DateTime date)
     {
-        return null;
-        // var newConsumedRow = new ConsumedRow()
-        // {
-        //     UserId = userId,
-        //     Date = date,
-        //     Text = name,
-        //     Kcal = kcal
-        // };
-        // await _dbContext.Consumed.AddAsync(newConsumedRow);
-        //
-        // await _dbContext.SaveChangesAsync();
-        //
-        // return newConsumedRow;
+        var newConsumedRow = new ConsumedRow()
+        {
+            UserId = userId,
+            Date = date,
+            Text = name,
+            Kcal = kcal
+        };
+        await _dbContext.Consumed.AddAsync(newConsumedRow);
+        
+        await _dbContext.SaveChangesAsync();
+        
+        return newConsumedRow;
 
 
         // return new ConsumedRow();
@@ -325,9 +324,9 @@ public class BotDatabase : IDisposable, IBotDatabase
     async Task<bool> IBotDatabase.HasUserIdAsync(long userId)
     {
         return await _dbContext
-            .Consumed
+            .Users
             .AsNoTracking()
-            .Where(c => c.UserId == userId)
+            .Where(c => c.Id == userId)
             .AnyAsync();
     }
 
