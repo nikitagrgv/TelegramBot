@@ -1,5 +1,4 @@
 ﻿using System.Data.Common;
-using System.Data.SQLite;
 using System.Globalization;
 
 namespace TelegramBot;
@@ -7,14 +6,12 @@ namespace TelegramBot;
 public class BotDatabase : IDisposable, IBotDatabase
 {
     private const string DatabaseTimeFormat = "yyyy-MM-dd HH:mm:ss";
-    private readonly SQLiteConnection _connection;
+    private readonly AppDbContext _dbContext;
     private bool _disposed;
 
-    public BotDatabase(string databasePath)
+    public BotDatabase(AppDbContext dbContext)
     {
-        string connectionString = $"Data Source={databasePath};Version=3;";
-
-        _connection = new SQLiteConnection(connectionString);
+        _dbContext = dbContext;
     }
 
     void IDisposable.Dispose()
@@ -448,7 +445,6 @@ public class BotDatabase : IDisposable, IBotDatabase
         if (_disposed) return;
         if (disposing)
         {
-            _connection.Dispose();
         }
 
         _disposed = true;
