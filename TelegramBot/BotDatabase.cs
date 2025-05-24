@@ -48,39 +48,44 @@ public class BotDatabase : IDisposable, IBotDatabase
         return true;
     }
 
-    async Task<double> IBotDatabase.GetConsumedKcalAsync(DateTime? optionalBegin, DateTime? optionalEnd,
-        long userId)
+    private Expression<Func<ConsumedRow, bool>> BuildFilterFunction(DateTime? optionalBegin, DateTime? optionalEnd)
     {
         Expression<Func<ConsumedRow, bool>> filterFunc;
+
         if (optionalBegin != null && optionalEnd != null)
         {
             filterFunc = c =>
-                c.UserId == userId &&
                 c.Date > optionalBegin &&
                 c.Date < optionalEnd;
         }
         else if (optionalBegin != null)
         {
             filterFunc = c =>
-                c.UserId == userId &&
                 c.Date > optionalBegin;
         }
         else if (optionalEnd != null)
         {
             filterFunc = c =>
-                c.UserId == userId &&
                 c.Date < optionalEnd;
         }
         else
         {
-            filterFunc = c =>
-                c.UserId == userId;
+            filterFunc = c => true;
         }
+
+        return filterFunc;
+    }
+
+    async Task<double> IBotDatabase.GetConsumedKcalAsync(DateTime? optionalBegin, DateTime? optionalEnd,
+        long userId)
+    {
+        Expression<Func<ConsumedRow, bool>> filterFunction = BuildFilterFunction(optionalBegin, optionalEnd);
 
         double value = await _dbContext
             .Consumed
             .AsNoTracking()
-            .Where(filterFunc)
+            .Where(c => c.UserId == userId)
+            .Where(filterFunction)
             .SumAsync(c => c.Kcal ?? 0);
         return value;
     }
