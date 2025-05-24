@@ -7,7 +7,6 @@ namespace TelegramBot;
 
 public class BotDatabase : IDisposable, IBotDatabase
 {
-    private const string DatabaseTimeFormat = "yyyy-MM-dd HH:mm:ss";
     private readonly AppDbContext _dbContext;
     private bool _disposed;
 
