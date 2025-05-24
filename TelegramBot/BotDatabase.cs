@@ -95,7 +95,10 @@ public class BotDatabase : IDisposable, IBotDatabase
             Date = date,
             Text = name,
             Kcal = kcal
-        }
+        };
+        await _dbContext.Consumed.AddAsync(newConsumedRow);
+
+        return newConsumedRow;
         // return new ConsumedRow();
         // string sql = """
         //              INSERT INTO consumed (user_id, date, text, kcal)
