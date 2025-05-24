@@ -50,7 +50,7 @@ public class BotDatabase : IDisposable, IBotDatabase
 
     async Task<double> IBotDatabase.GetConsumedKcalAsync(DateTime? begin, DateTime? end, long userId)
     {
-        Expression<Func<ConsumedRow, bool>> filterDateFunction = BuildFilterFunction(begin, end);
+        Expression<Func<ConsumedRow, bool>> filterDateFunction = BuildFilterDateFunction(begin, end);
 
         double value = await _dbContext
             .Consumed
@@ -354,7 +354,7 @@ public class BotDatabase : IDisposable, IBotDatabase
         _disposed = true;
     }
 
-    private static Expression<Func<ConsumedRow, bool>> BuildFilterFunction(DateTime? begin, DateTime? end)
+    private static Expression<Func<ConsumedRow, bool>> BuildFilterDateFunction(DateTime? begin, DateTime? end)
     {
         Expression<Func<ConsumedRow, bool>> filterFunc;
 
@@ -378,5 +378,12 @@ public class BotDatabase : IDisposable, IBotDatabase
         }
 
         return filterFunc;
+    }
+
+    private static Expression<Func<ConsumedRow, bool>> BuildFilterUserIdFunction(long? userId)
+    {
+        if (userId == null) return c => true;
+
+        return c => c.UserId == userId;
     }
 }
