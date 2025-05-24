@@ -356,28 +356,24 @@ public class BotDatabase : IDisposable, IBotDatabase
 
     private static Expression<Func<ConsumedRow, bool>> BuildFilterDateFunction(DateTime? begin, DateTime? end)
     {
-        Expression<Func<ConsumedRow, bool>> filterFunc;
-
         if (begin != null && end != null)
         {
-            filterFunc = c =>
+            return c =>
                 c.Date > begin &&
                 c.Date < end;
         }
-        else if (begin != null)
+
+        if (begin != null)
         {
-            filterFunc = c => c.Date > begin;
-        }
-        else if (end != null)
-        {
-            filterFunc = c => c.Date < end;
-        }
-        else
-        {
-            filterFunc = c => true;
+            return c => c.Date > begin;
         }
 
-        return filterFunc;
+        if (end != null)
+        {
+            return c => c.Date < end;
+        }
+
+        return c => true;
     }
 
     private static Expression<Func<ConsumedRow, bool>> BuildFilterUserIdFunction(long? userId)
