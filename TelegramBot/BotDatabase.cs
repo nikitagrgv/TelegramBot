@@ -148,7 +148,7 @@ public class BotDatabase : IDisposable, IBotDatabase
             .FirstOrDefaultAsync(u => u.Id == userId);
         if (entity == null)
         {
-            return 0;
+            return null;
         }
 
         return entity.DateTimeOffset;
