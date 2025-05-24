@@ -146,6 +146,7 @@ public class BotDatabase : IDisposable, IBotDatabase
             .Users
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Id == userId);
+        
         if (entity == null)
         {
             return null;
