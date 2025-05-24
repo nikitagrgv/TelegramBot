@@ -135,14 +135,23 @@ public class BotDatabase : IDisposable, IBotDatabase
         }
 
         entity.DateTimeOffset = dateTimeOffset;
-        
+
         await _dbContext.SaveChangesAsync();
         return true;
     }
 
-    async Task<int> IBotDatabase.GetUserTimezoneOffsetAsync(long userId)
+    async Task<int?> IBotDatabase.GetUserTimezoneOffsetAsync(long userId)
     {
-        return 0;
+        UserRow? entity = await _dbContext
+            .Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == userId);
+        if (entity == null)
+        {
+            return 0;
+        }
+
+        return entity.DateTimeOffset;
         // string sql = "SELECT timezone FROM users WHERE id = @id";
         // await using var cmd = new SQLiteCommand(sql, _connection);
         // cmd.Parameters.AddWithValue("id", userId);

@@ -12,7 +12,7 @@ public interface IBotDatabase
     public Task<List<ConsumedRow>> GetStatAsync(DateTime? optionalBegin, DateTime? optionalEnd, long? userId);
 
     public Task<bool> SetUserTimezoneOffsetAsync(long userId, int timezoneOffset);
-    public Task<int> GetUserTimezoneOffsetAsync(long userId);
+    public Task<int?> GetUserTimezoneOffsetAsync(long userId);
 
     public Task<double?> GetMaxKcalAsync(long userId);
     public Task<bool> SetMaxKcalAsync(long userId, double? maxKcal);
