@@ -115,6 +115,11 @@ public class BotDatabase : IDisposable, IBotDatabase
             return null;
         }
 
+        if (entity.UserId != userId)
+        {
+            return null;
+        }
+
         _dbContext.Consumed.Remove(entity);
 
         await _dbContext.SaveChangesAsync();
@@ -125,6 +130,10 @@ public class BotDatabase : IDisposable, IBotDatabase
     async Task<List<ConsumedRow>> IBotDatabase.GetStatAsync(DateTime? optionalBegin, DateTime? optionalEnd,
         long? userId)
     {
+        var entities = await _dbContext
+            .Consumed
+            .AsNoTracking()
+            .Where()
         return new List<ConsumedRow>();
 //         if (optionalBegin is { } begin && optionalEnd is { } end)
 //         {
