@@ -305,7 +305,7 @@ public partial class WeightBot
         ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        int timeZone = await _database.GetUserTimezoneOffsetAsync(userId);
+        int timeZone = await _database.GetUserTimezoneOffsetAsync(userId) ?? 0;
         DateTime dayBeginUtc = GetUserDayBeginUtc(timeZone);
 
         double consumed = await _database.GetConsumedKcalAsync(dayBeginUtc, null, userId);
@@ -337,7 +337,7 @@ public partial class WeightBot
         ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        int timeZone = await _database.GetUserTimezoneOffsetAsync(userId);
+        int timeZone = await _database.GetUserTimezoneOffsetAsync(userId) ?? 0;
         DateTime dayBeginUtc = GetUserDayBeginUtc(timeZone);
         await PrintStatAsync(dayBeginUtc, null, "📊 Day Statistics", ShortUserTimeFormat, timeZone, userId, botClient,
             cancellationToken);
@@ -347,7 +347,7 @@ public partial class WeightBot
         ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        int timeZone = await _database.GetUserTimezoneOffsetAsync(userId);
+        int timeZone = await _database.GetUserTimezoneOffsetAsync(userId) ?? 0;
         await PrintStatAsync(null, null, "📈 Total Statistics", LongUserTimeFormat, timeZone, userId, botClient,
             cancellationToken);
     }
