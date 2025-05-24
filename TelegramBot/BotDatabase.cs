@@ -146,25 +146,8 @@ public class BotDatabase : IDisposable, IBotDatabase
             .Users
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Id == userId);
-        
-        if (entity == null)
-        {
-            return null;
-        }
 
-        return entity.DateTimeOffset;
-        // string sql = "SELECT timezone FROM users WHERE id = @id";
-        // await using var cmd = new SQLiteCommand(sql, _connection);
-        // cmd.Parameters.AddWithValue("id", userId);
-        // object? result = await cmd.ExecuteScalarAsync();
-        // try
-        // {
-        //     return Convert.ToInt32(result);
-        // }
-        // catch (Exception)
-        // {
-        //     return 0;
-        // }
+        return entity?.DateTimeOffset;
     }
 
     async Task<bool> IBotDatabase.RegisterUserIdAsync(long userId, DateTime date)
