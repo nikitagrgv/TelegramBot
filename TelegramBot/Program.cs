@@ -5,20 +5,37 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace TelegramBot;
 
+public struct Config
+{
+    public Config()
+    {
+    }
+
+    public Config(string? botToken, string? adminId)
+    {
+        BotToken = botToken;
+        AdminId = adminId;
+    }
+
+    public string? BotToken { get; init; } = null;
+    public string? AdminId { get; init; } = null;
+}
+
 class Program
 {
-    private static Config? GetConfig()
+    private static Config GetConfig()
     {
         const string configPath = "botconf.json";
 
         if (!File.Exists(configPath))
         {
             Console.WriteLine("No config found");
-            return null;
+            return new Config();
         }
 
         string json = File.ReadAllText(configPath);
-        return JsonSerializer.Deserialize<Config>(json);
+        Config? config = JsonSerializer.Deserialize<Config>(json);
+        return config ?? new Config();
     }
 
     private static string? GetToken(Config? config)
@@ -231,6 +248,4 @@ class Program
 
         Console.WriteLine("Done");
     }
-
-    private record Config(string? BotToken, string? AdminId);
 }
