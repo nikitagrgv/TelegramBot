@@ -104,12 +104,12 @@ public class BotDatabase : IDisposable, IBotDatabase
     async Task<List<ConsumedRow>> IBotDatabase.GetStatAsync(DateTime? begin, DateTime? end, long? userId)
     {
         Expression<Func<ConsumedRow, bool>> filterDateFunction = BuildFilterDateFunction(begin, end);
-        Expression<Func<ConsumedRow, bool>> filterUserFunction = BuildFilterUserIdFunction(userId);
+        Expression<Func<ConsumedRow, bool>> filterUserIdFunction = BuildFilterUserIdFunction(userId);
 
         List<ConsumedRow> entities = await _dbContext
             .Consumed
             .AsNoTracking()
-            .Where(filterUserFunction)
+            .Where(filterUserIdFunction)
             .Where(filterDateFunction)
             .ToListAsync();
         return entities;
