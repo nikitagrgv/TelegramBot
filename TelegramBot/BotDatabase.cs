@@ -50,7 +50,12 @@ public class BotDatabase : IDisposable, IBotDatabase
     async Task<double> IBotDatabase.GetConsumedKcalAsync(DateTime? optionalBegin, DateTime? optionalEnd,
         long userId)
     {
-        return 0;
+        double value = await _dbContext
+            .Consumed
+            .AsNoTracking()
+            .Where(c => c.UserId == userId)
+            .SumAsync(c => c.Kcal ?? 0);
+        return value;
         // if (optionalBegin is { } begin && optionalEnd is { } end)
         // {
         //     const string sql = """
