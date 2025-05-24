@@ -48,32 +48,6 @@ public class BotDatabase : IDisposable, IBotDatabase
         return true;
     }
 
-    private static Expression<Func<ConsumedRow, bool>> BuildFilterFunction(DateTime? begin, DateTime? end)
-    {
-        Expression<Func<ConsumedRow, bool>> filterFunc;
-
-        if (begin != null && end != null)
-        {
-            filterFunc = c =>
-                c.Date > begin &&
-                c.Date < end;
-        }
-        else if (begin != null)
-        {
-            filterFunc = c => c.Date > begin;
-        }
-        else if (end != null)
-        {
-            filterFunc = c => c.Date < end;
-        }
-        else
-        {
-            filterFunc = c => true;
-        }
-
-        return filterFunc;
-    }
-
     async Task<double> IBotDatabase.GetConsumedKcalAsync(DateTime? begin, DateTime? end, long userId)
     {
         Expression<Func<ConsumedRow, bool>> filterDateFunction = BuildFilterFunction(begin, end);
@@ -380,14 +354,29 @@ public class BotDatabase : IDisposable, IBotDatabase
         _disposed = true;
     }
 
-
-    private static string ToDatabaseTimeFormat(DateTime dateTime)
+    private static Expression<Func<ConsumedRow, bool>> BuildFilterFunction(DateTime? begin, DateTime? end)
     {
-        return dateTime.ToString(DatabaseTimeFormat, CultureInfo.InvariantCulture);
-    }
+        Expression<Func<ConsumedRow, bool>> filterFunc;
 
-    private static DateTime FromDatabaseTimeFormat(string dateTime)
-    {
-        return DateTime.ParseExact(dateTime, DatabaseTimeFormat, CultureInfo.InvariantCulture);
+        if (begin != null && end != null)
+        {
+            filterFunc = c =>
+                c.Date > begin &&
+                c.Date < end;
+        }
+        else if (begin != null)
+        {
+            filterFunc = c => c.Date > begin;
+        }
+        else if (end != null)
+        {
+            filterFunc = c => c.Date < end;
+        }
+        else
+        {
+            filterFunc = c => true;
+        }
+
+        return filterFunc;
     }
 }
