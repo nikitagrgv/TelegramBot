@@ -1,5 +1,6 @@
 ﻿using System.Data.Common;
 using System.Globalization;
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 
 namespace TelegramBot;
@@ -50,10 +51,36 @@ public class BotDatabase : IDisposable, IBotDatabase
     async Task<double> IBotDatabase.GetConsumedKcalAsync(DateTime? optionalBegin, DateTime? optionalEnd,
         long userId)
     {
+        Expression<Func<ConsumedRow, bool>> expression;
+        if (optionalBegin != null && optionalEnd != null)
+        {
+            expression = c =>
+                c.UserId == userId &&
+                c.Date > optionalBegin &&
+                c.Date < optionalEnd;
+        }
+        else if (optionalBegin != null)
+        {
+            expression = c =>
+                c.UserId == userId &&
+                c.Date > optionalBegin;
+        }
+        else if (optionalEnd != null)
+        {
+            expression = c =>
+                c.UserId == userId &&
+                c.Date < optionalEnd;
+        }
+        else
+        {
+            expression = c => c.UserId == userId;
+        }
+
+        // = c => c.UserId == userId;
         double value = await _dbContext
             .Consumed
             .AsNoTracking()
-            .Where(c => c.UserId == userId)
+            .Where(expression)
             .SumAsync(c => c.Kcal ?? 0);
         return value;
         // if (optionalBegin is { } begin && optionalEnd is { } end)
