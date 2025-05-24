@@ -48,23 +48,23 @@ public class BotDatabase : IDisposable, IBotDatabase
         return true;
     }
 
-    private Expression<Func<ConsumedRow, bool>> BuildFilterFunction(DateTime? optionalBegin, DateTime? optionalEnd)
+    private Expression<Func<ConsumedRow, bool>> BuildFilterFunction(DateTime? begin, DateTime? end)
     {
         Expression<Func<ConsumedRow, bool>> filterFunc;
 
-        if (optionalBegin != null && optionalEnd != null)
+        if (begin != null && end != null)
         {
             filterFunc = c =>
-                c.Date > optionalBegin &&
-                c.Date < optionalEnd;
+                c.Date > begin &&
+                c.Date < end;
         }
-        else if (optionalBegin != null)
+        else if (begin != null)
         {
-            filterFunc = c => c.Date > optionalBegin;
+            filterFunc = c => c.Date > begin;
         }
-        else if (optionalEnd != null)
+        else if (end != null)
         {
-            filterFunc = c => c.Date < optionalEnd;
+            filterFunc = c => c.Date < end;
         }
         else
         {
@@ -74,10 +74,9 @@ public class BotDatabase : IDisposable, IBotDatabase
         return filterFunc;
     }
 
-    async Task<double> IBotDatabase.GetConsumedKcalAsync(DateTime? optionalBegin, DateTime? optionalEnd,
-        long userId)
+    async Task<double> IBotDatabase.GetConsumedKcalAsync(DateTime? begin, DateTime? end, long userId)
     {
-        Expression<Func<ConsumedRow, bool>> filterDateFunction = BuildFilterFunction(optionalBegin, optionalEnd);
+        Expression<Func<ConsumedRow, bool>> filterDateFunction = BuildFilterFunction(begin, end);
 
         double value = await _dbContext
             .Consumed
