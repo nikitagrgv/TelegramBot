@@ -35,6 +35,7 @@ public class BotDatabase : IDisposable, IBotDatabase
         var entity = await _dbContext
             .Users
             .FindAsync(userId);
+
         if (entity == null)
         {
             return false;
