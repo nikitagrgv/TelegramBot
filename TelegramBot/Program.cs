@@ -38,7 +38,7 @@ class Program
         return config ?? new Config();
     }
 
-    private static string? GetToken(Config? config)
+    private static string? GetToken(Config config)
     {
         string? str = Environment.GetEnvironmentVariable("BOT_TOKEN");
         if (!string.IsNullOrEmpty(str))
@@ -47,7 +47,7 @@ class Program
             return str;
         }
 
-        str = config?.BotToken;
+        str = config.BotToken;
         if (str != null)
         {
             Console.WriteLine("Get token from config");
@@ -195,7 +195,7 @@ class Program
     {
         Console.WriteLine("TelegramBot");
 
-        Config? config = GetConfig();
+        Config config = GetConfig();
 
         string? token = GetToken(config);
         if (string.IsNullOrEmpty(token))
