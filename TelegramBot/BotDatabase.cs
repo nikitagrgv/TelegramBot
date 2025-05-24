@@ -60,13 +60,11 @@ public class BotDatabase : IDisposable, IBotDatabase
         }
         else if (optionalBegin != null)
         {
-            filterFunc = c =>
-                c.Date > optionalBegin;
+            filterFunc = c => c.Date > optionalBegin;
         }
         else if (optionalEnd != null)
         {
-            filterFunc = c =>
-                c.Date < optionalEnd;
+            filterFunc = c => c.Date < optionalEnd;
         }
         else
         {
