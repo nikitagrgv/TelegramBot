@@ -77,7 +77,6 @@ class Program
     }
 
 
-    
     static async Task Main()
     {
         Console.WriteLine("TelegramBot");
@@ -106,20 +105,12 @@ class Program
 
         Console.WriteLine($"Admin ID is {adminId}");
 
-        await using var db = new AppDbContext();
-        await db.Database.EnsureCreatedAsync();
-        
-        await db.Database.MigrateAsync();
+        await using var dbContext = new AppDbContext();
+        await dbContext.Database.EnsureCreatedAsync();
 
-        return;
+        await dbContext.Database.MigrateAsync();
 
-        var database = new BotDatabase("ConsumeDatabase.sqlite");
-
-        if (!await database.InitializeAsync())
-        {
-            Console.WriteLine("Can't open the database");
-            return;
-        }
+        var database = new BotDatabase(dbContext);
 
         Console.WriteLine("Database initialized");
 
