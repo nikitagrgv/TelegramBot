@@ -101,92 +101,17 @@ public class BotDatabase : IDisposable, IBotDatabase
         return entity;
     }
 
-    async Task<List<ConsumedRow>> IBotDatabase.GetStatAsync(DateTime? optionalBegin, DateTime? optionalEnd,
-        long? userId)
+    async Task<List<ConsumedRow>> IBotDatabase.GetStatAsync(DateTime? begin, DateTime? end, long? userId)
     {
+        Expression<Func<ConsumedRow, bool>> filterDateFunction = BuildFilterDateFunction(begin, end);
+        Expression<Func<ConsumedRow, bool>> filterUserFunction = BuildFilterUserIdFunction(userId);
+
         var entities = await _dbContext
             .Consumed
             .AsNoTracking()
-            .Where()
-        return new List<ConsumedRow>();
-//         if (optionalBegin is { } begin && optionalEnd is { } end)
-//         {
-//             string userIdString = userId == null ? "" : "user_id = @id AND";
-//             string sql = $"""
-//                           SELECT *
-//                           FROM consumed
-//                           WHERE
-//                               {userIdString}
-//                               date BETWEEN @begin AND @end
-//                           ORDER BY date;
-//                           """;
-//             await using var cmd = new SQLiteCommand(sql, _connection);
-//             cmd.Parameters.AddWithValue("begin", ToDatabaseTimeFormat(begin));
-//             cmd.Parameters.AddWithValue("end", ToDatabaseTimeFormat(end));
-//             if (userId != null)
-//             {
-//                 cmd.Parameters.AddWithValue("id", userId);
-//             }
-//
-//             return await ExecuteConsumedAndGetAllAsync(cmd);
-//         }
-//
-//         if (optionalBegin is { } singleBegin)
-//         {
-//             string userIdString = userId == null ? "" : "user_id = @id AND";
-//             string sql = $"""
-//                           SELECT *
-//                           FROM consumed
-//                           WHERE
-//                               {userIdString}
-//                               date >= @begin
-//                           ORDER BY date;
-//                           """;
-//             await using var cmd = new SQLiteCommand(sql, _connection);
-//             cmd.Parameters.AddWithValue("begin", ToDatabaseTimeFormat(singleBegin));
-//             if (userId != null)
-//             {
-//                 cmd.Parameters.AddWithValue("id", userId);
-//             }
-//
-//             return await ExecuteConsumedAndGetAllAsync(cmd);
-//         }
-//
-//         if (optionalEnd is { } singleEnd)
-//         {
-//             string userIdString = userId == null ? "" : "user_id = @id AND";
-//             string sql = $"""
-//                           SELECT *
-//                           FROM consumed
-//                           WHERE
-//                               {userIdString}
-//                               date <= @end
-//                           ORDER BY date;
-//                           """;
-//             await using var cmd = new SQLiteCommand(sql, _connection);
-//             cmd.Parameters.AddWithValue("end", ToDatabaseTimeFormat(singleEnd));
-//             if (userId != null)
-//             {
-//                 cmd.Parameters.AddWithValue("id", userId);
-//             }
-//
-//             return await ExecuteConsumedAndGetAllAsync(cmd);
-//         }
-//
-//         string everythingEserIdString = userId == null ? "" : "WHERE user_id = @id";
-//         string everythingSql = $"""
-//                                 SELECT *
-//                                 FROM consumed
-//                                 {everythingEserIdString}
-//                                 ORDER BY date;
-//                                 """;
-//         await using var everythingCmd = new SQLiteCommand(everythingSql, _connection);
-//         if (userId != null)
-//         {
-//             everythingCmd.Parameters.AddWithValue("id", userId);
-//         }
-//
-//         return await ExecuteConsumedAndGetAllAsync(everythingCmd);
+            .Where(filterUserFunction)
+            .Where(filterDateFunction)
+            .ToListAsync();
     }
 
     // private async Task<ConsumedRowInfo?> ExecuteConsumedAndGetOneAsync(SQLiteCommand cmd)
