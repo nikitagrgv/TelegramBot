@@ -73,7 +73,8 @@ public class BotDatabase : IDisposable, IBotDatabase
         }
         else
         {
-            expression = c => c.UserId == userId;
+            expression = c =>
+                c.UserId == userId;
         }
 
         // = c => c.UserId == userId;
