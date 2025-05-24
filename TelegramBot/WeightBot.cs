@@ -242,7 +242,7 @@ public partial class WeightBot
 
         DateTime now = DateTime.UtcNow;
 
-        ConsumedRowInfo? row = await _database.AddConsumedAsync(userId, name, kcal, now);
+        ConsumedRow? row = await _database.AddConsumedAsync(userId, name, kcal, now);
 
         if (row == null)
         {
@@ -277,7 +277,7 @@ public partial class WeightBot
             return;
         }
 
-        ConsumedRowInfo? row = await _database.RemoveConsumedAsync(consumedId, force ? null : userId);
+        ConsumedRow? row = await _database.RemoveConsumedAsync(consumedId, force ? null : userId);
 
         if (row == null)
         {
@@ -357,7 +357,7 @@ public partial class WeightBot
         ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        List<ConsumedRowInfo> dbRows = await _database.GetStatAsync(begin, end, userId);
+        List<ConsumedRow> dbRows = await _database.GetStatAsync(begin, end, userId);
 
         const string idRowName = "ID";
         const string nameRowName = "Name";
@@ -376,7 +376,7 @@ public partial class WeightBot
             idSize = Int32.Max(idSize, row.Id.Length);
         }
 
-        double consumedToday = dbRows.Any() ? dbRows.Sum(row => row.Kcal) : 0;
+        double consumedToday = dbRows.Any() ? dbRows.Sum(row => row.Kcal ?? 0) : 0;
 
         int tableLengthBudget = strRows.Count >= 5 ? 36 : 30;
         int nameSize = int.Max(6, tableLengthBudget - kcalSize - dateSize - idSize);
@@ -422,7 +422,7 @@ public partial class WeightBot
             return;
         }
 
-        List<ConsumedRowInfo> dbRows = await _database.GetStatAsync(null, null, null);
+        List<ConsumedRow> dbRows = await _database.GetStatAsync(null, null, null);
 
         const string idRowName = "ID";
         const string userRowName = "User";
@@ -613,14 +613,14 @@ public partial class WeightBot
         return dayBeginUser.AddHours(-timeZone);
     }
 
-    private static ConsumedRowInfoStrings DbRowToUserStringRow(ConsumedRowInfo row, int timezone, string timeFormat)
+    private static ConsumedRowInfoStrings DbRowToUserStringRow(ConsumedRow row, int timezone, string timeFormat)
     {
         return new ConsumedRowInfoStrings(
             Id: row.Id.ToString(),
             UserId: row.UserId.ToString(),
             Date: FromDatabaseToUserTimeFormat(row.Date, timezone, timeFormat),
             Text: row.Text,
-            Kcal: row.Kcal.ToString("F"));
+            Kcal: row.Kcal?.ToString("F") ?? "-");
     }
 
     private static string FromDatabaseToUserTimeFormat(DateTime date, int timeZone, string format)
