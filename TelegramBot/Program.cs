@@ -221,6 +221,8 @@ class Program
 
         await using var db = new AppDbContext();
         await db.Database.EnsureCreatedAsync();
+        
+        await db.Database.MigrateAsync();
 
         return;
 
