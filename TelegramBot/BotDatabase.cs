@@ -1,5 +1,6 @@
 ﻿using System.Data.Common;
 using System.Globalization;
+using Microsoft.EntityFrameworkCore;
 
 namespace TelegramBot;
 
@@ -22,7 +23,10 @@ public class BotDatabase : IDisposable, IBotDatabase
 
     async Task<double?> IBotDatabase.GetMaxKcalAsync(long userId)
     {
-        var entity = await _dbContext.Users.FindAsync(userId);
+        var entity = await _dbContext
+            .Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == userId);
         return entity?.MaxKcal ?? null;
     }
 
