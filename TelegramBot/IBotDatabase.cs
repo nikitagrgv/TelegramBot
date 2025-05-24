@@ -5,7 +5,7 @@ public interface IBotDatabase
     public Task<bool> HasUserIdAsync(long userId);
     public Task<bool> RegisterUserIdAsync(long userId, DateTime date);
 
-    public Task<ConsumedRow?> AddConsumedAsync(long userId, string name, double kcal, DateTime date);
+    public Task<ConsumedRow?> AddConsumedAsync(long userId, string name, double? kcal, DateTime date);
     public Task<ConsumedRow?> RemoveConsumedAsync(long id, long? userId);
 
     public Task<double> GetConsumedKcalAsync(DateTime? optionalBegin, DateTime? optionalEnd, long userId);

@@ -231,7 +231,7 @@ public partial class WeightBot
         string name = m.Groups["name"].Value;
         string kcalString = m.Groups["kcal"].Value;
 
-        double kcal = 0;
+        double? kcal = 0;
         if (!string.IsNullOrEmpty(kcalString) && !TryParseDouble(kcalString, out kcal))
         {
             string invalidCommandMessage =
@@ -630,7 +630,7 @@ public partial class WeightBot
     }
 
     // TODO: shit?
-    private static bool TryParseDouble(string s, out double result)
+    private static bool TryParseDouble(string s, out double? result)
     {
         result = 0;
         if (string.IsNullOrWhiteSpace(s))
@@ -643,10 +643,20 @@ public partial class WeightBot
             .Replace(",", sep.ToString())
             .Replace(".", sep.ToString());
 
-        return double.TryParse(normalized,
-            NumberStyles.Number,
-            CultureInfo.CurrentCulture,
-            out result);
+
+        if (double.TryParse(normalized,
+                NumberStyles.Number,
+                CultureInfo.CurrentCulture,
+                out double validResult))
+        {
+            result = validResult;
+            return true;
+        }
+        else
+        {
+            result = null;
+            return false;
+        }
     }
 
     [GeneratedRegex(@"^\s*/?(?<cmd>[а-яА-Яa-zA-Z0-9_]+)(?:\s+(?<args>\S(?:.*\S)?))?\s*$")]

@@ -87,9 +87,16 @@ public class BotDatabase : IDisposable, IBotDatabase
         return value;
     }
 
-    async Task<ConsumedRow?> IBotDatabase.AddConsumedAsync(long userId, string name, double kcal, DateTime date)
+    async Task<ConsumedRow?> IBotDatabase.AddConsumedAsync(long userId, string name, double? kcal, DateTime date)
     {
-        return new ConsumedRow();
+        var newConsumedRow = new ConsumedRow()
+        {
+            UserId = userId,
+            Date = date,
+            Text = name,
+            Kcal = kcal
+        }
+        // return new ConsumedRow();
         // string sql = """
         //              INSERT INTO consumed (user_id, date, text, kcal)
         //              VALUES (@user_id, @date, @text, @kcal)
