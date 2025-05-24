@@ -48,7 +48,7 @@ public class BotDatabase : IDisposable, IBotDatabase
         return true;
     }
 
-    private Expression<Func<ConsumedRow, bool>> BuildFilterFunction(DateTime? begin, DateTime? end)
+    private static Expression<Func<ConsumedRow, bool>> BuildFilterFunction(DateTime? begin, DateTime? end)
     {
         Expression<Func<ConsumedRow, bool>> filterFunc;
 
