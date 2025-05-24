@@ -89,16 +89,22 @@ public class BotDatabase : IDisposable, IBotDatabase
 
     async Task<ConsumedRow?> IBotDatabase.AddConsumedAsync(long userId, string name, double? kcal, DateTime date)
     {
-        var newConsumedRow = new ConsumedRow()
-        {
-            UserId = userId,
-            Date = date,
-            Text = name,
-            Kcal = kcal
-        };
-        await _dbContext.Consumed.AddAsync(newConsumedRow);
 
-        return newConsumedRow;
+        return null;
+        // var newConsumedRow = new ConsumedRow()
+        // {
+        //     UserId = userId,
+        //     Date = date,
+        //     Text = name,
+        //     Kcal = kcal
+        // };
+        // await _dbContext.Consumed.AddAsync(newConsumedRow);
+        //
+        // await _dbContext.SaveChangesAsync();
+        //
+        // return newConsumedRow;
+
+
         // return new ConsumedRow();
         // string sql = """
         //              INSERT INTO consumed (user_id, date, text, kcal)
