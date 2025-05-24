@@ -32,16 +32,18 @@ public class BotDatabase : IDisposable, IBotDatabase
 
     async Task<bool> IBotDatabase.SetMaxKcalAsync(long userId, double? maxKcal)
     {
+        var entity = await _dbContext
+            .Users
+            .FindAsync(userId);
+        if (entity == null)
+        {
+            return false;
+        }
+
+        entity.MaxKcal = maxKcal;
+
+        await _dbContext.SaveChangesAsync();
         return true;
-        // const string sql = """
-        //                    UPDATE users
-        //                    SET max_kcal = @max_kcal
-        //                    WHERE id = @id
-        //                    """;
-        // await using var cmd = new SQLiteCommand(sql, _connection);
-        // cmd.Parameters.AddWithValue("@id", userId);
-        // cmd.Parameters.AddWithValue("@max_kcal", maxKcal);
-        // return await cmd.ExecuteNonQueryAsync() != 0;
     }
 
     async Task<double> IBotDatabase.GetConsumedKcalAsync(DateTime? optionalBegin, DateTime? optionalEnd,
