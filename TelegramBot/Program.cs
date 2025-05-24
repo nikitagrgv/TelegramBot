@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -62,26 +61,24 @@ class Program
         return null;
     }
 
-    [Table("users")]
     public class UserRow
     {
-        [Column("id")] public long Id { get; set; }
-        [Column("register_date")] public DateTime RegisterDate { get; set; }
-        [Column("timezone")] public int? DateTimeOffset { get; set; }
-        [Column("min_kcal")] public double? MinKcal { get; set; }
-        [Column("max_kcal")] public double? MaxKcal { get; set; }
+        public long Id { get; set; }
+        public DateTime RegisterDate { get; set; }
+        public int? DateTimeOffset { get; set; }
+        public double? MinKcal { get; set; }
+        public double? MaxKcal { get; set; }
 
         public ICollection<ConsumedRow> ConsumedItems { get; set; }
     }
 
-    [Table("consumed")]
     public class ConsumedRow
     {
-        [Column("id")] public long Id { get; set; }
-        [Column("user_id")] public long UserId { get; set; }
-        [Column("user_date")] public DateTime Date { get; set; }
-        [Column("user_date")] public string Text { get; set; }
-        [Column("user_date")] public double? Kcal { get; set; }
+        public long Id { get; set; }
+        public long UserId { get; set; }
+        public DateTime Date { get; set; }
+        public string Text { get; set; }
+        public double? Kcal { get; set; }
 
         public UserRow User { get; set; }
     }
