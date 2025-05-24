@@ -96,7 +96,7 @@ public class BotDatabase : IDisposable, IBotDatabase
             Text = name,
             Kcal = kcal
         };
-        
+
         await _dbContext.Consumed.AddAsync(newConsumedRow);
 
         await _dbContext.SaveChangesAsync();
@@ -106,26 +106,20 @@ public class BotDatabase : IDisposable, IBotDatabase
 
     async Task<ConsumedRow?> IBotDatabase.RemoveConsumedAsync(long id, long? userId)
     {
-        return new ConsumedRow();
+        ConsumedRow? entity = await _dbContext
+            .Consumed
+            .FindAsync(id);
 
-//         string userIdString = userId == null ? "" : "user_id = @user_id AND";
-//         string sql = $"""
-//                       DELETE
-//                       FROM consumed
-//                       WHERE
-//                           {userIdString}
-//                           id = @id
-//                       RETURNING *;
-//                       """;
-//         await using var cmd = new SQLiteCommand(sql, _connection);
-//         if (userId != null)
-//         {
-//             cmd.Parameters.AddWithValue("user_id", userId);
-//         }
-//
-//         cmd.Parameters.AddWithValue("id", id);
-//
-//         return await ExecuteConsumedAndGetOneAsync(cmd);
+        if (entity == null)
+        {
+            return null;
+        }
+
+        _dbContext.Consumed.Remove(entity);
+
+        await _dbContext.SaveChangesAsync();
+
+        return entity;
     }
 
     async Task<List<ConsumedRow>> IBotDatabase.GetStatAsync(DateTime? optionalBegin, DateTime? optionalEnd,
