@@ -97,7 +97,6 @@ public class BotDatabase : IDisposable, IBotDatabase
         _dbContext.Consumed.Remove(entity);
 
         await _dbContext.SaveChangesAsync();
-
         return entity;
     }
 
