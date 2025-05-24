@@ -162,16 +162,6 @@ public class BotDatabase : IDisposable, IBotDatabase
         await _dbContext.SaveChangesAsync();
 
         return true;
-
-        return true;
-        // string sql = """
-        //              INSERT INTO users (id, register_date)
-        //              VALUES (@id, @date);
-        //              """;
-        // await using var cmd = new SQLiteCommand(sql, _connection);
-        // cmd.Parameters.AddWithValue("id", userId);
-        // cmd.Parameters.AddWithValue("date", ToDatabaseTimeFormat(date));
-        // return await cmd.ExecuteNonQueryAsync() != 0;
     }
 
     protected virtual void Dispose(bool disposing)
