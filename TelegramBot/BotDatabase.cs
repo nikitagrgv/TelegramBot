@@ -115,7 +115,7 @@ public class BotDatabase : IDisposable, IBotDatabase
             return null;
         }
 
-        if (entity.UserId != userId)
+        if (userId != null && entity.UserId != userId)
         {
             return null;
         }
