@@ -378,7 +378,10 @@ public class BotDatabase : IDisposable, IBotDatabase
 
     private static Expression<Func<ConsumedRow, bool>> BuildFilterUserIdFunction(long? userId)
     {
-        if (userId == null) return c => true;
+        if (userId == null)
+        {
+            return c => true;
+        }
 
         return c => c.UserId == userId;
     }
