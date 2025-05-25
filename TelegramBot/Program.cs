@@ -19,7 +19,7 @@ public struct Config
     public string? AdminId { get; init; } = null;
 }
 
-class Program
+internal class Program
 {
     private static Config GetConfig()
     {
@@ -77,25 +77,19 @@ class Program
     }
 
 
-    static async Task Main()
+    private static async Task Main()
     {
         Console.WriteLine("TelegramBot");
 
         Config config = GetConfig();
 
         string? token = GetToken(config);
-        if (string.IsNullOrEmpty(token))
-        {
-            return;
-        }
+        if (string.IsNullOrEmpty(token)) return;
 
         Console.WriteLine($"Token length is {token.Length}");
 
         string? adminIdString = GetAdminIdString(config);
-        if (string.IsNullOrEmpty(adminIdString))
-        {
-            return;
-        }
+        if (string.IsNullOrEmpty(adminIdString)) return;
 
         if (!long.TryParse(adminIdString, out long adminId))
         {
@@ -114,7 +108,7 @@ class Program
 
         Console.WriteLine("Database initialized");
 
-        CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
+        var cancelTokenSource = new CancellationTokenSource();
 
         Console.CancelKeyPress += (_, e) =>
         {

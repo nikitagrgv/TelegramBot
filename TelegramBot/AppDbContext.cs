@@ -1,8 +1,8 @@
-﻿namespace TelegramBot;
-
-using System.Globalization;
+﻿using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+
+namespace TelegramBot;
 
 public class AppDbContext : DbContext
 {

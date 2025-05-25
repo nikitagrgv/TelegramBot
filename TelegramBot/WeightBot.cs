@@ -1,12 +1,11 @@
 ﻿using System.Globalization;
 using System.Text.RegularExpressions;
+using Telegram.Bot;
+using Telegram.Bot.Polling;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace TelegramBot;
-
-using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Polling;
-using Telegram.Bot.Types.Enums;
 
 public partial class WeightBot
 {
@@ -33,10 +32,10 @@ public partial class WeightBot
 
         var receiverOptions = new ReceiverOptions
         {
-            AllowedUpdates = [],
+            AllowedUpdates = []
         };
 
-        User me = await botClient.GetMe(cancellationToken: _cancelTokenSource.Token);
+        User me = await botClient.GetMe(_cancelTokenSource.Token);
         Console.WriteLine($"Start listening @{me.Username}");
 
 
@@ -45,30 +44,25 @@ public partial class WeightBot
             new("start", "Get the help"),
             new("stat", "Print consumed kcal by the current day"),
             new("daystat", "Print all consumed products by the current day"),
-            new("longstat", "Print all consumed products by all the time"),
+            new("longstat", "Print all consumed products by all the time")
         ];
         await botClient.SetMyCommands(commands, cancellationToken: _cancelTokenSource.Token);
 
         await botClient.ReceiveAsync(
-            updateHandler: HandleUpdateAsync,
-            errorHandler: HandleErrorAsync,
-            receiverOptions: receiverOptions,
-            cancellationToken: _cancelTokenSource.Token);
+            HandleUpdateAsync,
+            HandleErrorAsync,
+            receiverOptions,
+            _cancelTokenSource.Token);
     }
 
 
     private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
         CancellationToken cancellationToken)
     {
-        if (update.Message is { } message)
-        {
-            await HandleMessageAsync(message, botClient, cancellationToken);
-        }
+        if (update.Message is { } message) await HandleMessageAsync(message, botClient, cancellationToken);
 
         if (update.CallbackQuery is { } callbackQuery)
-        {
             await HandleCallbackQueryAsync(callbackQuery, botClient, cancellationToken);
-        }
     }
 
     private async Task HandleCallbackQueryAsync(CallbackQuery callbackQuery, ITelegramBotClient botClient,
@@ -76,10 +70,7 @@ public partial class WeightBot
     {
         if (callbackQuery.From is not { Id: var userId }) return;
 
-        if (!await RegisterUserIfNotRegisteredAsync(userId, botClient, cancellationToken))
-        {
-            return;
-        }
+        if (!await RegisterUserIfNotRegisteredAsync(userId, botClient, cancellationToken)) return;
 
         if (callbackQuery.Data is not { } queryData) return;
 
@@ -97,10 +88,7 @@ public partial class WeightBot
     {
         if (message.From is not { Id: var userId }) return;
 
-        if (!await RegisterUserIfNotRegisteredAsync(userId, botClient, cancellationToken))
-        {
-            return;
-        }
+        if (!await RegisterUserIfNotRegisteredAsync(userId, botClient, cancellationToken)) return;
 
         if (message.Text is not { } userText) return;
 
@@ -132,11 +120,10 @@ public partial class WeightBot
         string cmdLower = cmd.ToLower();
 
         if (IsAdmin(userId))
-        {
             switch (cmdLower)
             {
                 case "removeforce":
-                    await RemoveConsumedAsync(args, userId, force: true, botClient, cancellationToken);
+                    await RemoveConsumedAsync(args, userId, true, botClient, cancellationToken);
                     return;
                 case "superstat":
                     await PrintSuperStatAsync(userId, botClient, cancellationToken);
@@ -145,7 +132,6 @@ public partial class WeightBot
                     await ShutdownBot(userId, botClient, cancellationToken);
                     return;
             }
-        }
 
         switch (cmdLower)
         {
@@ -167,7 +153,7 @@ public partial class WeightBot
             case "удалить":
             case "делит":
             case "дел":
-                await RemoveConsumedAsync(args, userId, force: false, botClient, cancellationToken);
+                await RemoveConsumedAsync(args, userId, false, botClient, cancellationToken);
                 return;
             case "stat":
             case "стат":
@@ -190,7 +176,7 @@ public partial class WeightBot
                 await SetMaxKcalAsync(args, userId, botClient, cancellationToken);
                 return;
             default:
-                string message = $"Unknown command: {cmd}. Type /start to see a list of available commands.";
+                var message = $"Unknown command: {cmd}. Type /start to see a list of available commands.";
                 await botClient.SendMessage(userId, message, cancellationToken: cancellationToken);
                 return;
         }
@@ -199,12 +185,9 @@ public partial class WeightBot
     private async Task ShutdownBot(long userId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        if (!IsAdmin(userId))
-        {
-            return;
-        }
+        if (!IsAdmin(userId)) return;
 
-        string message = "Shutdown...";
+        var message = "Shutdown...";
         await botClient.SendMessage(userId, message, cancellationToken: cancellationToken);
         _cancelTokenSource.CancelAfter(1000);
     }
@@ -222,7 +205,7 @@ public partial class WeightBot
 
         if (!m.Success)
         {
-            string invalidCommandMessage =
+            var invalidCommandMessage =
                 $"Sorry, I didn't understand your 'add' command. Invalid arguments: '{args}'. Type /start to see a list of available commands.";
             await botClient.SendMessage(userId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
@@ -234,7 +217,7 @@ public partial class WeightBot
         double? kcal = 0;
         if (!string.IsNullOrEmpty(kcalString) && !TryParseDouble(kcalString, out kcal))
         {
-            string invalidCommandMessage =
+            var invalidCommandMessage =
                 $"Sorry, I didn't understand your 'add' command. Invalid kcal number: '{kcalString}'. Type /start to see a list of available commands.";
             await botClient.SendMessage(userId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
@@ -246,7 +229,7 @@ public partial class WeightBot
 
         if (row == null)
         {
-            string errorMessage =
+            var errorMessage =
                 $"Database error. Can't add the row. User ID: '{userId}', name: '{name}', kcal: '{kcal}'";
             await botClient.SendMessage(userId, errorMessage, cancellationToken: cancellationToken);
             return;
@@ -254,13 +237,13 @@ public partial class WeightBot
 
         int timeZone = await _database.GetUserTimezoneOffsetAsync(userId) ?? 0;
 
-        string message = $"""
-                          🍽️ Added
-                          🍽️ {row.Text}
-                          🔥 {row.Kcal} kcal
-                          📅 {FromDatabaseToUserTimeFormat(row.Date, timeZone, LongUserTimeFormat)}
-                          🆔 {row.Id}
-                          """;
+        var message = $"""
+                       🍽️ Added
+                       🍽️ {row.Text}
+                       🔥 {row.Kcal} kcal
+                       📅 {FromDatabaseToUserTimeFormat(row.Date, timeZone, LongUserTimeFormat)}
+                       🆔 {row.Id}
+                       """;
         await botClient.SendMessage(userId, message, cancellationToken: cancellationToken);
 
         await PrintShortStatAsync(userId, botClient, cancellationToken);
@@ -271,7 +254,7 @@ public partial class WeightBot
     {
         if (!long.TryParse(args.Trim(), out long consumedId) || consumedId < 0)
         {
-            string invalidCommandMessage =
+            var invalidCommandMessage =
                 $"Sorry, I didn't understand your 'remove' command. Invalid id: '{args}'. Type /start to see a list of available commands.";
             await botClient.SendMessage(userId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
@@ -281,7 +264,7 @@ public partial class WeightBot
 
         if (row == null)
         {
-            string errorMessage =
+            var errorMessage =
                 $"Database error. Can't remove the row. User ID: '{userId}', consumed ID: '{consumedId}'";
             await botClient.SendMessage(userId, errorMessage, cancellationToken: cancellationToken);
             return;
@@ -289,13 +272,13 @@ public partial class WeightBot
 
         int timeZone = await _database.GetUserTimezoneOffsetAsync(userId) ?? 0;
 
-        string message = $"""
-                          🗑️ Removed
-                          🍽 {row.Text}
-                          🔥 {row.Kcal} kcal
-                          📅 {FromDatabaseToUserTimeFormat(row.Date, timeZone, LongUserTimeFormat)}
-                          🆔 {row.Id}
-                          """;
+        var message = $"""
+                       🗑️ Removed
+                       🍽 {row.Text}
+                       🔥 {row.Kcal} kcal
+                       📅 {FromDatabaseToUserTimeFormat(row.Date, timeZone, LongUserTimeFormat)}
+                       🆔 {row.Id}
+                       """;
         await botClient.SendMessage(userId, message, cancellationToken: cancellationToken);
 
         await PrintShortStatAsync(userId, botClient, cancellationToken);
@@ -314,16 +297,12 @@ public partial class WeightBot
         string message;
         if (limit != null)
         {
-            int consumedPercents = (int)(consumed / limit * 100);
+            var consumedPercents = (int)(consumed / limit * 100);
             message = $"🔥 Consumed Today: {consumed} / {limit} kcal ({consumedPercents} %)\n";
             if (consumed < limit)
-            {
                 message += $"✅ {limit - consumed} kcal left\n";
-            }
             else
-            {
                 message += $"❌ {consumed - limit} kcal overeat!\n";
-            }
         }
         else
         {
@@ -372,8 +351,8 @@ public partial class WeightBot
         int idSize = idRowName.Length;
         foreach (ConsumedRowInfoStrings row in strRows)
         {
-            kcalSize = Int32.Max(kcalSize, row.Kcal.Length);
-            idSize = Int32.Max(idSize, row.Id.Length);
+            kcalSize = int.Max(kcalSize, row.Kcal.Length);
+            idSize = int.Max(idSize, row.Id.Length);
         }
 
         double consumedToday = dbRows.Any() ? dbRows.Sum(row => row.Kcal ?? 0) : 0;
@@ -381,9 +360,9 @@ public partial class WeightBot
         int tableLengthBudget = strRows.Count >= 5 ? 36 : 30;
         int nameSize = int.Max(6, tableLengthBudget - kcalSize - dateSize - idSize);
 
-        string rowFormat = $"{{0, {idSize}}}| {{1, -{nameSize}}}| {{2, {kcalSize}}}| {{3, {dateSize}}}\n";
+        var rowFormat = $"{{0, {idSize}}}| {{1, -{nameSize}}}| {{2, {kcalSize}}}| {{3, {dateSize}}}\n";
 
-        string message = "";
+        var message = "";
         message += titleMessage + '\n';
         message += $"🌍 Time Zone: {timeZone:+#;-#;0}\n";
         message += $"🔥 Consumed: {consumedToday} kcal\n";
@@ -393,9 +372,8 @@ public partial class WeightBot
 
         foreach (ConsumedRowInfoStrings row in strRows)
         {
-            bool firstRow = true;
+            var firstRow = true;
             foreach (string chunk in Utils.SplitStringByChunks(row.Text, nameSize))
-            {
                 if (firstRow)
                 {
                     message += string.Format(rowFormat, row.Id, chunk, row.Kcal, row.Date);
@@ -405,7 +383,6 @@ public partial class WeightBot
                 {
                     message += string.Format(rowFormat, string.Empty, chunk, string.Empty, string.Empty);
                 }
-            }
         }
 
         message += "</pre>";
@@ -417,10 +394,7 @@ public partial class WeightBot
         ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        if (!IsAdmin(userId))
-        {
-            return;
-        }
+        if (!IsAdmin(userId)) return;
 
         List<ConsumedRow> dbRows = await _database.GetStatAsync(null, null, null);
 
@@ -441,28 +415,27 @@ public partial class WeightBot
         int dateSize = timeRowName.Length;
         foreach (ConsumedRowInfoStrings row in strRows)
         {
-            idSize = Int32.Max(idSize, row.Id.Length);
-            userIdSize = Int32.Max(userIdSize, row.UserId.Length);
-            kcalSize = Int32.Max(kcalSize, row.Kcal.Length);
-            dateSize = Int32.Max(dateSize, row.Date.Length);
+            idSize = int.Max(idSize, row.Id.Length);
+            userIdSize = int.Max(userIdSize, row.UserId.Length);
+            kcalSize = int.Max(kcalSize, row.Kcal.Length);
+            dateSize = int.Max(dateSize, row.Date.Length);
         }
 
         int tableLengthBudget = strRows.Count >= 5 ? 36 : 30;
         int nameSize = int.Max(6, tableLengthBudget - kcalSize - dateSize - idSize - userIdSize);
 
-        string rowFormat =
+        var rowFormat =
             $"{{0, {idSize}}}| {{1, {userIdSize}}}| {{2, -{nameSize}}}| {{3, {kcalSize}}}| {{4, {dateSize}}}\n";
 
-        string message = "";
+        var message = "";
 
         message += "<pre>";
         message += string.Format(rowFormat, idRowName, userRowName, nameRowName, kcalRowName, timeRowName);
 
         foreach (ConsumedRowInfoStrings row in strRows)
         {
-            bool firstRow = true;
+            var firstRow = true;
             foreach (string chunk in Utils.SplitStringByChunks(row.Text, nameSize))
-            {
                 if (firstRow)
                 {
                     message += string.Format(rowFormat, row.Id, row.UserId, chunk, row.Kcal, row.Date);
@@ -472,7 +445,6 @@ public partial class WeightBot
                 {
                     message += string.Format(rowFormat, string.Empty, string.Empty, chunk, string.Empty, string.Empty);
                 }
-            }
         }
 
         message += "</pre>";
@@ -485,7 +457,7 @@ public partial class WeightBot
     {
         if (!int.TryParse(args.Trim(), out int timezone) || timezone < 0)
         {
-            string invalidCommandMessage =
+            var invalidCommandMessage =
                 $"Sorry, I didn't understand your 'timezone' command. Invalid offset: '{args}'. Type /start to see a list of available commands.";
             await botClient.SendMessage(userId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
@@ -494,13 +466,13 @@ public partial class WeightBot
         bool success = await _database.SetUserTimezoneOffsetAsync(userId, timezone);
         if (!success)
         {
-            string errorMessage =
+            var errorMessage =
                 $"Database error. Can't set the timezone. User ID: '{userId}', timezone: '{timezone}'";
             await botClient.SendMessage(userId, errorMessage, cancellationToken: cancellationToken);
             return;
         }
 
-        string message = $"Timezone updated: {timezone:+#;-#;0}";
+        var message = $"Timezone updated: {timezone:+#;-#;0}";
         await botClient.SendMessage(userId, message, cancellationToken: cancellationToken);
     }
 
@@ -509,7 +481,7 @@ public partial class WeightBot
     {
         if (!double.TryParse(args.Trim(), out double limit) || limit < 0)
         {
-            string invalidCommandMessage =
+            var invalidCommandMessage =
                 $"Sorry, I didn't understand your 'limit' command. Invalid value: '{args}'. Type /start to see a list of available commands.";
             await botClient.SendMessage(userId, invalidCommandMessage, cancellationToken: cancellationToken);
             return;
@@ -518,23 +490,20 @@ public partial class WeightBot
         bool success = await _database.SetMaxKcalAsync(userId, limit);
         if (!success)
         {
-            string errorMessage =
+            var errorMessage =
                 $"Database error. Can't set the limit. User ID: '{userId}', limit: '{limit}'";
             await botClient.SendMessage(userId, errorMessage, cancellationToken: cancellationToken);
             return;
         }
 
-        string message = $"Limit updated: {limit} kcal";
+        var message = $"Limit updated: {limit} kcal";
         await botClient.SendMessage(userId, message, cancellationToken: cancellationToken);
     }
 
     private async Task<bool> RegisterUserIfNotRegisteredAsync(long userId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
-        if (await _database.HasUserIdAsync(userId))
-        {
-            return true;
-        }
+        if (await _database.HasUserIdAsync(userId)) return true;
 
         DateTime registerDate = DateTime.UtcNow;
 
@@ -609,18 +578,18 @@ public partial class WeightBot
     private static DateTime GetUserDayBeginUtc(int timeZone)
     {
         DateTime curDateUser = DateTime.UtcNow.AddHours(+timeZone);
-        DateTime dayBeginUser = new DateTime(curDateUser.Year, curDateUser.Month, curDateUser.Day, 0, 0, 0);
+        var dayBeginUser = new DateTime(curDateUser.Year, curDateUser.Month, curDateUser.Day, 0, 0, 0);
         return dayBeginUser.AddHours(-timeZone);
     }
 
     private static ConsumedRowInfoStrings DbRowToUserStringRow(ConsumedRow row, int timezone, string timeFormat)
     {
         return new ConsumedRowInfoStrings(
-            Id: row.Id.ToString(),
-            UserId: row.UserId.ToString(),
-            Date: FromDatabaseToUserTimeFormat(row.Date, timezone, timeFormat),
-            Text: row.Text,
-            Kcal: row.Kcal?.ToString("F") ?? "-");
+            row.Id.ToString(),
+            row.UserId.ToString(),
+            FromDatabaseToUserTimeFormat(row.Date, timezone, timeFormat),
+            row.Text,
+            row.Kcal?.ToString("F") ?? "-");
     }
 
     private static string FromDatabaseToUserTimeFormat(DateTime date, int timeZone, string format)
@@ -636,10 +605,10 @@ public partial class WeightBot
         if (string.IsNullOrWhiteSpace(s))
             return false;
 
-        char sep = Convert.ToChar(
+        var sep = Convert.ToChar(
             CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator);
 
-        var normalized = s
+        string normalized = s
             .Replace(",", sep.ToString())
             .Replace(".", sep.ToString());
 
@@ -652,11 +621,9 @@ public partial class WeightBot
             result = validResult;
             return true;
         }
-        else
-        {
-            result = null;
-            return false;
-        }
+
+        result = null;
+        return false;
     }
 
     [GeneratedRegex(@"^\s*/?(?<cmd>[а-яА-Яa-zA-Z0-9_]+)(?:\s+(?<args>\S(?:.*\S)?))?\s*$")]

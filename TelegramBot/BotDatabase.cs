@@ -1,6 +1,4 @@
-﻿using System.Data.Common;
-using System.Globalization;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 
 namespace TelegramBot;
@@ -13,12 +11,6 @@ public class BotDatabase : IDisposable, IBotDatabase
     public BotDatabase(AppDbContext dbContext)
     {
         _dbContext = dbContext;
-    }
-
-    void IDisposable.Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
     }
 
     async Task<double?> IBotDatabase.GetMaxKcalAsync(long userId)
@@ -36,10 +28,7 @@ public class BotDatabase : IDisposable, IBotDatabase
             .Users
             .FindAsync(userId);
 
-        if (entity == null)
-        {
-            return false;
-        }
+        if (entity == null) return false;
 
         entity.MaxKcal = maxKcal;
 
@@ -62,7 +51,7 @@ public class BotDatabase : IDisposable, IBotDatabase
 
     async Task<ConsumedRow?> IBotDatabase.AddConsumedAsync(long userId, string name, double? kcal, DateTime date)
     {
-        var newConsumedRow = new ConsumedRow()
+        var newConsumedRow = new ConsumedRow
         {
             UserId = userId,
             Date = date,
@@ -83,15 +72,9 @@ public class BotDatabase : IDisposable, IBotDatabase
             .Consumed
             .FindAsync(id);
 
-        if (entity == null)
-        {
-            return null;
-        }
+        if (entity == null) return null;
 
-        if (userId != null && entity.UserId != userId)
-        {
-            return null;
-        }
+        if (userId != null && entity.UserId != userId) return null;
 
         _dbContext.Consumed.Remove(entity);
 
@@ -128,10 +111,7 @@ public class BotDatabase : IDisposable, IBotDatabase
             .Users
             .FindAsync(userId);
 
-        if (entity == null)
-        {
-            return false;
-        }
+        if (entity == null) return false;
 
         entity.DateTimeOffset = dateTimeOffset;
 
@@ -151,7 +131,7 @@ public class BotDatabase : IDisposable, IBotDatabase
 
     async Task<bool> IBotDatabase.RegisterUserIdAsync(long userId, DateTime date)
     {
-        var newUser = new UserRow()
+        var newUser = new UserRow
         {
             Id = userId,
             RegisterDate = date
@@ -161,6 +141,12 @@ public class BotDatabase : IDisposable, IBotDatabase
         await _dbContext.SaveChangesAsync();
 
         return true;
+    }
+
+    void IDisposable.Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
     protected virtual void Dispose(bool disposing)
@@ -176,31 +162,20 @@ public class BotDatabase : IDisposable, IBotDatabase
     private static Expression<Func<ConsumedRow, bool>> BuildFilterDateFunction(DateTime? begin, DateTime? end)
     {
         if (begin != null && end != null)
-        {
             return c =>
                 c.Date > begin &&
                 c.Date < end;
-        }
 
-        if (begin != null)
-        {
-            return c => c.Date > begin;
-        }
+        if (begin != null) return c => c.Date > begin;
 
-        if (end != null)
-        {
-            return c => c.Date < end;
-        }
+        if (end != null) return c => c.Date < end;
 
         return c => true;
     }
 
     private static Expression<Func<ConsumedRow, bool>> BuildFilterUserIdFunction(long? userId)
     {
-        if (userId == null)
-        {
-            return c => true;
-        }
+        if (userId == null) return c => true;
 
         return c => c.UserId == userId;
     }
