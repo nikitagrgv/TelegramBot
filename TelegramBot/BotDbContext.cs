@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace TelegramBot;
 
-public class AppDbContext : DbContext
+public class BotDbContext : DbContext
 {
     public DbSet<UserRow> Users { get; set; }
     public DbSet<ConsumedRow> Consumed { get; set; }

@@ -99,7 +99,7 @@ internal class Program
 
         Console.WriteLine($"Admin ID is {adminId}");
 
-        await using var dbContext = new AppDbContext();
+        await using var dbContext = new BotDbContext();
         await dbContext.Database.EnsureCreatedAsync();
 
         await dbContext.Database.MigrateAsync();

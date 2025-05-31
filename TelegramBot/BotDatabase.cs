@@ -5,10 +5,10 @@ namespace TelegramBot;
 
 public class BotDatabase : IDisposable, IBotDatabase
 {
-    private readonly AppDbContext _dbContext;
+    private readonly BotDbContext _dbContext;
     private bool _disposed;
 
-    public BotDatabase(AppDbContext dbContext)
+    public BotDatabase(BotDbContext dbContext)
     {
         _dbContext = dbContext;
     }
