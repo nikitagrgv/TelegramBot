@@ -8,5 +8,5 @@ public class ConsumedRow
     public string Text { get; set; }
     public double? Kcal { get; set; }
 
-    public UserRow User { get; set; }
+    public UserRow? User { get; set; }
 }

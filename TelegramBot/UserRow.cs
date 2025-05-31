@@ -8,5 +8,5 @@ public class UserRow
     public double? MinKcal { get; set; }
     public double? MaxKcal { get; set; }
 
-    public ICollection<ConsumedRow> ConsumedItems { get; set; }
+    public ICollection<ConsumedRow>? ConsumedItems { get; set; }
 }
