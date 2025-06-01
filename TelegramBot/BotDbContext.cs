@@ -86,6 +86,7 @@ public class BotDbContext : DbContext
             entity.Property(c => c.Text)
                 .HasColumnName("text")
                 .HasColumnType("TEXT")
+                .HasMaxLength(100)
                 .IsRequired();
 
             entity.Property(c => c.Kcal)
