@@ -41,6 +41,11 @@ public class BotDbContext : DbContext
                 .HasColumnType("TEXT")
                 .IsRequired();
 
+            entity.Property(u => u.BanDate)
+                .HasColumnName("ban_date")
+                .HasConversion(dateConverter)
+                .HasColumnType("TEXT");
+
             entity.Property(u => u.DateTimeOffset)
                 .HasColumnName("date_time_offset");
 
