@@ -101,7 +101,8 @@ internal class Program
 
         await using var dbContext = new BotDbContext();
 
-        await dbContext.Database.MigrateAsync();
+        await dbContext.Database.EnsureCreatedAsync();
+        // await dbContext.Database.MigrateAsync();
 
         var database = new BotDatabase(dbContext);
 
