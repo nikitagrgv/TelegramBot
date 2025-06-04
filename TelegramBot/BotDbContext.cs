@@ -4,14 +4,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace TelegramBot;
 
-public class BotDbContext : DbContext
+public class BotDbContext(string databasePath) : DbContext
 {
     public DbSet<UserRow> Users { get; set; }
     public DbSet<ConsumedRow> Consumed { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlite("Data Source=ConsumeDatabase.sqlite");
+        optionsBuilder.UseSqlite($"Data Source={databasePath}");
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

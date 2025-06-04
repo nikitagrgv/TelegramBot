@@ -80,9 +80,9 @@ internal class Program
     private static async Task Main()
     {
         string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        
+
         Console.WriteLine("TelegramBot");
-        
+
         Console.WriteLine($"Base dir is '{baseDir}'");
 
         Config config = GetConfig(baseDir);
@@ -103,8 +103,7 @@ internal class Program
 
         Console.WriteLine($"Admin ID is {adminId}");
 
-        var database = new BotDatabase($"{baseDir}/ConsumeDatabase.sqlite");
-        await using var dbContext = new BotDbContext();
+        await using var dbContext = new BotDbContext($"{baseDir}/ConsumeDatabase.sqlite");
 
         await dbContext.Database.EnsureCreatedAsync();
         // await dbContext.Database.MigrateAsync();
