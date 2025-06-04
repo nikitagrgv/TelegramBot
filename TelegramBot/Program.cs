@@ -4,9 +4,9 @@ namespace TelegramBot;
 
 class Program
 {
-    private static Config? GetConfig()
+    private static Config? GetConfig(string baseDir)
     {
-        const string configPath = "botconf.json";
+        string configPath = $"{baseDir}/botconf.json";
 
         if (!File.Exists(configPath))
         {
@@ -60,9 +60,13 @@ class Program
 
     static async Task Main()
     {
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        
         Console.WriteLine("TelegramBot");
+        
+        Console.WriteLine($"Base dir is '{baseDir}'");
 
-        Config? config = GetConfig();
+        Config? config = GetConfig(baseDir);
 
         string? token = GetToken(config);
         if (string.IsNullOrEmpty(token))
@@ -86,7 +90,7 @@ class Program
 
         Console.WriteLine($"Admin ID is {adminId}");
 
-        var database = new BotDatabase("ConsumeDatabase.sqlite");
+        var database = new BotDatabase($"{baseDir}/ConsumeDatabase.sqlite");
 
         if (!await database.InitializeAsync())
         {
