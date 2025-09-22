@@ -1,0 +1,8 @@
+﻿services:
+  tgbot:
+    image: tgbot
+    volumes:
+      - /root/tgbot:/app/data
+    build:
+      context: .
+      dockerfile: TelegramBot/Dockerfile
