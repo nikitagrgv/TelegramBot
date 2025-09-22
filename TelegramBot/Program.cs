@@ -60,7 +60,8 @@ class Program
 
     static async Task Main()
     {
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        // string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        string baseDir = "/app/data";
         
         Console.WriteLine("TelegramBot");
         
