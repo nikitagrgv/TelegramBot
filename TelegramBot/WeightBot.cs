@@ -58,11 +58,13 @@ public partial class WeightBot
         await notify;
     }
 
+    private readonly Dictionary<long, DateTime> _notifies = new();
+
     private async Task NotifyLoop(CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)
         {
-            await Task.Delay(5000, cancellationToken);
+            await Task.Delay(1000, cancellationToken);
         }
     }
 
