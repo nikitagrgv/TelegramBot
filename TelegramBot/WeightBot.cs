@@ -101,7 +101,7 @@ public partial class WeightBot
     {
         if (_notifies.TryGetValue(userid, out DateTime prevNotify))
         {
-            if (now - prevNotify < _notifyCheckPeriod)
+            if (now - prevNotify < _notifyCooldownPeriod)
             {
                 Console.WriteLine($"nope {now}");
                 return;
