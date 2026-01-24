@@ -676,6 +676,10 @@ public partial class WeightBot
                🌍 Set the time zone offset:
                timezone +7
                пояс 7
+               
+               🔔 Enable or disable notifications:
+               notifyon
+               notifyoff
 
                ❓ Print this help:
                /start
