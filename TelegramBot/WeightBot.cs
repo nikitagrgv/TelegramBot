@@ -65,9 +65,25 @@ public partial class WeightBot
         while (!cancellationToken.IsCancellationRequested)
         {
             DateTime now = DateTime.UtcNow;
-            Console.WriteLine($"spam {now}");
+            await TryNotify(now, 975920512, cancellationToken);
             await Task.Delay(1000, cancellationToken);
         }
+    }
+
+    private async Task TryNotify(DateTime now, long id, CancellationToken cancellationToken)
+    {
+        if (_notifies.TryGetValue(id, out DateTime prevNotify))
+        {
+            TimeSpan minUpdatePeriod = TimeSpan.FromSeconds(10);
+            if (now - prevNotify < minUpdatePeriod)
+            {
+                Console.WriteLine($"nope {now}");
+                return;
+            }
+        }
+
+        Console.WriteLine($"spam {now}");
+        _notifies.Add(123, now);
     }
 
     private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
