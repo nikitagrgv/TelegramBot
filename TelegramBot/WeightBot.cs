@@ -59,8 +59,8 @@ public partial class WeightBot
     }
 
     private readonly Dictionary<long, DateTime> _notifies = new();
-    private readonly TimeSpan _notifyCheckPeriod = TimeSpan.FromSeconds(5);
-    private readonly TimeSpan _notifyCooldownPeriod = TimeSpan.FromSeconds(10);
+    private readonly TimeSpan _notifyCheckPeriod = TimeSpan.FromMinutes(10);
+    private readonly TimeSpan _notifyCooldownPeriod = TimeSpan.FromHours(1) + TimeSpan.FromMinutes(30);
 
     private async Task NotifyLoop(TelegramBotClient botClient, CancellationToken cancellationToken)
     {
@@ -110,6 +110,9 @@ public partial class WeightBot
         int timezone = await _database.GetUserTimezoneOffsetAsync(userid);
         DateTime localTime = now.AddHours(timezone);
         int hour = localTime.Hour;
+        if (hour == 11 || hour == 16)
+        {
+        }
 
         string message = "hi!";
         await botClient.SendMessage(userid, message, cancellationToken: cancellationToken);
