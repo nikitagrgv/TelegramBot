@@ -399,7 +399,7 @@ public class BotDatabase : IDisposable
         if (newVersion < 2)
         {
             await MigrateDatabaseToVersion2();
-            // newVersion = 2;
+            newVersion = 2;
         }
 
         return newVersion;
