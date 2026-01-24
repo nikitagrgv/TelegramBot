@@ -48,6 +48,8 @@ public partial class WeightBot
             new("longstat", "Print all consumed products by all the time"),
         ];
         await botClient.SetMyCommands(commands, cancellationToken: _cancelTokenSource.Token);
+        
+        // Task.Run()
 
         await botClient.ReceiveAsync(
             updateHandler: HandleUpdateAsync,

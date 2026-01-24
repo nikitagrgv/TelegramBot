@@ -396,6 +396,12 @@ public class BotDatabase : IDisposable
             newVersion = 1;
         }
 
+        if (newVersion < 2)
+        {
+            await MigrateDatabaseToVersion2();
+            // newVersion = 2;
+        }
+
         return newVersion;
     }
 
@@ -425,6 +431,17 @@ public class BotDatabase : IDisposable
                                                         kcal    REAL,
                                                         FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
                                                     );
+                                                    """, _connection);
+            await cmd.ExecuteNonQueryAsync();
+        }
+    }
+
+    private async Task MigrateDatabaseToVersion2()
+    {
+        {
+            await using var cmd = new SQLiteCommand("""
+                                                    ALTER TABLE users
+                                                    ADD COLUMN send_notifications INTEGER NOT NULL DEFAULT 0;
                                                     """, _connection);
             await cmd.ExecuteNonQueryAsync();
         }
