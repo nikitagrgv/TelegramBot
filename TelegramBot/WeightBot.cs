@@ -75,7 +75,6 @@ public partial class WeightBot
         }
         catch (TaskCanceledException _)
         {
-            Console.WriteLine("Notify canceled");
         }
 
         Console.WriteLine("Notify finished");
