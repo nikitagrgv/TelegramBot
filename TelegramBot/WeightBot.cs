@@ -247,6 +247,12 @@ public partial class WeightBot
             case "лимит":
                 await SetMaxKcalAsync(args, userId, botClient, cancellationToken);
                 return;
+            case "notifyon":
+                await SetNotificationsEnabled(userId, botClient, true, cancellationToken);
+                return;
+            case "notifyoff":
+                await SetNotificationsEnabled(userId, botClient, false, cancellationToken);
+                return;
             default:
                 string message = $"Unknown command: {cmd}. Type /start to see a list of available commands.";
                 await botClient.SendMessage(userId, message, cancellationToken: cancellationToken);
@@ -605,6 +611,21 @@ public partial class WeightBot
         await botClient.SendMessage(userId, message, cancellationToken: cancellationToken);
     }
 
+    private async Task SetNotificationsEnabled(long userId, ITelegramBotClient botClient, bool enabled,
+        CancellationToken cancellationToken)
+    {
+        bool success = await _database.SetUserNotificationsEnabled(userId, enabled);
+        if (!success)
+        {
+            string errorMessage = $"Database error. Can't update notifications. User ID: '{userId}'";
+            await botClient.SendMessage(userId, errorMessage, cancellationToken: cancellationToken);
+            return;
+        }
+
+        string message = enabled ? "Notifications enabled" : "Notifications disabled";
+        await botClient.SendMessage(userId, message, cancellationToken: cancellationToken);
+    }
+
     private async Task<bool> RegisterUserIfNotRegisteredAsync(long userId, ITelegramBotClient botClient,
         CancellationToken cancellationToken)
     {
@@ -676,7 +697,7 @@ public partial class WeightBot
                🌍 Set the time zone offset:
                timezone +7
                пояс 7
-               
+
                🔔 Enable or disable notifications:
                notifyon
                notifyoff
