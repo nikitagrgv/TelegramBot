@@ -103,7 +103,6 @@ public partial class WeightBot
         {
             if (now - prevNotify < _notifyCooldownPeriod)
             {
-                Console.WriteLine($"nope {now}");
                 return;
             }
         }
