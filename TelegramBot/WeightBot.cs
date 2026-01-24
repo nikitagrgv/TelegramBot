@@ -59,6 +59,8 @@ public partial class WeightBot
     }
 
     private readonly Dictionary<long, DateTime> _notifies = new();
+    private readonly TimeSpan _notifyCheckPeriod = TimeSpan.FromMinutes(10);
+    private readonly TimeSpan _notifyCooldownPeriod = TimeSpan.FromMinutes(12);
 
     private async Task NotifyLoop(CancellationToken cancellationToken)
     {
@@ -76,8 +78,7 @@ public partial class WeightBot
     {
         if (_notifies.TryGetValue(id, out DateTime prevNotify))
         {
-            TimeSpan minUpdatePeriod = TimeSpan.FromSeconds(10);
-            if (now - prevNotify < minUpdatePeriod)
+            if (now - prevNotify < _notifyCheckPeriod)
             {
                 Console.WriteLine($"nope {now}");
                 return;
@@ -85,7 +86,7 @@ public partial class WeightBot
         }
 
         Console.WriteLine($"spam {now}");
-        _notifies.Add(123, now);
+        _notifies[id] = now;
     }
 
     private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
