@@ -49,15 +49,22 @@ public partial class WeightBot
         ];
         await botClient.SetMyCommands(commands, cancellationToken: _cancelTokenSource.Token);
 
-        // Task.Run()
-
+        Task notify = NotifyLoop(_cancelTokenSource.Token);
         await botClient.ReceiveAsync(
             updateHandler: HandleUpdateAsync,
             errorHandler: HandleErrorAsync,
             receiverOptions: receiverOptions,
             cancellationToken: _cancelTokenSource.Token);
+        await notify;
     }
 
+    private async Task NotifyLoop(CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            await Task.Delay(5000, cancellationToken);
+        }
+    }
 
     private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
         CancellationToken cancellationToken)
