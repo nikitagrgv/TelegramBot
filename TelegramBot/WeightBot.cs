@@ -68,6 +68,8 @@ public partial class WeightBot
             await TryNotify(now, 975920512, cancellationToken);
             await Task.Delay(1000, cancellationToken);
         }
+
+        Console.WriteLine("Notify finished");
     }
 
     private async Task TryNotify(DateTime now, long id, CancellationToken cancellationToken)
