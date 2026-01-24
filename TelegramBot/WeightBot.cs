@@ -64,6 +64,8 @@ public partial class WeightBot
     {
         while (!cancellationToken.IsCancellationRequested)
         {
+            DateTime now = DateTime.Now;
+            Console.WriteLine($"spam {now}");
             await Task.Delay(1000, cancellationToken);
         }
     }
