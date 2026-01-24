@@ -69,7 +69,20 @@ public partial class WeightBot
             while (!cancellationToken.IsCancellationRequested)
             {
                 DateTime now = DateTime.UtcNow;
-                await TryNotify(botClient, now, 975920512, cancellationToken);
+
+                try
+                {
+                    await TryNotify(botClient, now, 975920512, cancellationToken);
+                }
+                catch (TaskCanceledException _)
+                {
+                    break;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+
                 await Task.Delay(_notifyCheckPeriod, cancellationToken);
             }
         }
