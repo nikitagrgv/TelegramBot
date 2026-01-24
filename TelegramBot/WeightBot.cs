@@ -49,7 +49,7 @@ public partial class WeightBot
         ];
         await botClient.SetMyCommands(commands, cancellationToken: _cancelTokenSource.Token);
 
-        Task notify = NotifyLoop(_cancelTokenSource.Token);
+        Task notify = NotifyLoop(botClient, _cancelTokenSource.Token);
         await botClient.ReceiveAsync(
             updateHandler: HandleUpdateAsync,
             errorHandler: HandleErrorAsync,
@@ -62,21 +62,21 @@ public partial class WeightBot
     private readonly TimeSpan _notifyCheckPeriod = TimeSpan.FromMinutes(10);
     private readonly TimeSpan _notifyCooldownPeriod = TimeSpan.FromMinutes(12);
 
-    private async Task NotifyLoop(CancellationToken cancellationToken)
+    private async Task NotifyLoop(TelegramBotClient botClient, CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)
         {
             DateTime now = DateTime.UtcNow;
-            await TryNotify(now, 975920512, cancellationToken);
+            await TryNotify(botClient, now, 975920512, cancellationToken);
             await Task.Delay(1000, cancellationToken);
         }
 
         Console.WriteLine("Notify finished");
     }
 
-    private async Task TryNotify(DateTime now, long id, CancellationToken cancellationToken)
+    private async Task TryNotify(TelegramBotClient botClient, DateTime now, long userid, CancellationToken cancellationToken)
     {
-        if (_notifies.TryGetValue(id, out DateTime prevNotify))
+        if (_notifies.TryGetValue(userid, out DateTime prevNotify))
         {
             if (now - prevNotify < _notifyCheckPeriod)
             {
@@ -85,8 +85,9 @@ public partial class WeightBot
             }
         }
 
-        Console.WriteLine($"spam {now}");
-        _notifies[id] = now;
+        string message = "hi!";
+        await botClient.SendMessage(userid, message, cancellationToken: cancellationToken);
+        _notifies[userid] = now;
     }
 
     private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
@@ -531,7 +532,7 @@ public partial class WeightBot
             message += $"{id}\n";
         }
 
-        await botClient.SendMessage(userId, message, cancellationToken: cancellationToken, parseMode: ParseMode.Html);
+        await botClient.SendMessage(userId, message, cancellationToken: cancellationToken);
     }
 
     private async Task SetUserTimezoneOffsetAsync(string args, long userId, ITelegramBotClient botClient,
