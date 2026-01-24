@@ -48,7 +48,7 @@ public partial class WeightBot
             new("longstat", "Print all consumed products by all the time"),
         ];
         await botClient.SetMyCommands(commands, cancellationToken: _cancelTokenSource.Token);
-        
+
         // Task.Run()
 
         await botClient.ReceiveAsync(
@@ -137,6 +137,9 @@ public partial class WeightBot
         {
             switch (cmdLower)
             {
+                case "notified":
+                    await PrintNotifiedAsync(userId, botClient, cancellationToken);
+                    return;
                 case "removeforce":
                     await RemoveConsumedAsync(args, userId, force: true, botClient, cancellationToken);
                     return;
@@ -478,6 +481,25 @@ public partial class WeightBot
         }
 
         message += "</pre>";
+
+        await botClient.SendMessage(userId, message, cancellationToken: cancellationToken, parseMode: ParseMode.Html);
+    }
+
+    private async Task PrintNotifiedAsync(long userId,
+        ITelegramBotClient botClient,
+        CancellationToken cancellationToken)
+    {
+        if (!IsAdmin(userId))
+        {
+            return;
+        }
+
+        List<long> ids = await _database.GetNotifiedUsersIds();
+        string message = "";
+        foreach (long id in ids)
+        {
+            message += $"{id}\n";
+        }
 
         await botClient.SendMessage(userId, message, cancellationToken: cancellationToken, parseMode: ParseMode.Html);
     }
