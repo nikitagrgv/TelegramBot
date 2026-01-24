@@ -59,8 +59,8 @@ public partial class WeightBot
     }
 
     private readonly Dictionary<long, DateTime> _notifies = new();
-    private readonly TimeSpan _notifyCheckPeriod = TimeSpan.FromMinutes(10);
-    private readonly TimeSpan _notifyCooldownPeriod = TimeSpan.FromMinutes(12);
+    private readonly TimeSpan _notifyCheckPeriod = TimeSpan.FromMinutes(5);
+    private readonly TimeSpan _notifyCooldownPeriod = TimeSpan.FromMinutes(10);
 
     private async Task NotifyLoop(TelegramBotClient botClient, CancellationToken cancellationToken)
     {
