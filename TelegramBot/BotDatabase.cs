@@ -339,6 +339,15 @@ public class BotDatabase : IDisposable
         }
     }
 
+    public async Task<bool> SetUserNotificationsEnabled(long userId, bool enabled)
+    {
+        string sql = "UPDATE users SET send_notifications = @enabled WHERE id = @id";
+        await using var cmd = new SQLiteCommand(sql, _connection);
+        cmd.Parameters.AddWithValue("id", userId);
+        cmd.Parameters.AddWithValue("timezone", enabled ? 1 : 0);
+        return await cmd.ExecuteNonQueryAsync() != 0;
+    }
+
     public async Task<List<long>> GetNotifiedUsersIds()
     {
         string sql = "SELECT id FROM users WHERE send_notifications = 1";
