@@ -69,18 +69,22 @@ public partial class WeightBot
             while (!cancellationToken.IsCancellationRequested)
             {
                 DateTime now = DateTime.UtcNow;
+                List<long> notifiedUsersIds = await _database.GetNotifiedUsersIds();
 
-                try
+                foreach (long userId in notifiedUsersIds)
                 {
-                    await TryNotify(botClient, now, 975920512, cancellationToken);
-                }
-                catch (TaskCanceledException _)
-                {
-                    break;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
+                    try
+                    {
+                        await TryNotify(botClient, now, 975920512, cancellationToken);
+                    }
+                    catch (TaskCanceledException _)
+                    {
+                        break;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
                 }
 
                 await Task.Delay(_notifyCheckPeriod, cancellationToken);
