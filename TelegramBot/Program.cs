@@ -62,9 +62,12 @@ class Program
     {
         // string baseDir = AppDomain.CurrentDomain.BaseDirectory;
         string baseDir = "/app/data";
-        
+        string? baseDirEnvironment = Environment.GetEnvironmentVariable("BASE_DIR");
+        if (!string.IsNullOrEmpty(baseDirEnvironment))
+            baseDir = baseDirEnvironment;
+
         Console.WriteLine("TelegramBot");
-        
+
         Console.WriteLine($"Base dir is '{baseDir}'");
 
         Config? config = GetConfig(baseDir);
