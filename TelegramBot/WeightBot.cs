@@ -110,9 +110,10 @@ public partial class WeightBot
         int timezone = await _database.GetUserTimezoneOffsetAsync(userid);
         DateTime localTime = now.AddHours(timezone);
         int hour = localTime.Hour;
-        if (hour == 11 || hour == 16)
-        {
-        }
+        bool needNotify = hour == 11 || hour == 16;
+
+        if (!needNotify)
+            return;
 
         string message = "hi!";
         await botClient.SendMessage(userid, message, cancellationToken: cancellationToken);
