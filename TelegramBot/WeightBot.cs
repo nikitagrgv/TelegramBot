@@ -97,9 +97,9 @@ public partial class WeightBot
         Console.WriteLine("Notify finished");
     }
 
-    private async Task TryNotify(TelegramBotClient botClient, DateTime now, long userid, CancellationToken cancellationToken)
+    private async Task TryNotify(TelegramBotClient botClient, DateTime now, long userId, CancellationToken cancellationToken)
     {
-        if (_notifies.TryGetValue(userid, out DateTime prevNotify))
+        if (_notifies.TryGetValue(userId, out DateTime prevNotify))
         {
             if (now - prevNotify < _notifyCooldownPeriod)
             {
@@ -107,7 +107,7 @@ public partial class WeightBot
             }
         }
 
-        int timezone = await _database.GetUserTimezoneOffsetAsync(userid);
+        int timezone = await _database.GetUserTimezoneOffsetAsync(userId);
         DateTime localTime = now.AddHours(timezone);
         int hour = localTime.Hour;
         bool needNotify = hour == 11 || hour == 16;
@@ -115,9 +115,8 @@ public partial class WeightBot
         if (!needNotify)
             return;
 
-        string message = "hi!";
-        await botClient.SendMessage(userid, message, cancellationToken: cancellationToken);
-        _notifies[userid] = now;
+        _notifies[userId] = now;
+        await PrintShortStatAsync(userId, botClient, cancellationToken);
     }
 
     private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
