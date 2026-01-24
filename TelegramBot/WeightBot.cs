@@ -75,7 +75,7 @@ public partial class WeightBot
                 {
                     try
                     {
-                        await TryNotify(botClient, now, 975920512, cancellationToken);
+                        await TryNotify(botClient, now, userId, cancellationToken);
                     }
                     catch (TaskCanceledException _)
                     {
