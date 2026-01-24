@@ -64,11 +64,18 @@ public partial class WeightBot
 
     private async Task NotifyLoop(TelegramBotClient botClient, CancellationToken cancellationToken)
     {
-        while (!cancellationToken.IsCancellationRequested)
+        try
         {
-            DateTime now = DateTime.UtcNow;
-            await TryNotify(botClient, now, 975920512, cancellationToken);
-            await Task.Delay(_notifyCheckPeriod, cancellationToken);
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                DateTime now = DateTime.UtcNow;
+                await TryNotify(botClient, now, 975920512, cancellationToken);
+                await Task.Delay(_notifyCheckPeriod, cancellationToken);
+            }
+        }
+        catch (TaskCanceledException _)
+        {
+            Console.WriteLine("Canceled");
         }
 
         Console.WriteLine("Notify finished");
