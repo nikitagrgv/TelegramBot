@@ -339,6 +339,22 @@ public class BotDatabase : IDisposable
         }
     }
 
+    public async Task<List<long>> GetNotifiedUsersIds()
+    {
+        string sql = "SELECT id FROM users WHERE send_notifications = 1";
+        await using var cmd = new SQLiteCommand(sql, _connection);
+        DbDataReader reader = await cmd.ExecuteReaderAsync();
+
+        List<long> ids = [];
+        while (await reader.ReadAsync())
+        {
+            long id = reader.GetInt64(0);
+            ids.Add(id);
+        }
+
+        return ids;
+    }
+
     public async Task<bool> HasUserIdAsync(long userId)
     {
         string sql = "SELECT EXISTS(SELECT 1 FROM users WHERE id = @id)";
