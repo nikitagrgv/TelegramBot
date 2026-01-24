@@ -344,7 +344,7 @@ public class BotDatabase : IDisposable
         string sql = "UPDATE users SET send_notifications = @enabled WHERE id = @id";
         await using var cmd = new SQLiteCommand(sql, _connection);
         cmd.Parameters.AddWithValue("id", userId);
-        cmd.Parameters.AddWithValue("timezone", enabled ? 1 : 0);
+        cmd.Parameters.AddWithValue("enabled", enabled ? 1 : 0);
         return await cmd.ExecuteNonQueryAsync() != 0;
     }
 
