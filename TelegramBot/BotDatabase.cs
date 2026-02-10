@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace TelegramBot;
 
-public class BotDatabase : IDisposable
+public class BotDatabase : IBotDatabase, IDisposable
 {
     private const string DatabaseTimeFormat = "yyyy-MM-dd HH:mm:ss";
     private readonly SQLiteConnection _connection;
